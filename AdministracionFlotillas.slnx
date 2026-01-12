@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AdministracionFlotillas.AccesoDatos/AdministracionFlotillas.AccesoDatos.csproj" />
+    <Project Path="src/AdministracionFlotillas.ModelosComunes/AdministracionFlotillas.ModelosComunes.csproj" />
+    <Project Path="src/AdministracionFlotillas.ReglasNegocio/AdministracionFlotillas.ReglasNegocio.csproj" />
+    <Project Path="src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj" />
+  </Folder>
+</Solution>
