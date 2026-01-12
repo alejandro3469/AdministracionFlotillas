@@ -1,7 +1,13 @@
+using AdministracionFlotillas.Web.Mappings;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(); // Para soporte de JSON en AJAX
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
