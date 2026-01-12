@@ -1,4 +1,7 @@
 using AdministracionFlotillas.Web.Mappings;
+using AdministracionFlotillas.AccesoDatos.Repositorios;
+using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
+using AdministracionFlotillas.ReglasNegocio.Servicios.Escenarios.Oracle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,12 @@ builder.Services.AddControllersWithViews()
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Repositorios
+builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
+
+// Servicios (por ahora usamos directamente Oracle, luego se puede usar Factory)
+builder.Services.AddScoped<IEmployeesService, EmployeesServiceOracle>();
 
 var app = builder.Build();
 
