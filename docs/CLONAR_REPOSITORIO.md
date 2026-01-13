@@ -90,18 +90,16 @@ dotnet --version
 
 ---
 
-## IMPORTANTE: Archivos de Solución (.sln vs .slnx)
+## Archivos de Solución (.sln vs .slnx)
 
 El repositorio contiene dos archivos de solución:
-- **`AdministracionFlotillas.slnx`** - Formato nuevo de Visual Studio 2022 (solo para Visual Studio)
-- **`AdministracionFlotillas.sln`** - Formato tradicional (compatible con VS Code y Visual Studio)
+- **`AdministracionFlotillas.slnx`** - Formato nuevo de Visual Studio 2022
+- **`AdministracionFlotillas.sln`** - Formato tradicional
 
-**Para usuarios de VS Code (Windows):**
-- ✅ **USA**: `AdministracionFlotillas.sln` (archivo tradicional)
-- ❌ **NO uses**: `AdministracionFlotillas.slnx` (VS Code no lo reconoce)
-
-**Para usuarios de Visual Studio 2022:**
-- Puedes usar cualquiera de los dos archivos
+**Compatibilidad:**
+- **VS Code**: Usa `AdministracionFlotillas.sln` (formato tradicional)
+- **Visual Studio 2022**: Puede usar ambos formatos
+- **Visual Studio (versiones anteriores a 2022)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
 
 ---
 
@@ -115,16 +113,15 @@ El repositorio contiene dos archivos de solución:
 **3.2. Navega a donde quieres clonar el proyecto:**
 ```powershell
 # Ejemplo: clonar en Documentos
-cd C:\Users\TU_USUARIO\Documents
+cd C:\Users\[TU_USUARIO]\Documents
 
-# O clonar en otra ubicación (ajusta la ruta)
+# O clonar en otra ubicación
 cd D:\Proyectos
 ```
 
 **3.3. Clona el repositorio:**
 ```powershell
-# Reemplaza TU_USUARIO con el usuario real de GitHub
-git clone https://github.com/TU_USUARIO/AdministracionFlotillas.git
+git clone https://github.com/alejandro3469/AdministracionFlotillas.git
 ```
 
 **3.4. Navega al proyecto clonado:**
@@ -194,16 +191,12 @@ ls -la
 **4.1. Asegúrate de estar en la raíz del proyecto:**
 ```bash
 # Windows
-cd C:\Users\TU_USUARIO\Documents\AdministracionFlotillas
+cd [RUTA_DONDE_CLONASTE]\AdministracionFlotillas
 
 # Mac
 cd ~/Documents/AdministracionFlotillas
 
 # Verifica que estás en el lugar correcto
-# Windows (PowerShell)
-pwd
-
-# Mac
 pwd
 # Debe mostrar la ruta del proyecto
 ```
@@ -328,25 +321,42 @@ Tienes dos opciones:
 
 **Opción A: Abrir la carpeta (Recomendado)**
 - Ve a: **File** → **Open Folder...**
-- Navega a: `C:\Users\TU_USUARIO\Documents\AdministracionFlotillas`
+- Navega a la carpeta del proyecto clonado
 - Haz clic en "Select Folder"
 - VS Code detectará automáticamente los proyectos .NET
 
 **Opción B: Abrir el archivo de solución**
 - Ve a: **File** → **Open File...**
-- Navega a: `C:\Users\TU_USUARIO\Documents\AdministracionFlotillas`
-- **IMPORTANTE**: Selecciona `AdministracionFlotillas.sln` (NO uses `.slnx`)
+- Navega a la carpeta del proyecto clonado
+- Selecciona `AdministracionFlotillas.sln` (formato tradicional)
 - VS Code abrirá la solución con todos los proyectos
 
 **8.3. Verifica que VS Code detecta .NET:**
 - Abre la Terminal integrada: `Ctrl + `` (backtick)
 - Ejecuta: `dotnet --version`
-- Deberías ver: `10.0.101`
+- Debe mostrar la versión instalada de .NET SDK
 
-**8.4. (Opcional) Instalar extensiones recomendadas:**
+**8.4. Instalar extensiones recomendadas:**
 - VS Code puede sugerirte instalar extensiones
 - Asegúrate de tener la extensión "C#" de Microsoft instalada
 - Si VS Code no detecta los proyectos, instala la extensión "C# Dev Kit" de Microsoft
+
+### Para Windows (Visual Studio):
+
+**8.1. Abre Visual Studio:**
+- Busca "Visual Studio" en el menú Inicio
+
+**8.2. Abre el proyecto:**
+- Ve a: **File** → **Open** → **Project/Solution...**
+- Navega a la carpeta del proyecto clonado
+- **Visual Studio 2022**: Puede abrir `AdministracionFlotillas.slnx` o `AdministracionFlotillas.sln`
+- **Visual Studio (versiones anteriores)**: Abre `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+- Haz clic en "Open"
+
+**8.3. Verifica que Visual Studio detecta .NET:**
+- Visual Studio debería detectar automáticamente .NET SDK 10.0.101
+- Si no, ve a: **Tools** → **Options** → **Projects and Solutions** → **.NET Core**
+- Verifica que .NET SDK 10.0.101 está listado
 
 ### Para Mac (Rider):
 
@@ -356,8 +366,8 @@ Tienes dos opciones:
 
 **8.2. Abre el proyecto:**
 - Ve a: **File** → **Open**
-- Navega a: `/Users/TU_USUARIO/Documents/AdministracionFlotillas`
-- Selecciona el archivo `AdministracionFlotillas.slnx`
+- Navega a la carpeta del proyecto clonado
+- Selecciona el archivo `AdministracionFlotillas.slnx` o `AdministracionFlotillas.sln`
 - Haz clic en "Open"
 
 **8.3. Verifica que Rider detecta .NET:**
@@ -438,18 +448,21 @@ dotnet sln list
 - Verifica que clonaste el repositorio completo
 - Intenta clonar nuevamente en una carpeta diferente
 
-### Error: "El archivo seleccionado no es un archivo de solución válido" (VS Code)
+### Error: "El archivo seleccionado no es un archivo de solución válido"
 
 **Solución:**
-- VS Code no puede abrir archivos `.slnx` (formato de Visual Studio 2022)
-- **Usa el archivo `.sln` tradicional**:
-  - Abre VS Code
-  - Ve a: **File** → **Open File...**
-  - Selecciona `AdministracionFlotillas.sln` (NO `.slnx`)
-- O simplemente abre la carpeta del proyecto:
-  - **File** → **Open Folder...**
-  - Selecciona la carpeta `AdministracionFlotillas`
-  - VS Code detectará automáticamente los proyectos
+- Este error ocurre cuando se intenta abrir un archivo `.slnx` en un IDE que no lo soporta
+- **VS Code**: Usa `AdministracionFlotillas.sln` (formato tradicional)
+- **Visual Studio (versiones anteriores a 2022)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+- **Visual Studio 2022**: Puede usar ambos formatos
+
+**Pasos para corregir:**
+1. Abre el IDE (VS Code o Visual Studio)
+2. Ve a: **File** → **Open File...** (o **Open Project/Solution...**)
+3. Selecciona `AdministracionFlotillas.sln` (NO `.slnx`)
+4. O simplemente abre la carpeta del proyecto:
+   - **VS Code**: **File** → **Open Folder...**
+   - El IDE detectará automáticamente los proyectos
 
 ### La aplicación no se ejecuta (error de puerto)
 
@@ -464,7 +477,7 @@ dotnet sln list
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/TU_USUARIO/AdministracionFlotillas.git
+git clone https://github.com/alejandro3469/AdministracionFlotillas.git
 
 # Navegar al proyecto
 cd AdministracionFlotillas
@@ -515,5 +528,4 @@ Después de clonar y configurar el proyecto:
 
 ---
 
-**Última actualización**: Enero 2025
 
