@@ -69,7 +69,7 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" class="btn btn-outline-info btn-sm btn-ver" data-id="' + row.idEmpleado + '" title="Ver Detalles">Ver</button>';
+                            return '<button type="button" class="btn btn-outline-info btn-sm btn-ver" data-id="' + row.idEmpleado + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles del Empleado" aria-label="Ver Detalles"><i class="fas fa-eye" aria-hidden="true"></i></button>';
                         }
                     }
                 ],
@@ -103,32 +103,36 @@
                 dom: 'Bfrtip',
                 buttons: [
                     {
-                        text: 'Actualizar',
+                        text: '<i class="fas fa-sync-alt" aria-hidden="true"></i> Actualizar',
                         action: function(e, dt, node, config) {
                             dt.ajax.reload();
                         },
-                        className: 'btn btn-secondary btn-sm'
+                        className: 'btn btn-secondary btn-sm',
+                        titleAttr: 'Actualizar tabla de empleados'
                     },
                     {
                         extend: 'excel',
-                        text: 'Exportar Excel',
+                        text: '<i class="fas fa-file-excel" aria-hidden="true"></i> Exportar Excel',
                         className: 'btn btn-success btn-sm',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6]
-                        }
+                        },
+                        titleAttr: 'Exportar datos a Excel'
                     },
                     {
                         extend: 'pdf',
-                        text: 'Exportar PDF',
+                        text: '<i class="fas fa-file-pdf" aria-hidden="true"></i> Exportar PDF',
                         className: 'btn btn-danger btn-sm',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6]
-                        }
+                        },
+                        titleAttr: 'Exportar datos a PDF'
                     },
                     {
                         extend: 'print',
-                        text: 'Imprimir',
-                        className: 'btn btn-secondary btn-sm'
+                        text: '<i class="fas fa-print" aria-hidden="true"></i> Imprimir',
+                        className: 'btn btn-secondary btn-sm',
+                        titleAttr: 'Imprimir tabla de empleados'
                     }
                 ],
                 responsive: true
@@ -137,10 +141,24 @@
             // Guardar referencia global de la tabla
             window.tablaEmpleados = tabla;
 
+            // Inicializar tooltips de Bootstrap
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
             // Event listeners para botones de acción
             $('#employeesTable tbody').on('click', '.btn-ver', function() {
                 var idEmpleado = $(this).data('id');
                 verDetallesEmpleado(idEmpleado);
+            });
+            
+            // Reinicializar tooltips después de cargar datos en la tabla
+            tabla.on('draw', function() {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
             });
         });
 
