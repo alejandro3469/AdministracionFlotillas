@@ -16,6 +16,8 @@ Esta carpeta contiene toda la documentación relacionada con el proyecto.
 - **[COMO_CONTINUAR.md](./COMO_CONTINUAR.md)** - **EMPIEZA AQUÍ** - Guía paso a paso para continuar
 - **[SETUP.md](./SETUP.md)** - Guía de configuración rápida del proyecto
 - **[GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)** - Guía de configuración de base de datos remota
+- **[ESTADO_PROYECTO.md](./ESTADO_PROYECTO.md)** - Estado completo del proyecto, vistas completas/incompletas
+- **[ESTRUCTURA_VISTAS.md](./ESTRUCTURA_VISTAS.md)** - **NUEVO** - Guía detallada de qué archivos componen cada vista
 - **[SEGUIMIENTO_PROGRESO.md](./SEGUIMIENTO_PROGRESO.md)** - Seguimiento detallado del progreso del proyecto
 - **[COMANDOS_UTILES.md](./COMANDOS_UTILES.md)** - Comandos útiles para desarrollo diario
 - **[NOTAS.md](./NOTAS.md)** - Notas personales, recordatorios e ideas
