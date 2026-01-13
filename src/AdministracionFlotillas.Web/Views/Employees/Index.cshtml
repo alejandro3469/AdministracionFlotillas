@@ -574,17 +574,102 @@
                 modal.show();
             }
 
+            // Función para validar email
+            function validarEmail(email) {
+                if (!email || email.trim().length === 0) {
+                    return {
+                        valido: false,
+                        mensaje: 'El campo de email no puede estar vacío'
+                    };
+                }
+                
+                var emailTrim = email.trim();
+                var arroba = String.fromCharCode(64);
+                
+                // Validaciones básicas
+                if (emailTrim.length < 5) {
+                    return {
+                        valido: false,
+                        mensaje: 'El email es demasiado corto'
+                    };
+                }
+                
+                if (emailTrim.length > 254) {
+                    return {
+                        valido: false,
+                        mensaje: 'El email es demasiado largo (máximo 254 caracteres)'
+                    };
+                }
+                
+                // Verificar que no tenga espacios
+                if (emailTrim.indexOf(' ') !== -1) {
+                    return {
+                        valido: false,
+                        mensaje: 'El email no puede contener espacios'
+                    };
+                }
+                
+                // Validar formato básico: debe tener arroba y al menos un punto después del arroba
+                var indiceArroba = emailTrim.indexOf(arroba);
+                
+                if (indiceArroba <= 0) {
+                    return {
+                        valido: false,
+                        mensaje: 'El email debe contener un símbolo ' + arroba + ' después del nombre de usuario'
+                    };
+                }
+                
+                if (indiceArroba === emailTrim.length - 1) {
+                    return {
+                        valido: false,
+                        mensaje: 'El email debe contener un dominio después del símbolo ' + arroba
+                    };
+                }
+                
+                // Verificar que tenga al menos un punto después del arroba
+                var parteDominio = emailTrim.substring(indiceArroba + 1);
+                if (parteDominio.indexOf('.') === -1) {
+                    return {
+                        valido: false,
+                        mensaje: 'El dominio del email debe contener al menos un punto (ej: dominio.com)'
+                    };
+                }
+                
+                // Verificar que el punto no esté al final
+                if (parteDominio.indexOf('.') === parteDominio.length - 1) {
+                    return {
+                        valido: false,
+                        mensaje: 'El dominio del email debe tener una extensión después del punto (ej: .com, .org)'
+                    };
+                }
+                
+                // Validar que no tenga múltiples arrobas
+                if (emailTrim.split(arroba).length > 2) {
+                    return {
+                        valido: false,
+                        mensaje: 'El email no puede contener múltiples símbolos ' + arroba
+                    };
+                }
+                
+                return {
+                    valido: true,
+                    mensaje: ''
+                };
+            }
+
             // Confirmar envío de email
             $('#btnConfirmarEnvio').on('click', function() {
                 var email = $('#emailReceptor').val();
-                var arroba = String.fromCharCode(64);
-                var emailValido = email && email.length > 0 && email.indexOf(arroba) > 0;
+                var validacion = validarEmail(email);
                 
-                if (!emailValido) {
+                if (!validacion.valido) {
+                    var arroba = String.fromCharCode(64);
                     Swal.fire({
                         icon: 'error',
                         title: 'Email Inválido',
-                        text: 'Por favor ingrese un email válido',
+                        html: '<strong>' + validacion.mensaje + '</strong><br><br>' +
+                              'Por favor ingrese un email válido con el formato:<br>' +
+                              '<code>ejemplo' + arroba + 'dominio.com</code>',
                         confirmButtonText: 'Entendido'
                     });
                     return;
