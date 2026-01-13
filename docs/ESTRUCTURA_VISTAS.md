@@ -74,25 +74,35 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 
 ---
 
-#### 4️⃣ Capa Web - ViewModels y Mappings (2 archivos)
+#### 4️⃣ Capa Web - ViewModels y Parseador (2 archivos)
 
 **`src/AdministracionFlotillas.Web/ViewModels/EmployeeViewModel.cs`**
 - **Propósito**: Modelo específico para mostrar datos en la vista (UI)
 - **Contenido**:
-  - Propiedades formateadas para la UI: `FullName`, `HireDate` (string), `Salary` (string formateado)
-  - Propiedades adicionales: `DepartmentName`, `JobTitle` (para mostrar nombres en lugar de IDs)
-- **Uso**: Se usa en las vistas y se mapea desde `Employee` usando AutoMapper
-- **Convención**: Sufijo `ViewModel`, nombre en singular (`EmployeeViewModel`)
+  - **Todas las propiedades están en español**: `IdEmpleado`, `PrimerNombre`, `Apellido`, `CorreoElectronico`, `NumeroTelefono`, `FechaContratacion`, `Salario`, `PorcentajeComision`, `NombreCompleto`, etc.
+  - Propiedades formateadas para la UI: `FechaContratacion` (string), `Salario` (string formateado como moneda), `PorcentajeComision` (string formateado como porcentaje)
+  - Propiedades adicionales: `NombreDepartamento`, `TituloPuesto` (para mostrar nombres en lugar de IDs)
+- **Uso**: Se usa en las vistas y se parsea desde `Employee` usando el parseador manual
+- **Convención**: 
+  - Sufijo `ViewModel`, nombre en singular (`EmployeeViewModel`)
+  - Todas las propiedades en español siguiendo convenciones oficiales
 - **Diferencia con Model**: El ViewModel tiene datos formateados y combinados para la UI, mientras que el Model tiene los datos puros de la BD
 
-**`src/AdministracionFlotillas.Web/Mappings/MappingProfile.cs`**
-- **Propósito**: Configura AutoMapper para convertir entre `Employee` y `EmployeeViewModel`
+**`src/AdministracionFlotillas.Web/Parseador/EmployeeParseador.cs`**
+- **Propósito**: Parseador manual (sin AutoMapper) para convertir entre `Employee` y `EmployeeViewModel`
 - **Contenido**:
-  - Mapeo `Employee → EmployeeViewModel`: Convierte fechas a string, salarios a formato moneda, combina nombres
-  - Mapeo `EmployeeViewModel → Employee`: Convierte strings de vuelta a tipos de datos
-- **Uso**: El Controller usa AutoMapper para convertir automáticamente
-- **Convención**: Nombre `MappingProfile`, contiene todos los mapeos del proyecto
-- **Nota**: Si agregas otra entidad (ej: Department), agregas su mapeo aquí
+  - **Métodos estáticos en español**:
+    - `ConvertirAVista(Employee empleado)`: Convierte un Employee a EmployeeViewModel
+    - `ConvertirListaAVista(List<Employee> empleados)`: Convierte una lista de Employee a lista de EmployeeViewModel
+    - `ConvertirAModelo(EmployeeViewModel modeloVista)`: Convierte un EmployeeViewModel a Employee
+  - Conversiones explícitas y formateo manual: fechas a string, salarios a formato moneda, porcentajes, combina nombres
+- **Uso**: El Controller llama directamente a los métodos estáticos del parseador
+- **Convención**: 
+  - Carpeta `Parseador` (en español)
+  - Nombre `EmployeeParseador` (sufijo `Parseador`)
+  - Métodos y variables en español
+  - Parseo manual y explícito (no automático)
+- **Nota**: Si agregas otra entidad (ej: Department), creas `DepartmentParseador.cs` en la misma carpeta
 
 ---
 
@@ -106,7 +116,10 @@ La vista Employees está completamente implementada y funcional. Está compuesta
   - **Método `ObtenerEmployeePorId(int id)`**: Endpoint AJAX POST que retorna un empleado por ID en JSON
 - **Dependencias inyectadas**:
   - `IEmployeesService _servicio`: Para acceder a la lógica de negocio
-  - `IMapper _mapeador`: Para convertir entre Model y ViewModel
+- **Uso del Parseador**:
+  - Usa `EmployeeParseador.ConvertirListaAVista()` para convertir List<Employee> a List<EmployeeViewModel>
+  - Usa `EmployeeParseador.ConvertirAVista()` para convertir Employee a EmployeeViewModel
+  - El parseador es estático, no requiere inyección de dependencias
 - **Convención**: 
   - Nombre en plural (`EmployeesController`)
   - Hereda de `Controller`
@@ -195,10 +208,10 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.Web/Program.cs`**
 - **Propósito**: Configuración de la aplicación y Dependency Injection
 - **Contenido**:
-  - Registro de AutoMapper: `builder.Services.AddAutoMapper(typeof(MappingProfile))`
   - Registro de Repository: `builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>()`
   - Registro de Service: `builder.Services.AddScoped<IEmployeesService, EmployeesServiceOracle>()`
   - Configuración de rutas MVC
+  - **Nota**: No se registra AutoMapper, se usa parseador manual estático
 - **Uso**: Se ejecuta al iniciar la aplicación
 - **Convención**: Archivo de configuración principal de ASP.NET Core
 
@@ -233,9 +246,10 @@ La vista Employees está completamente implementada y funcional. Está compuesta
    ↓
 9. Service aplica reglas de negocio y retorna List<Employee>
    ↓
-10. Controller usa AutoMapper para convertir List<Employee> → List<EmployeeViewModel>
+10. Controller usa EmployeeParseador.ConvertirListaAVista() para convertir List<Employee> → List<EmployeeViewModel>
     ↓
 11. Controller retorna JSON: { exito: true, datos: List<EmployeeViewModel> }
+    (Las propiedades del JSON están en español: idEmpleado, nombreCompleto, correoElectronico, etc.)
     ↓
 12. JavaScript recibe la respuesta y actualiza DataTables
     ↓
@@ -306,9 +320,9 @@ Para crear una nueva vista completa (ej: Departments), necesitas crear **11 arch
 - [ ] `src/AdministracionFlotillas.ReglasNegocio/Servicios/Interfaces/IDepartmentsService.cs`
 - [ ] `src/AdministracionFlotillas.ReglasNegocio/Servicios/Escenarios/Oracle/DepartmentsServiceOracle.cs`
 
-#### 4. Capa Web - ViewModels y Mappings
-- [ ] `src/AdministracionFlotillas.Web/ViewModels/DepartmentViewModel.cs`
-- [ ] Actualizar `src/AdministracionFlotillas.Web/Mappings/MappingProfile.cs` (agregar mapeo Department)
+#### 4. Capa Web - ViewModels y Parseador
+- [ ] `src/AdministracionFlotillas.Web/ViewModels/DepartmentViewModel.cs` (con propiedades en español)
+- [ ] `src/AdministracionFlotillas.Web/Parseador/DepartmentParseador.cs` (parseador manual)
 
 #### 5. Capa Web - Controller
 - [ ] `src/AdministracionFlotillas.Web/Controllers/DepartmentsController.cs`
@@ -488,6 +502,12 @@ Para crear una nueva vista completa (ej: Departments), necesitas crear **11 arch
 ### Para ViewModels
 - **Singular**: `EmployeeViewModel.cs`, `DepartmentViewModel.cs`
 - **Ubicación**: `src/AdministracionFlotillas.Web/ViewModels/`
+- **Convención**: Todas las propiedades en español (IdEmpleado, PrimerNombre, etc.)
+
+### Para Parseadores
+- **Sufijo Parseador**: `EmployeeParseador.cs`, `DepartmentParseador.cs`
+- **Ubicación**: `src/AdministracionFlotillas.Web/Parseador/`
+- **Convención**: Métodos estáticos en español (ConvertirAVista, ConvertirAModelo)
 
 ### Para Controllers
 - **Plural**: `EmployeesController.cs`, `DepartmentsController.cs`

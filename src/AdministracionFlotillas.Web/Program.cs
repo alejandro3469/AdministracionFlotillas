@@ -1,4 +1,3 @@
-using AdministracionFlotillas.Web.Mappings;
 using AdministracionFlotillas.AccesoDatos.Repositorios;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Escenarios.Oracle;
@@ -8,9 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(); // Para soporte de JSON en AJAX
-
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Repositorios
 builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();

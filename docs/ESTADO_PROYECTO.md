@@ -25,13 +25,17 @@
   - Implementación para escenario Oracle
   - Aplica validaciones de negocio (filtra empleados con salario > 0)
 
-#### 4. Capa Web - ViewModels y Mappings
+#### 4. Capa Web - ViewModels y Parseador
 - **`src/AdministracionFlotillas.Web/ViewModels/EmployeeViewModel.cs`**
-  - ViewModel con propiedades para UI: FullName, HireDateFormatted, JobTitle, ManagerName, DepartmentName
+  - ViewModel con propiedades en español para UI
+  - Propiedades: IdEmpleado, PrimerNombre, Apellido, CorreoElectronico, NumeroTelefono, FechaContratacion, Salario, PorcentajeComision, NombreCompleto, etc.
+  - Todas las propiedades están en español siguiendo convenciones
   
-- **`src/AdministracionFlotillas.Web/Mappings/MappingProfile.cs`**
-  - AutoMapper configurado para mapear Employee ↔ EmployeeViewModel
-  - Conversiones de formato (fechas, moneda, porcentajes)
+- **`src/AdministracionFlotillas.Web/Parseador/EmployeeParseador.cs`**
+  - Parseador manual (sin AutoMapper) para convertir Employee ↔ EmployeeViewModel
+  - Métodos estáticos: `ConvertirAVista()`, `ConvertirListaAVista()`, `ConvertirAModelo()`
+  - Conversiones explícitas y formateo manual (fechas, moneda, porcentajes)
+  - Nombres de métodos y variables en español
 
 #### 5. Capa Web - Controller
 - **`src/AdministracionFlotillas.Web/Controllers/EmployeesController.cs`**

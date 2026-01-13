@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
 using AdministracionFlotillas.Web.ViewModels;
+using AdministracionFlotillas.Web.Parseador;
 
 namespace AdministracionFlotillas.Web.Controllers;
 
@@ -10,12 +10,10 @@ namespace AdministracionFlotillas.Web.Controllers;
 public class EmployeesController : Controller
 {
     private readonly IEmployeesService _servicio;
-    private readonly IMapper _mapeador;
     
-    public EmployeesController(IEmployeesService servicio, IMapper mapeador)
+    public EmployeesController(IEmployeesService servicio)
     {
         _servicio = servicio;
-        _mapeador = mapeador;
     }
     
     /// <summary>
@@ -36,7 +34,7 @@ public class EmployeesController : Controller
         try
         {
             var empleados = await _servicio.ObtenerEmployeesAsync();
-            var modelosVista = _mapeador.Map<List<EmployeeViewModel>>(empleados);
+            var modelosVista = EmployeeParseador.ConvertirListaAVista(empleados);
             
             return Json(new { exito = true, datos = modelosVista });
         }
@@ -61,7 +59,7 @@ public class EmployeesController : Controller
                 return Json(new { exito = false, mensaje = "Empleado no encontrado" });
             }
             
-            var modeloVista = _mapeador.Map<EmployeeViewModel>(empleado);
+            var modeloVista = EmployeeParseador.ConvertirAVista(empleado);
             return Json(new { exito = true, datos = modeloVista });
         }
         catch (Exception excepcion)

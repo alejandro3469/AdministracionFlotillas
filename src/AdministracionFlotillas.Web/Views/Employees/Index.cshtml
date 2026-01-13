@@ -45,29 +45,29 @@
                     }
                 },
                 columns: [
-                    { data: 'employeeId', name: 'EmployeeId', width: '5%' },
+                    { data: 'idEmpleado', name: 'IdEmpleado', width: '5%' },
                     { 
-                        data: 'fullName', 
-                        name: 'FullName', 
+                        data: 'nombreCompleto', 
+                        name: 'NombreCompleto', 
                         width: '20%',
                         render: function(data, type, row) {
-                            return data || (row.firstName + ' ' + row.lastName);
+                            return data || (row.primerNombre + ' ' + row.apellido);
                         }
                     },
-                    { data: 'email', name: 'Email', width: '15%' },
-                    { data: 'phoneNumber', name: 'PhoneNumber', width: '12%' },
-                    { data: 'hireDate', name: 'HireDate', width: '12%' },
+                    { data: 'correoElectronico', name: 'CorreoElectronico', width: '15%' },
+                    { data: 'numeroTelefono', name: 'NumeroTelefono', width: '12%' },
+                    { data: 'fechaContratacion', name: 'FechaContratacion', width: '12%' },
                     { 
-                        data: 'salary', 
-                        name: 'Salary', 
+                        data: 'salario', 
+                        name: 'Salario', 
                         width: '12%',
                         render: function(data, type, row) {
                             return data || '-';
                         }
                     },
                     { 
-                        data: 'departmentId', 
-                        name: 'DepartmentId', 
+                        data: 'idDepartamento', 
+                        name: 'IdDepartamento', 
                         width: '10%',
                         render: function(data, type, row) {
                             return data ? 'Dept. ' + data : '-';
@@ -81,7 +81,7 @@
                         searchable: false,
                         render: function(data, type, row) {
                             return '<div class="btn-group btn-group-sm" role="group">' +
-                                   '<button type="button" class="btn btn-outline-info btn-ver" data-id="' + row.employeeId + '" title="Ver Detalles">' +
+                                   '<button type="button" class="btn btn-outline-info btn-ver" data-id="' + row.idEmpleado + '" title="Ver Detalles">' +
                                    '<i class="bi bi-eye"></i></button>' +
                                    '</div>';
                         }
@@ -165,12 +165,12 @@
                 success: function(respuesta) {
                     if (respuesta.exito) {
                         var empleado = respuesta.datos;
-                        var mensaje = 'ID Empleado: ' + empleado.employeeId + '\n' +
-                                     'Nombre: ' + empleado.fullName + '\n' +
-                                     'Email: ' + empleado.email + '\n' +
-                                     'Teléfono: ' + (empleado.phoneNumber || 'N/A') + '\n' +
-                                     'Fecha Contratación: ' + empleado.hireDate + '\n' +
-                                     'Salario: ' + (empleado.salary || 'N/A');
+                        var mensaje = 'ID Empleado: ' + empleado.idEmpleado + '\n' +
+                                     'Nombre: ' + empleado.nombreCompleto + '\n' +
+                                     'Email: ' + empleado.correoElectronico + '\n' +
+                                     'Teléfono: ' + (empleado.numeroTelefono || 'N/A') + '\n' +
+                                     'Fecha Contratación: ' + empleado.fechaContratacion + '\n' +
+                                     'Salario: ' + (empleado.salario || 'N/A');
                         alert(mensaje);
                     } else {
                         mostrarMensaje('error', respuesta.mensaje || 'Error al cargar el empleado');
