@@ -29,3 +29,23 @@ header {
 footer {
   padding: 1rem 0;
 }
+
+/* Estilos para botones de DataTables - Negro plano, sin borde, texto blanco */
+.dt-buttons .btn {
+  background-color: #000 !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 0.375rem 0.75rem;
+  margin-right: 0.25rem;
+}
+
+.dt-buttons .btn:hover {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+.dt-buttons .btn:focus {
+  background-color: #000 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}

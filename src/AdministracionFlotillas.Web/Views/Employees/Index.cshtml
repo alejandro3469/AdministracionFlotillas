@@ -107,13 +107,13 @@
                         action: function(e, dt, node, config) {
                             dt.ajax.reload();
                         },
-                        className: 'btn btn-secondary btn-sm',
+                        className: 'btn btn-sm',
                         titleAttr: 'Actualizar tabla de empleados'
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel" aria-hidden="true"></i> Exportar Excel',
-                        className: 'btn btn-success btn-sm',
+                        className: 'btn btn-sm',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6]
                         },
@@ -122,7 +122,7 @@
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf" aria-hidden="true"></i> Exportar PDF',
-                        className: 'btn btn-danger btn-sm',
+                        className: 'btn btn-sm',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6]
                         },
@@ -131,7 +131,7 @@
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print" aria-hidden="true"></i> Imprimir',
-                        className: 'btn btn-secondary btn-sm',
+                        className: 'btn btn-sm',
                         titleAttr: 'Imprimir tabla de empleados'
                     }
                 ],
