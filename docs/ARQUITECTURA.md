@@ -5,27 +5,27 @@
 ```mermaid
 graph TB
     subgraph "Frontend - Capa de Presentación"
-        UI[Interfaz de Usuario<br/>Kendo UI + Bootstrap]
+        UI[Interfaz de Usuario<br/>DataTables + Bootstrap]
         JS[JavaScript/AJAX]
         UI --> JS
     end
     
     subgraph "Capa de Aplicación - Web"
-        CTRL[Controllers<br/>FlotillasController]
-        VM[ViewModels<br/>FlotillaViewModel]
-        PARSER[ViewModelParser<br/>AutoMapper]
+        CTRL[Controllers<br/>EmployeesController]
+        VM[ViewModels<br/>EmployeeViewModel]
+        PARSER[AutoMapper<br/>MappingProfile]
         CTRL --> VM
         CTRL --> PARSER
     end
     
     subgraph "Capa de Reglas de Negocio"
-        SERV[Servicios<br/>ServicioFlotillas]
+        SERV[Servicios<br/>EmployeesServiceOracle]
         BM[Business Models<br/>ModelosComunes]
         SERV --> BM
     end
     
     subgraph "Capa de Acceso a Datos"
-        REPO[Repositorios<br/>RepositorioFlotillas]
+        REPO[Repositorios<br/>EmployeesRepository]
         CONN[ConexionOracle]
         REPO --> CONN
         REPO --> BM
@@ -55,28 +55,28 @@ graph TB
 sequenceDiagram
     autonumber
     participant U as Usuario
-    participant K as Kendo UI
+    participant DT as DataTables
     participant C as Controller
-    participant P as Parser
+    participant P as AutoMapper
     participant S as Servicio
     participant R as Repositorio
     participant O as Oracle DB
     
-    U->>K: 1. Click en "Buscar"
-    K->>C: 2. POST /Flotillas/BuscarFlotillas<br/>(JSON: ViewModel)
+    U->>DT: 1. Carga página /Employees
+    DT->>C: 2. POST /Employees/ObtenerEmployees<br/>(AJAX)
     C->>P: 3. Convierte ViewModel
     P->>S: 4. BusinessModel
-    S->>R: 5. ObtenerFlotillas(params)
-    R->>O: 6. Ejecuta SP_BUSCAR_FLOTILLAS
-    O-->>R: 7. SYS_REFCURSOR
-    R-->>S: 8. List<Dictionary>
-    S->>S: 9. Transforma a BusinessModel
-    S-->>P: 10. List<BusinessModel>
+    S->>R: 5. ObtenerEmployeesAsync()
+    R->>O: 6. SELECT * FROM EMPLOYEES<br/>(o datos mock)
+    O-->>R: 7. Resultados
+    R-->>S: 8. List<Employee>
+    S->>S: 9. Aplica reglas de negocio
+    S-->>P: 10. List<Employee>
     P->>P: 11. Convierte a ViewModel
-    P-->>C: 12. List<ViewModel>
-    C-->>K: 13. JSON Response
-    K->>K: 14. Actualiza Kendo Grid
-    K-->>U: 15. Muestra resultados
+    P-->>C: 12. List<EmployeeViewModel>
+    C-->>DT: 13. JSON Response
+    DT->>DT: 14. Actualiza DataTables
+    DT-->>U: 15. Muestra resultados
 ```
 
 ## Estructura de Capas y Responsabilidades
@@ -88,7 +88,7 @@ graph TD
         W2[Validar ViewModels]
         W3[Convertir ViewModel ↔ BusinessModel]
         W4[Devolver respuestas JSON/HTML]
-        W5[Renderizar vistas con Kendo UI]
+        W5[Renderizar vistas con DataTables]
     end
     
     subgraph "Capa Reglas de Negocio - Responsabilidades"
@@ -124,20 +124,20 @@ graph TD
 
 ```mermaid
 flowchart TD
-    Start([Usuario llena formulario]) --> Modal[Modal Kendo UI]
+    Start([Usuario llena formulario]) --> Modal[Modal Bootstrap]
     Modal --> Validate{Validar<br/>Frontend}
     Validate -->|Error| ShowError[Mostrar errores]
     Validate -->|OK| SendAJAX[Enviar AJAX POST]
     SendAJAX --> Controller[Controller recibe]
-    Controller --> ParseVM[Parser: ViewModel → BusinessModel]
+    Controller --> ParseVM[AutoMapper: ViewModel → BusinessModel]
     ParseVM --> Service[Servicio valida reglas]
     Service -->|Error Negocio| ReturnError[Retornar error]
     Service -->|OK| Repo[Repositorio inserta]
-    Repo --> SP[Ejecuta SP_CREAR_FLOTILLA]
+    Repo --> SP[Ejecuta INSERT o SP]
     SP --> DB[(Oracle DB)]
     DB -->|Success| ReturnSuccess[Retornar éxito]
     DB -->|Error| ReturnDBError[Retornar error DB]
-    ReturnSuccess --> UpdateUI[Actualizar Kendo Grid]
+    ReturnSuccess --> UpdateUI[Actualizar DataTables]
     ReturnError --> ShowError
     ReturnDBError --> ShowError
     UpdateUI --> End([Flotilla creada])
@@ -148,19 +148,19 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A[Usuario ingresa filtros] --> B[Kendo Grid aplica filtros]
+    A[Usuario ingresa filtros] --> B[DataTables aplica filtros]
     B --> C[Enviar petición AJAX]
     C --> D[Controller recibe filtros]
-    D --> E[Parser convierte]
+    D --> E[AutoMapper convierte]
     E --> F[Servicio procesa]
     F --> G[Repositorio construye query]
-    G --> H[Ejecuta SP con parámetros]
+    G --> H[Ejecuta SELECT con WHERE]
     H --> I[(Oracle DB)]
-    I --> J[Retorna cursor]
+    I --> J[Retorna resultados]
     J --> K[Transforma resultados]
-    K --> L[Parser convierte a ViewModel]
+    K --> L[AutoMapper convierte a ViewModel]
     L --> M[Retorna JSON]
-    M --> N[Kendo Grid actualiza]
+    M --> N[DataTables actualiza]
     N --> O[Usuario ve resultados]
 ```
 
@@ -191,25 +191,25 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant U as Usuario
-    participant K as Kendo Grid
+    participant DT as DataTables
     participant C as Controller
     participant S as Servicio
     participant R as Repositorio
     participant DB as Oracle DB
     
-    U->>K: Click "Eliminar"
-    K->>K: Confirmar acción
-    K->>C: POST /Flotillas/Eliminar/{id}
-    C->>S: EliminarFlotilla(id)
+    U->>DT: Click "Eliminar"
+    DT->>DT: Confirmar acción
+    DT->>C: POST /Employees/EliminarEmployee<br/>{id: ...}
+    C->>S: EliminarEmployeeAsync(id)
     S->>S: Validar reglas de negocio
-    S->>R: ActualizarStatus(id, false)
-    R->>DB: UPDATE FLOTILLAS<br/>SET ESTA_ACTIVA = 0<br/>WHERE ID = id
+    S->>R: EliminarEmployeeAsync(id)
+    R->>DB: UPDATE EMPLOYEES<br/>SET STATUS = 'INACTIVE'<br/>WHERE EMPLOYEE_ID = id
     DB-->>R: 1 fila afectada
     R-->>S: Éxito
     S-->>C: Éxito
-    C-->>K: JSON {exito: true}
-    K->>K: Actualizar fila (ocultar o marcar)
-    K-->>U: Flotilla desactivada
+    C-->>DT: JSON {success: true}
+    DT->>DT: Actualizar fila (ocultar o marcar)
+    DT-->>U: Employee desactivado
 ```
 
 ## Componentes y Tecnologías por Capa
@@ -221,7 +221,7 @@ mindmap
       ASP.NET Core MVC
       Controllers
       Views .cshtml
-      Kendo UI
+      DataTables
       Bootstrap
       JavaScript/AJAX
       ViewModels
@@ -249,5 +249,5 @@ mindmap
 
 ---
 
-**Última actualización**: Enero 2025
+**Última actualización**: Enero 2026
 

@@ -103,6 +103,7 @@ Toda la documentación está en la carpeta **[docs/](./docs/)**:
 - **[docs/GUIA_BASE_DATOS.md](./docs/GUIA_BASE_DATOS.md)** - Guía de configuración de base de datos
 - **[docs/COMANDOS_UTILES.md](./docs/COMANDOS_UTILES.md)** - Comandos útiles para desarrollo
 - **[docs/NOTAS.md](./docs/NOTAS.md)** - Notas personales y recordatorios
+- **[docs/ESTADO_PROYECTO.md](./docs/ESTADO_PROYECTO.md)** - **NUEVO** - Estado completo del proyecto, vistas completas/incompletas
 - **[docs/SEGUIMIENTO_PROGRESO.md](./docs/SEGUIMIENTO_PROGRESO.md)** - Seguimiento detallado del progreso
 
 ### Documentación Externa
@@ -121,9 +122,9 @@ Toda la documentación está en la carpeta **[docs/](./docs/)**:
   - **Mismo código funciona en todos los sistemas operativos**
 - **ASP.NET Core MVC** - Patrón Model-View-Controller
 - **C#** - Lenguaje de programación
-- **Oracle Database** - Base de datos remota (Oracle Cloud Free Tier recomendado)
-- **Kendo UI** - Framework de UI (última versión)
-- **Bootstrap** - Framework CSS (última versión)
+- **Oracle Database HR** - Base de datos de ejemplo estándar (Oracle HR schema)
+- **DataTables** - Framework de tablas JavaScript (gratis, con exportación Excel/PDF)
+- **Bootstrap 5** - Framework CSS (última versión)
 - **AutoMapper** - Parser ViewModel ↔ BusinessModel
 - **DataGrip** (Mac) / **DataGrip o SQL Developer** (Windows) - Herramientas de visualización de base de datos
 
@@ -149,23 +150,26 @@ dotnet run      # Ejecutar
 
 ## Estado del Proyecto
 
-Ver el estado detallado en **[docs/SEGUIMIENTO_PROGRESO.md](./docs/SEGUIMIENTO_PROGRESO.md)**
+Ver el estado detallado en **[docs/ESTADO_PROYECTO.md](./docs/ESTADO_PROYECTO.md)** y **[docs/SEGUIMIENTO_PROGRESO.md](./docs/SEGUIMIENTO_PROGRESO.md)**
 
 **Resumen rápido:**
-- [x] Crear solución
-- [x] Crear proyecto AccesoDatos
-- [x] Crear proyecto ModelosComunes
-- [x] Crear proyecto ReglasNegocio
-- [x] Crear proyecto Web (MVC)
+- [x] Crear solución con 4 proyectos
 - [x] Configurar todas las referencias entre proyectos
-- [x] Crear documentación completa con diagramas
-- [x] Crear guía para clonar repositorio
-- [ ] Agregar paquetes NuGet necesarios
-- [ ] Configurar base de datos remota gratuita
-- [ ] Configurar Kendo UI y Bootstrap
-- [ ] Crear repositorio GitHub
-- [ ] Implementar funcionalidades CRUD con modales
-- [ ] Crear dashboards gamificados
+- [x] Instalar paquetes NuGet (AutoMapper, NewtonsoftJson)
+- [x] **Vista Employees COMPLETA y FUNCIONAL**
+  - [x] Modelo Employee
+  - [x] Repository con datos mock
+  - [x] Service con reglas de negocio
+  - [x] Controller con endpoints AJAX
+  - [x] Views con DataTables
+  - [x] JavaScript para manejo de UI
+- [x] DataTables configurado (gratis, con exportación)
+- [x] Bootstrap 5 y Bootstrap Icons
+- [x] AutoMapper configurado
+- [x] Dependency Injection configurado
+- [ ] Conectar a base de datos Oracle real
+- [ ] Agregar funcionalidades CRUD completas (Crear/Editar/Eliminar)
+- [ ] Crear nuevas vistas (Departments, Jobs, etc.)
 
 ## Para Nuevos Miembros del Equipo
 
