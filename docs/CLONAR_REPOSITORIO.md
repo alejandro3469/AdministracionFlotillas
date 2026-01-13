@@ -93,13 +93,16 @@ dotnet --version
 ## Archivos de Solución (.sln vs .slnx)
 
 El repositorio contiene dos archivos de solución:
-- **`AdministracionFlotillas.slnx`** - Formato nuevo de Visual Studio 2022
-- **`AdministracionFlotillas.sln`** - Formato tradicional
+- **`AdministracionFlotillas.slnx`** - Formato nuevo de Visual Studio 2022 (solo versión 17.10 Preview 3 o superior)
+- **`AdministracionFlotillas.sln`** - Formato tradicional (compatible con todas las versiones)
 
 **Compatibilidad:**
 - **VS Code**: Usa `AdministracionFlotillas.sln` (formato tradicional)
-- **Visual Studio 2022**: Puede usar ambos formatos
+- **Visual Studio 2022 (versión 17.10 Preview 3 o superior)**: Puede usar ambos formatos
+- **Visual Studio 2022 (versiones anteriores a 17.10)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
 - **Visual Studio (versiones anteriores a 2022)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+
+**Recomendación**: Usa `AdministracionFlotillas.sln` para máxima compatibilidad en Windows y Mac.
 
 ---
 
@@ -351,8 +354,8 @@ Tienes dos opciones:
 **8.2. Abre el proyecto:**
 - Ve a: **File** → **Open** → **Project/Solution...**
 - Navega a la carpeta del proyecto clonado
-- **Visual Studio 2022**: Puede abrir `AdministracionFlotillas.slnx` o `AdministracionFlotillas.sln`
-- **Visual Studio (versiones anteriores)**: Abre `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+- Selecciona `AdministracionFlotillas.sln` (formato tradicional, compatible con todas las versiones)
+- **Nota**: Si tu versión de Visual Studio 2022 es anterior a 17.10 Preview 3, no podrás abrir `.slnx`
 - Haz clic en "Open"
 
 **8.3. Verifica que Visual Studio detecta .NET:**
@@ -455,8 +458,9 @@ dotnet sln list
 **Solución:**
 - Este error ocurre cuando se intenta abrir un archivo `.slnx` en un IDE que no lo soporta
 - **VS Code**: Usa `AdministracionFlotillas.sln` (formato tradicional)
+- **Visual Studio 2022 (versiones anteriores a 17.10 Preview 3)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+- **Visual Studio 2022 (versión 17.10 Preview 3 o superior)**: Puede usar ambos formatos
 - **Visual Studio (versiones anteriores a 2022)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
-- **Visual Studio 2022**: Puede usar ambos formatos
 
 **Pasos para corregir:**
 1. Abre el IDE (VS Code o Visual Studio)
