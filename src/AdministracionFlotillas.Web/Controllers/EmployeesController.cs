@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
@@ -5,6 +6,7 @@ using AdministracionFlotillas.Web.ViewModels;
 
 namespace AdministracionFlotillas.Web.Controllers;
 
+[AllowAnonymous]
 public class EmployeesController : Controller
 {
     private readonly IEmployeesService _service;
@@ -24,6 +26,7 @@ public class EmployeesController : Controller
     
     // Endpoint AJAX para obtener employees
     [HttpPost]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> ObtenerEmployees()
     {
         try
@@ -41,6 +44,7 @@ public class EmployeesController : Controller
     
     // Endpoint AJAX para obtener employee por ID
     [HttpPost]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> ObtenerEmployeePorId([FromBody] int id)
     {
         try
