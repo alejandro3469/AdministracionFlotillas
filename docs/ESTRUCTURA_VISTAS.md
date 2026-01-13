@@ -136,18 +136,37 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.Web/Views/Employees/Index.cshtml`**
 - **Propósito**: Vista principal que el usuario ve en el navegador
 - **Contenido**:
-  - HTML con título, descripción y botón de actualizar
+  - HTML con título, descripción y breadcrumb de navegación
   - Incluye la vista parcial `_EmployeesGrid` usando `@await Html.PartialAsync("_EmployeesGrid")`
-  - Sección `@section Scripts` con JavaScript para inicializar DataTables
+  - Modal para envío por email con validación
+  - Sección `@section Scripts` con JavaScript completo para:
+    - Inicialización de DataTables con configuración avanzada
+    - Filtros personalizados (nombre, fecha, salario, departamento, email, teléfono)
+    - Selección de empleados con checkboxes
+    - Validación de email con SweetAlert2
+    - jQuery UI Datepicker para fechas
+    - Inputmask para formato de moneda
+    - Tooltips de Bootstrap
+- **Funcionalidades implementadas**:
+  - Breadcrumb: `Home > Employees`
+  - Modal de envío por email con tabla resumen
+  - Validación robusta de email (9 validaciones diferentes)
+  - Filtros en tiempo real
+  - Selección restringida por fecha de contratación
+  - Botones de exportación (Excel, PDF, Print, Refresh, Enviar Email)
 - **Estructura**:
   ```html
   <div class="container-fluid">
     <h2>Employees</h2>
-    <button id="btnRefrescar">Actualizar</button>
+    <p>Descripción</p>
+    <nav aria-label="breadcrumb">...</nav>
     @await Html.PartialAsync("_EmployeesGrid")
   </div>
+  <!-- Modal Enviar Email -->
+  <div class="modal fade" id="modalEnviarEmail">...</div>
   @section Scripts {
-    <script>/* Inicialización DataTables */</script>
+    <script src="~/js/employees.js"></script>
+    <script>/* Inicialización completa DataTables y filtros */</script>
   }
   ```
 - **Convención**: 
@@ -156,16 +175,36 @@ La vista Employees está completamente implementada y funcional. Está compuesta
   - Extensión `.cshtml` (mezcla de C# y HTML)
 
 **`src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGrid.cshtml`**
-- **Propósito**: Vista parcial que contiene solo la tabla HTML
+- **Propósito**: Vista parcial que contiene los filtros y la tabla HTML
 - **Contenido**:
+  - **Filtros** (6 inputs en 2 filas):
+    - Filtro por Nombre (búsqueda en tiempo real)
+    - Filtro por Fecha de Contratación (rango: Desde/Hasta con datepicker)
+    - Filtro por Rango de Salario (Mínimo/Máximo con formato moneda)
+    - Filtro por Departamento (búsqueda por texto)
+    - Filtro por Email (búsqueda por texto)
+    - Filtro por Teléfono (búsqueda por texto)
   - Tabla HTML con estructura para DataTables
-  - Columnas: ID, Nombre Completo, Email, Teléfono, Fecha Contratación, Salario, Departamento, Acciones
+  - Columnas: Checkbox (selección), Nombre Completo, Email, Teléfono, Fecha Contratación, Salario, Departamento, Acciones
   - El `<tbody>` está vacío porque los datos se cargan vía AJAX
 - **Estructura**:
   ```html
-  <div class="card">
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input type="text" id="filtroBusqueda" placeholder="Buscar por nombre...">
+    </div>
+    <!-- Más filtros... -->
+  </div>
+  <!-- Tabla -->
+  <div class="table-responsive">
     <table id="employeesTable" class="table">
-      <thead>...</thead>
+      <thead>
+        <tr>
+          <th>Nombre Completo</th>
+          <!-- Más columnas... -->
+        </tr>
+      </thead>
       <tbody><!-- Datos cargados vía AJAX --></tbody>
     </table>
   </div>
@@ -174,6 +213,7 @@ La vista Employees está completamente implementada y funcional. Está compuesta
   - Prefijo `_` indica que es una vista parcial
   - Se puede reutilizar en otras vistas si es necesario
   - No tiene `@section Scripts` porque el JavaScript está en la vista principal
+  - Estilo minimalista (sin cards, solo tabla y filtros)
 
 ---
 
@@ -186,6 +226,7 @@ La vista Employees está completamente implementada y funcional. Está compuesta
   - **`actualizarTabla()`**: Recarga la tabla DataTables
   - **Manejo global de errores AJAX**: Captura errores de todas las peticiones AJAX
 - **Uso**: Se incluye en `Index.cshtml` con `<script src="~/js/employees.js"></script>`
+- **Nota**: La mayoría de la lógica JavaScript está en el `@section Scripts` de `Index.cshtml` (inicialización de DataTables, filtros, validación, etc.)
 - **Convención**: 
   - Nombre en minúsculas y plural (`employees.js`)
   - Ubicación: `wwwroot/js/` (archivos estáticos)
@@ -198,10 +239,15 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.Web/Views/Shared/_Layout.cshtml`**
 - **Propósito**: Layout principal que envuelve todas las vistas
 - **Contenido**:
-  - Referencias a DataTables CSS y JS (CDN)
-  - Referencias a jQuery y Bootstrap
-  - Bootstrap Icons
+  - Referencias a DataTables CSS y JS (CDN) con extensiones (Buttons, Print, HTML5)
+  - Referencias a jQuery 3.7.1 y Bootstrap 5.3.2
+  - Font Awesome 5.15.4 (CDN) para iconos
+  - SweetAlert2 11.10.0 (CDN) para alertas personalizadas
+  - jQuery UI 1.13.2 (CDN) para datepicker
+  - jQuery UI Datepicker Spanish localization
+  - Inputmask 5.0.8 (CDN) para formato de moneda
   - Menú de navegación con enlace "Employees"
+  - Padding consistente en toda la aplicación
 - **Uso**: Todas las vistas usan este layout (configurado en `_ViewStart.cshtml`)
 - **Convención**: Prefijo `_` indica que es compartido
 
@@ -219,9 +265,19 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 - **Propósito**: Configuración de la aplicación (cadenas de conexión, etc.)
 - **Contenido**:
   - `ConnectionStrings.OracleConnection`: Cadena de conexión a Oracle (placeholder)
-  - `DatabaseSettings.UseMockData`: Flag para usar datos mock o reales
+  - `DatabaseSettings.UseMockData`: Flag para usar datos mock o reales (actualmente `true`)
 - **Uso**: Se lee en `Program.cs` con `builder.Configuration.GetConnectionString("OracleConnection")`
 - **Convención**: Archivo JSON estándar de configuración en ASP.NET Core
+
+**`src/AdministracionFlotillas.Web/wwwroot/css/site.css`**
+- **Propósito**: Estilos CSS personalizados para la aplicación
+- **Contenido**:
+  - Padding consistente para `.container`, `.container-fluid`, `main`
+  - Estilos para botones de DataTables (transparentes con hover opaco)
+  - Estilos para botón "Enviar por Email" (transparente con hover opaco)
+  - Estilos minimalistas (solo lo necesario)
+- **Uso**: Se incluye automáticamente en `_Layout.cshtml`
+- **Convención**: Archivo CSS estándar en `wwwroot/css/`
 
 ---
 

@@ -197,27 +197,22 @@ dotnet add src/AdministracionFlotillas.ReglasNegocio/AdministracionFlotillas.Reg
 
 **Nota:** Estas vistas se crean automáticamente con el template MVC.
 
-### 6. AutoMapper Instalado en Web
+### 6. Parseador Manual Implementado (Sin AutoMapper)
 
-**Archivo modificado:**
-- `src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj` - Agregado PackageReference
+**Nota:** Este proyecto NO usa AutoMapper. Se implementó un parseador manual para tener control explícito sobre las conversiones y seguir convenciones de nomenclatura en español.
 
-**Comandos ejecutados:**
-```bash
-cd src/AdministracionFlotillas.Web
-dotnet add package AutoMapper
-dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
-cd ../..
-```
+**Archivo creado:**
+- `src/AdministracionFlotillas.Web/Parseador/EmployeeParseador.cs` - Parseador manual estático
 
-**Versiones instaladas:**
-- AutoMapper v16.0.0
-- AutoMapper.Extensions.Microsoft.DependencyInjection v12.0.1
+**Contenido:**
+- Métodos estáticos para convertir entre `Employee` (BusinessModel) y `EmployeeViewModel`
+- Conversiones explícitas con formateo manual (fechas, moneda, porcentajes)
+- Nombres de métodos y variables en español
 
 **Verificación:**
 ```bash
-# Ver paquetes instalados
-dotnet list src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj package
+# Verificar que el archivo existe
+ls src/AdministracionFlotillas.Web/Parseador/EmployeeParseador.cs
 ```
 
 ### 7. Repositorio GitHub Creado y Conectado
@@ -273,7 +268,7 @@ git branch -M main
 - [ ] Instalar Microsoft.AspNetCore.Mvc.NewtonsoftJson en Web (FASE 1.1)
 - [ ] Instalar Oracle.ManagedDataAccess.Core en AccesoDatos (FASE 1.2)
 - [ ] Instalar y configurar DataTables (FASE 1.2)
-- [ ] Configurar AutoMapper en Program.cs (FASE 2.3)
+- [x] Crear parseador manual (FASE 2.3) - ✅ COMPLETADO
 - [ ] Crear modelo de ejemplo en ModelosComunes (FASE 2.1)
 - [ ] Crear ViewModel de ejemplo en Web (FASE 2.2)
 - [ ] Crear servicio de ejemplo en ReglasNegocio (FASE 4.1)
@@ -361,10 +356,11 @@ $("#flotillasTable").DataTable({
 ### 5. Parser ViewModel ↔ BusinessModel
 
 **Requisitos:**
-- AutoMapper configurado
-- Perfiles de mapeo creados
+- Parseador manual implementado (NO se usa AutoMapper)
+- Clase estática con métodos de conversión
 - Conversión bidireccional funcionando
 - Usado en controladores
+- Nombres de métodos y variables en español
 
 ### 6. Componentes Reutilizables (Solo Nombre de Controlador)
 
@@ -619,9 +615,9 @@ libman install datatables.net-responsive --destination wwwroot/lib/datatables
 
 #### Paso 1.3: Configurar Program.cs
 
-- Configurar AutoMapper
 - Configurar inyección de dependencias
 - Configurar NewtonsoftJson para JSON
+- **Nota:** NO se configura AutoMapper, se usa parseador manual
 
 **Documento de referencia:** [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) - Sección "Configurar Program.cs"
 
@@ -663,16 +659,17 @@ public class FlotillaViewModel
 }
 ```
 
-#### Paso 2.3: Configurar AutoMapper
+#### Paso 2.3: Crear Parseador Manual
 
-**Archivo:** `src/AdministracionFlotillas.Web/Mappings/MappingProfile.cs`
+**Nota:** Este proyecto NO usa AutoMapper. Se implementa un parseador manual para tener control explícito sobre las conversiones.
+
+**Archivo:** `src/AdministracionFlotillas.Web/Parseador/EmployeeParseador.cs`
 
 ```csharp
-using AutoMapper;
 using AdministracionFlotillas.ModelosComunes;
 using AdministracionFlotillas.Web.ViewModels;
 
-namespace AdministracionFlotillas.Web.Mappings;
+namespace AdministracionFlotillas.Web.Parseador;
 
 public class MappingProfile : Profile
 {
