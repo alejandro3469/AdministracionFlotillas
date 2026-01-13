@@ -292,9 +292,22 @@
                 }
             });
 
-            // Filtro de búsqueda general
+            // Filtro de búsqueda por nombre (solo columna de nombre)
             $('#filtroBusqueda').on('keyup', function() {
-                tabla.search(this.value).draw();
+                tabla.column(1).search(this.value).draw();
+            });
+
+            // Filtros de departamento, email y teléfono
+            $('#filtroDepartamento').on('keyup', function() {
+                aplicarFiltros();
+            });
+
+            $('#filtroEmail').on('keyup', function() {
+                aplicarFiltros();
+            });
+
+            $('#filtroTelefono').on('keyup', function() {
+                aplicarFiltros();
             });
 
             // Filtros de salario
@@ -318,6 +331,9 @@
                         var fechaFin = null;
                         var salarioMin = null;
                         var salarioMax = null;
+                        var filtroDepartamento = $('#filtroDepartamento').val().toLowerCase();
+                        var filtroEmail = $('#filtroEmail').val().toLowerCase();
+                        var filtroTelefono = $('#filtroTelefono').val().toLowerCase();
 
                         // Filtro de fecha de contratación (rango)
                         var fechaInicioText = $('#filtroFechaInicio').val();
@@ -393,6 +409,30 @@
                             }
                         }
 
+                        // Validar filtro de departamento
+                        if (filtroDepartamento) {
+                            var departamento = (rowData.idDepartamento ? 'Dept. ' + rowData.idDepartamento : '').toLowerCase();
+                            if (departamento.indexOf(filtroDepartamento) === -1) {
+                                return false;
+                            }
+                        }
+
+                        // Validar filtro de email
+                        if (filtroEmail) {
+                            var email = (rowData.correoElectronico || '').toLowerCase();
+                            if (email.indexOf(filtroEmail) === -1) {
+                                return false;
+                            }
+                        }
+
+                        // Validar filtro de teléfono
+                        if (filtroTelefono) {
+                            var telefono = (rowData.numeroTelefono || '').toLowerCase();
+                            if (telefono.indexOf(filtroTelefono) === -1) {
+                                return false;
+                            }
+                        }
+
                         return true;
                     };
                 
@@ -402,10 +442,6 @@
                 tabla.draw();
             }
 
-            // Limpiar filtros cuando se limpia la búsqueda general
-            $('#filtroBusqueda').on('keyup', function() {
-                tabla.search(this.value).draw();
-            });
 
             // Seleccionar todos
             $('#selectAll').on('change', function() {
