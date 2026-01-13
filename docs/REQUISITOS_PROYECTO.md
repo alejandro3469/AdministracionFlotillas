@@ -30,14 +30,14 @@ Este documento especifica todos los requisitos técnicos, arquitectónicos y de 
 
 1. **Base de Datos Principal**:
    - **Preferencia**: AdventureWorks (local) si es posible
-   - **Alternativa**: Base de datos remota gratuita accesible v�a URL
+   - **Alternativa**: Base de datos remota gratuita accesible vía URL
    - **Restricción**: NO usar Supabase (ya en uso en otro proyecto)
    - **Propósito**: Practicar conexión Oracle con procedimientos almacenados
 
 2. **Acceso desde DataGrip**:
    - Debe ser accesible desde DataGrip para visualización en tiempo real
    - Debe permitir copiar y rastrear datos fácilmente
-   - Conexión v�a URL/connection string
+   - Conexión vía URL/connection string
 
 3. **Recomendaciones de Base de Datos Remota Gratuita**:
    - **Oracle Cloud Free Tier**: Base de datos Oracle gratuita (siempre disponible)
@@ -49,7 +49,7 @@ Este documento especifica todos los requisitos técnicos, arquitectónicos y de 
 ### Configuración de Base de Datos
 
 - **Tipo**: Oracle (para procedimientos almacenados)
-- **Acceso**: Remoto v�a connection string
+- **Acceso**: Remoto vía connection string
 - **Herramienta de Visualización**: DataGrip
 - **Propósito Educativo**: Practicar procedimientos almacenados Oracle
 
@@ -60,10 +60,10 @@ Este documento especifica todos los requisitos técnicos, arquitectónicos y de 
 ```
 AdministracionFlotillas/
  src/
-�    AdministracionFlotillas.Web/              # Capa de Aplicación (MVC)
-�    AdministracionFlotillas.ReglasNegocio/     # Capa de Reglas de Negocio
-�    AdministracionFlotillas.AccesoDatos/        # Capa de Acceso a Datos
-�    AdministracionFlotillas.ModelosComunes/    #  NUEVO: Modelos compartidos
+    AdministracionFlotillas.Web/              # Capa de Aplicación (MVC)
+    AdministracionFlotillas.ReglasNegocio/     # Capa de Reglas de Negocio
+    AdministracionFlotillas.AccesoDatos/        # Capa de Acceso a Datos
+    AdministracionFlotillas.ModelosComunes/    #  NUEVO: Modelos compartidos
 ```
 
 ### Capa de Modelos Comunes (NUEVA)
@@ -78,22 +78,23 @@ AdministracionFlotillas/
 - Entidades de dominio
 
 **Referencias**:
-- `AccesoDatos` �� referencia a `ModelosComunes`
-- `ReglasNegocio` �� referencia a `ModelosComunes`
-- `Web` �� referencia a `ReglasNegocio` (no directamente a ModelosComunes)
+- `AccesoDatos` → referencia a `ModelosComunes`
+- `ReglasNegocio` → referencia a `ModelosComunes`
+- `Web` → referencia a `ReglasNegocio` (no directamente a ModelosComunes)
 
-### Parser ViewModel � BusinessModel
+### Parseador ViewModel ↔ BusinessModel
 
-**Ubicación**: Capa de Aplicación (Web)
+**Ubicación**: Capa de Aplicación (Web) - Carpeta `Parseador/`
 
 **Propósito**: Convertir entre:
-- **ViewModels** (Modelos de la capa de aplicación)
+- **ViewModels** (Modelos de la capa de aplicación con propiedades en español)
 - **BusinessModels** (Modelos de la capa de reglas de negocio)
 
 **Implementación**:
 - Parseador manual (sin AutoMapper) - Métodos estáticos en español
 - Métodos de conversión bidireccional
 - Validaciones durante la conversión
+- Todas las propiedades de ViewModels en español
 
 **Ejemplo de Estructura**:
 ```csharp
@@ -106,33 +107,33 @@ public static class EmployeeParseador
 }
 ```
 
-## � Frontend y UI
+##  Frontend y UI
 
-### Tecnolog�as de Frontend
+### Tecnologías de Frontend
 
-1. **Kendo UI**:
-   - �ltima versión disponible
-   - Controles para tablas, filtros, visualizaciones
+1. **DataTables**:
+   - Framework gratuito para tablas interactivas
+   - Controles para tablas, filtros, exportación (Excel, PDF, Print)
    - Integración con Bootstrap
 
 2. **Bootstrap**:
-   - �ltima versión
+   - Última versión
    - Solo clases por defecto de Bootstrap
-   - Sin estilos personalizados (excepto Kendo)
+   - Sin estilos personalizados
 
 3. **Restricciones de Estilos**:
-   -  Solo Bootstrap por defecto
-   -  Solo Kendo UI por defecto
-   -  NO estilos personalizados/CSS custom
+   - Solo Bootstrap por defecto
+   - Solo DataTables por defecto
+   - NO estilos personalizados/CSS custom
    - **Objetivo**: Garantizar consistencia en estilos
 
 ### Funcionalidades CRUD
 
 1. **Operaciones CRUD**:
-   -  **Crear**: Insertar datos en base de datos
-   -  **Leer**: Visualizar información
-   -  **Actualizar**: Modificar datos existentes
-   -  **Eliminar**: Eliminación lógica (por status, NO f�sica)
+   - **Crear**: Insertar datos en base de datos
+   - **Leer**: Visualizar información
+   - **Actualizar**: Modificar datos existentes
+   - **Eliminar**: Eliminación lógica (por status, NO física)
 
 2. **Interfaz con Modales**:
    - Crear/Editar mediante modales
@@ -140,28 +141,12 @@ public static class EmployeeParseador
    - Validación en tiempo real
 
 3. **Visualización de Datos**:
-   - Tablas con Kendo Grid
-   - Filtros avanzados con controles Kendo
+   - Tablas con DataTables
+   - Filtros avanzados
    - Visualizaciones en diferentes formatos:
-     - Gráficos (Kendo Charts)
-     - Dashboards gamificados
      - Tablas interactivas
+     - Exportación a Excel/PDF
      - Tarjetas informativas
-
-### Dashboards Gamificados
-
-**Requisitos**:
-- Visualización creativa de información
-- Uso de controles Kendo para:
-  - Gráficos interactivos
-  - Métricas visuales
-  - Indicadores de progreso
-  - Elementos gamificados (badges, niveles, etc.)
-
-**Tecnolog�as Permitidas**:
-- Kendo UI (última versión)
-- Bootstrap (última versión)
-- JavaScript vanilla o jQuery (si Kendo lo requiere)
 
 ##  Colaboración y Control de Versiones
 
@@ -179,7 +164,7 @@ public static class EmployeeParseador
 - `feature/*`: Nuevas funcionalidades
 - `fix/*`: Correcciones de bugs
 
-## � Dependencias y Paquetes NuGet
+##  Dependencias y Paquetes NuGet
 
 ### Paquetes Requeridos
 
@@ -199,32 +184,32 @@ public static class EmployeeParseador
 ### Flujo Completo
 
 ```
-Usuario (Vista Kendo)
-    �
+Usuario (Vista DataTables)
+    ↓
 JavaScript/AJAX
-    �
+    ↓
 Controller (Capa Web)
-    �
-ViewModelParser (Convierte ViewModel �� BusinessModel)
-    �
+    ↓
+Parseador Manual (Convierte ViewModel ↔ BusinessModel, métodos en español)
+    ↓
 Servicio (Capa ReglasNegocio)
-    �
+    ↓
 Repositorio (Capa AccesoDatos)
-    �
+    ↓
 Procedimiento Almacenado Oracle
-    �
+    ↓
 Base de Datos
 ```
 
 ### Conversión de Modelos
 
 ```
-ViewModel (Web Layer)
-    � [Parser]
+ViewModel (Web Layer - propiedades en español)
+    ↓ [Parseador Manual]
 BusinessModel (ModelosComunes)
-    �
+    ↓
 DTO/Entidad (AccesoDatos)
-    �
+    ↓
 Procedimiento Almacenado
 ```
 
@@ -242,40 +227,38 @@ Procedimiento Almacenado
 ```
 Web/
  ViewModels/
-�    FlotillaViewModel.cs
- Helpers/
-�    ViewModelParser.cs
+    EmployeeViewModel.cs (propiedades en español)
+ Parseador/
+    EmployeeParseador.cs (métodos estáticos en español)
  Controllers/
-     FlotillasController.cs
+     EmployeesController.cs
 
 ModelosComunes/
- Flotilla.cs
+ Employee.cs
 
 ReglasNegocio/
  Servicios/
-     ServicioFlotillas.cs
+     EmployeesServiceOracle.cs
 
 AccesoDatos/
  Repositorios/
-     RepositorioFlotillas.cs
+     EmployeesRepository.cs
 ```
 
 ##  Objetivos del Proyecto
 
 1. **Educativo**: Practicar arquitectura en capas con .NET
 2. **Práctica Oracle**: Aprender procedimientos almacenados Oracle
-3. **Frontend Moderno**: Dominar Kendo UI y Bootstrap
+3. **Frontend Moderno**: Dominar DataTables y Bootstrap
 4. **Colaboración**: Trabajar con Git/GitHub
 5. **Mejores Prácticas**: Separación de responsabilidades, clean code
 
 ##  Documentación Relacionada
 
 - [SETUP.md](./SETUP.md) - Configuración inicial
-- [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) - Gu�a paso a paso
+- [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) - Guía paso a paso
 - [SEGUIMIENTO_PROGRESO.md](./SEGUIMIENTO_PROGRESO.md) - Estado del proyecto
 
 ---
 
-**�ltima actualización**: Enero 2025
-
-
+**Última actualización**: Enero 2026
