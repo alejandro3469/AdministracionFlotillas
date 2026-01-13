@@ -251,68 +251,105 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Configurar jQuery UI Datepicker en español
-            $.datepicker.regional['es'] = {
-                closeText: 'Cerrar',
-                prevText: '&#x3C;Ant',
-                nextText: 'Sig&#x3E;',
-                currentText: 'Hoy',
-                monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
-                monthNamesShort: ['Ene','Feb','Mar','Abr','May','Jun',
-                    'Jul','Ago','Sep','Oct','Nov','Dic'],
-                dayNames: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
-                dayNamesShort: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
-                dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
-                weekHeader: 'Sm',
-                dateFormat: 'dd/mm/yy',
-                firstDay: 1,
-                isRTL: false,
-                showMonthAfterYear: false,
-                yearSuffix: ''
-            };
-            $.datepicker.setDefaults($.datepicker.regional['es']);
+            // Configurar jQuery UI Datepicker en español (solo si jQuery UI está cargado)
+            if (typeof $.datepicker !== 'undefined') {
+                $.datepicker.regional['es'] = {
+                    closeText: 'Cerrar',
+                    prevText: '&#x3C;Ant',
+                    nextText: 'Sig&#x3E;',
+                    currentText: 'Hoy',
+                    monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                        'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+                    monthNamesShort: ['Ene','Feb','Mar','Abr','May','Jun',
+                        'Jul','Ago','Sep','Oct','Nov','Dic'],
+                    dayNames: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
+                    dayNamesShort: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+                    dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+                    weekHeader: 'Sm',
+                    dateFormat: 'dd/mm/yy',
+                    firstDay: 1,
+                    isRTL: false,
+                    showMonthAfterYear: false,
+                    yearSuffix: ''
+                };
+                $.datepicker.setDefaults($.datepicker.regional['es']);
 
-            // Inicializar Date Pickers para Fecha de Contratación (rango)
-            $('#filtroFechaInicio').datepicker({
-                dateFormat: 'dd/mm/yy',
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                onSelect: function(selectedDate) {
-                    $('#filtroFechaFin').datepicker('option', 'minDate', selectedDate);
-                    aplicarFiltros();
+                // Inicializar Date Pickers para Fecha de Contratación (rango) solo si los elementos existen
+                var filtroFechaInicio = $('#filtroFechaInicio');
+                var filtroFechaFin = $('#filtroFechaFin');
+                
+                if (filtroFechaInicio.length > 0) {
+                    filtroFechaInicio.datepicker({
+                        dateFormat: 'dd/mm/yy',
+                        changeMonth: true,
+                        changeYear: true,
+                        showButtonPanel: true,
+                        onSelect: function(selectedDate) {
+                            if (filtroFechaFin.length > 0) {
+                                filtroFechaFin.datepicker('option', 'minDate', selectedDate);
+                            }
+                            aplicarFiltros();
+                        }
+                    });
                 }
-            });
 
-            $('#filtroFechaFin').datepicker({
-                dateFormat: 'dd/mm/yy',
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                onSelect: function(selectedDate) {
-                    $('#filtroFechaInicio').datepicker('option', 'maxDate', selectedDate);
-                    aplicarFiltros();
+                if (filtroFechaFin.length > 0) {
+                    filtroFechaFin.datepicker({
+                        dateFormat: 'dd/mm/yy',
+                        changeMonth: true,
+                        changeYear: true,
+                        showButtonPanel: true,
+                        onSelect: function(selectedDate) {
+                            if (filtroFechaInicio.length > 0) {
+                                filtroFechaInicio.datepicker('option', 'maxDate', selectedDate);
+                            }
+                            aplicarFiltros();
+                        }
+                    });
                 }
-            });
+            }
 
-            // Inicializar formato de moneda para inputs de salario
-            $('#filtroSalarioMin, #filtroSalarioMax').inputmask({
-                alias: 'numeric',
-                groupSeparator: ',',
-                autoGroup: true,
-                digits: 2,
-                digitsOptional: false,
-                prefix: '$ ',
-                placeholder: '0',
-                rightAlign: false,
-                oncomplete: function() {
-                    aplicarFiltros();
-                },
-                oncleared: function() {
-                    aplicarFiltros();
+            // Inicializar formato de moneda para inputs de salario (solo si Inputmask está cargado y los elementos existen)
+            if (typeof $.fn.inputmask !== 'undefined') {
+                var filtroSalarioMin = $('#filtroSalarioMin');
+                var filtroSalarioMax = $('#filtroSalarioMax');
+                
+                if (filtroSalarioMin.length > 0 && filtroSalarioMax.length > 0) {
+                    filtroSalarioMin.inputmask({
+                        alias: 'numeric',
+                        groupSeparator: ',',
+                        autoGroup: true,
+                        digits: 2,
+                        digitsOptional: false,
+                        prefix: '$ ',
+                        placeholder: '0',
+                        rightAlign: false,
+                        oncomplete: function() {
+                            aplicarFiltros();
+                        },
+                        oncleared: function() {
+                            aplicarFiltros();
+                        }
+                    });
+                    
+                    filtroSalarioMax.inputmask({
+                        alias: 'numeric',
+                        groupSeparator: ',',
+                        autoGroup: true,
+                        digits: 2,
+                        digitsOptional: false,
+                        prefix: '$ ',
+                        placeholder: '0',
+                        rightAlign: false,
+                        oncomplete: function() {
+                            aplicarFiltros();
+                        },
+                        oncleared: function() {
+                            aplicarFiltros();
+                        }
+                    });
                 }
-            });
+            }
 
             // Filtro de búsqueda por nombre (solo columna de nombre)
             $('#filtroBusqueda').on('keyup', function() {
