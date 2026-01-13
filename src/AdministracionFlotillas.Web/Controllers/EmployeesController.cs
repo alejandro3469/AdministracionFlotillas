@@ -9,58 +9,64 @@ namespace AdministracionFlotillas.Web.Controllers;
 [AllowAnonymous]
 public class EmployeesController : Controller
 {
-    private readonly IEmployeesService _service;
-    private readonly IMapper _mapper;
+    private readonly IEmployeesService _servicio;
+    private readonly IMapper _mapeador;
     
-    public EmployeesController(IEmployeesService service, IMapper mapper)
+    public EmployeesController(IEmployeesService servicio, IMapper mapeador)
     {
-        _service = service;
-        _mapper = mapper;
+        _servicio = servicio;
+        _mapeador = mapeador;
     }
     
-    // Vista principal
+    /// <summary>
+    /// Vista principal de empleados
+    /// </summary>
     public IActionResult Index()
     {
         return View();
     }
     
-    // Endpoint AJAX para obtener employees
+    /// <summary>
+    /// Endpoint AJAX para obtener todos los empleados
+    /// </summary>
     [HttpPost]
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> ObtenerEmployees()
     {
         try
         {
-            var employees = await _service.ObtenerEmployeesAsync();
-            var viewModels = _mapper.Map<List<EmployeeViewModel>>(employees);
+            var empleados = await _servicio.ObtenerEmployeesAsync();
+            var modelosVista = _mapeador.Map<List<EmployeeViewModel>>(empleados);
             
-            return Json(new { success = true, data = viewModels });
+            return Json(new { exito = true, datos = modelosVista });
         }
-        catch (Exception ex)
+        catch (Exception excepcion)
         {
-            return Json(new { success = false, message = ex.Message });
+            return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
     
-    // Endpoint AJAX para obtener employee por ID
+    /// <summary>
+    /// Endpoint AJAX para obtener un empleado por ID
+    /// </summary>
     [HttpPost]
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> ObtenerEmployeePorId([FromBody] int id)
     {
         try
         {
-            var employee = await _service.ObtenerEmployeePorIdAsync(id);
-            if (employee == null)
+            var empleado = await _servicio.ObtenerEmployeePorIdAsync(id);
+            if (empleado == null)
             {
-                return Json(new { success = false, message = "Employee no encontrado" });
+                return Json(new { exito = false, mensaje = "Empleado no encontrado" });
             }
             
-            var viewModel = _mapper.Map<EmployeeViewModel>(employee);
-            return Json(new { success = true, data = viewModel });
+            var modeloVista = _mapeador.Map<EmployeeViewModel>(empleado);
+            return Json(new { exito = true, datos = modeloVista });
         }
-        catch (Exception ex)
+        catch (Exception excepcion)
         {
-            return Json(new { success = false, message = ex.Message });
+            return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
 }

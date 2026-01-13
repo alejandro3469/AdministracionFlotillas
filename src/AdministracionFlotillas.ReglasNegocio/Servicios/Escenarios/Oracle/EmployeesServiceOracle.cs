@@ -10,29 +10,35 @@ namespace AdministracionFlotillas.ReglasNegocio.Servicios.Escenarios.Oracle;
 /// </summary>
 public class EmployeesServiceOracle : IEmployeesService
 {
-    private readonly IEmployeesRepository _repository;
+    private readonly IEmployeesRepository _repositorio;
     
-    public EmployeesServiceOracle(IEmployeesRepository repository)
+    public EmployeesServiceOracle(IEmployeesRepository repositorio)
     {
-        _repository = repository;
+        _repositorio = repositorio;
     }
     
+    /// <summary>
+    /// Obtiene todos los empleados aplicando reglas de negocio
+    /// </summary>
     public async Task<List<Employee>> ObtenerEmployeesAsync()
     {
         // Reglas de negocio específicas para Oracle
-        var employees = await _repository.ObtenerEmployeesAsync();
+        var empleados = await _repositorio.ObtenerEmployeesAsync();
         
         // Validaciones específicas para Oracle
         // Ejemplo: Filtrar empleados activos (con salario > 0)
-        return employees.Where(e => e.Salary > 0).ToList();
+        return empleados.Where(empleado => empleado.Salary > 0).ToList();
     }
     
+    /// <summary>
+    /// Obtiene un empleado por ID aplicando validaciones de negocio
+    /// </summary>
     public async Task<Employee?> ObtenerEmployeePorIdAsync(int id)
     {
         if (id <= 0)
             throw new ArgumentException("El ID debe ser mayor que cero", nameof(id));
             
-        return await _repository.ObtenerEmployeePorIdAsync(id);
+        return await _repositorio.ObtenerEmployeePorIdAsync(id);
     }
 }
 

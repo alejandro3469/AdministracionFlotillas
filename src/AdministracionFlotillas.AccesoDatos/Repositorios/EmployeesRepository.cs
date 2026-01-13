@@ -8,11 +8,14 @@ namespace AdministracionFlotillas.AccesoDatos.Repositorios;
 /// </summary>
 public class EmployeesRepository : IEmployeesRepository
 {
-    // Implementación con datos mock basados en HR
+    /// <summary>
+    /// Obtiene todos los empleados de la base de datos
+    /// Por ahora retorna datos mock, luego se conectará a Oracle
+    /// </summary>
     public async Task<List<Employee>> ObtenerEmployeesAsync()
     {
         // Datos mock realistas basados en la estructura de HR
-        return new List<Employee>
+        var empleados = new List<Employee>
         {
             new Employee 
             { 
@@ -119,12 +122,17 @@ public class EmployeesRepository : IEmployeesRepository
                 DepartmentId = 60
             }
         };
+        
+        return empleados;
     }
     
+    /// <summary>
+    /// Obtiene un empleado específico por su ID
+    /// </summary>
     public async Task<Employee?> ObtenerEmployeePorIdAsync(int id)
     {
-        var employees = await ObtenerEmployeesAsync();
-        return employees.FirstOrDefault(e => e.EmployeeId == id);
+        var empleados = await ObtenerEmployeesAsync();
+        return empleados.FirstOrDefault(empleado => empleado.EmployeeId == id);
     }
 }
 

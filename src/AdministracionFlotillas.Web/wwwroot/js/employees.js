@@ -37,8 +37,8 @@ function mostrarMensaje(tipo, mensaje, titulo) {
 
 // Función para actualizar tabla DataTables
 function actualizarTabla() {
-    if (window.employeesTable) {
-        window.employeesTable.ajax.reload(null, false);
+    if (window.tablaEmpleados) {
+        window.tablaEmpleados.ajax.reload(null, false);
     }
 }
 
