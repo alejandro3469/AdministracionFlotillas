@@ -17,5 +17,9 @@ public class Employee
     public decimal? CommissionPct { get; set; }
     public int? ManagerId { get; set; }
     public int? DepartmentId { get; set; }
+    
+    public int? Antiguedad { get; set; }
+    
+    public string NombreDepartamento { get; set; }
 }
 

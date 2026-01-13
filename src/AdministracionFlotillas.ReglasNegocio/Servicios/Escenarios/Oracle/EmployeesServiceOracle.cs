@@ -50,6 +50,9 @@ public class EmployeesServiceOracle : IEmployeesService
         if (!ValidarSalarioValido(empleado))
             throw new InvalidOperationException($"El empleado con ID {id} no cumple con los criterios salariales del sistema");
         
+        if (!ValidarSalarioMayorADiezMil(empleado))
+            throw new InvalidOperationException($"El empleado con ID {id} no es mayor a diez mil");
+        
         return empleado;
     }
     
@@ -85,6 +88,8 @@ public class EmployeesServiceOracle : IEmployeesService
         {
             antiguedad--;
         }
+        
+        empleado.Antiguedad = antiguedad;
         
         return Math.Max(0, antiguedad);
     }
@@ -139,6 +144,15 @@ public class EmployeesServiceOracle : IEmployeesService
         
         // Regla de negocio: El salario debe ser mayor al mínimo establecido
         return empleado.Salary.HasValue && empleado.Salary.Value >= SalarioMinimo;
+    }
+    
+    private bool ValidarSalarioMayorADiezMil(Employee empleado)
+    {
+        if (empleado == null)
+            return false;
+        
+        // Regla de negocio: El salario debe ser mayor al mínimo establecido
+        return empleado.Salary.HasValue && empleado.Salary.Value > 10000;
     }
     
     /// <summary>

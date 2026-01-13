@@ -35,7 +35,7 @@ public static class EmployeeParseador
             IdGerente = empleado.ManagerId,
             IdDepartamento = empleado.DepartmentId,
             NombreCompleto = $"{empleado.FirstName} {empleado.LastName}".Trim(),
-            NombreDepartamento = null, // Se puede poblar desde el servicio si es necesario
+            NombreDepartamento = empleado.NombreDepartamento == null ? "Departamento sin informacion. actualizar informacion por whatsapp(+5240007645)" : empleado.NombreDepartamento, // Se puede poblar desde el servicio si es necesario
             TituloPuesto = null // Se puede poblar desde el servicio si es necesario
         };
     }
