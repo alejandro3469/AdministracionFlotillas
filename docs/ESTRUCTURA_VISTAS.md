@@ -55,22 +55,38 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.ReglasNegocio/Servicios/Interfaces/IEmployeesService.cs`**
 - **Propósito**: Define la interfaz del servicio de negocio (contrato)
 - **Contenido**:
-  - Métodos: `ObtenerEmployeesAsync()`, `ObtenerEmployeePorIdAsync(int id)`
+  - **Métodos principales**: `ObtenerEmployeesAsync()`, `ObtenerEmployeePorIdAsync(int id)`
+  - **Métodos de negocio**: 
+    - `ObtenerEmployeesActivosConSalarioMinimoAsync(decimal salarioMinimo)`
+    - `CalcularAntiguedadEnAnios(Employee empleado)`
+    - `EsElegibleParaBonificacion(Employee empleado)`
+    - `CalcularSalarioAnualEstimado(Employee empleado)`
 - **Uso**: La capa Web usa esta interfaz para acceder a la lógica de negocio
 - **Convención**: Prefijo `I` para interfaces, nombre en plural (`Employees`) porque maneja múltiples empleados
 
 **`src/AdministracionFlotillas.ReglasNegocio/Servicios/Escenarios/Oracle/EmployeesServiceOracle.cs`**
 - **Propósito**: Implementa las reglas de negocio para empleados en escenario Oracle
 - **Contenido**:
-  - Implementa `IEmployeesService`
-  - Aplica validaciones de negocio (ej: filtra empleados con salario > 0)
-  - Valida parámetros (ej: ID debe ser mayor que cero)
-- **Uso**: Es inyectado en el Controller de la capa Web
+  - Implementa `IEmployeesService` con lógica de negocio específica
+  - **Reglas de negocio aplicadas**:
+    - Validación de salario mínimo (1000m)
+    - Ordenamiento por antigüedad (más antiguos primero)
+    - Validación de criterios de negocio antes de devolver datos
+  - **Métodos de negocio implementados**:
+    - `CalcularAntiguedadEnAnios()`: Calcula antigüedad en años con ajuste por meses/días
+    - `EsElegibleParaBonificacion()`: Valida elegibilidad según antigüedad (≥1 año) y salario mínimo (≥2000m)
+    - `CalcularSalarioAnualEstimado()`: Calcula salario anual incluyendo comisiones estimadas
+    - `ObtenerEmployeesActivosConSalarioMinimoAsync()`: Filtra por salario mínimo
+  - **Constantes de negocio**:
+    - `SalarioMinimo = 1000m`
+    - `AntiguedadMinimaParaBonificacion = 1`
+    - `SalarioMinimoParaBonificacion = 2000m`
+- **Uso**: Es inyectado en el Controller de la capa Web, aplica toda la lógica de negocio
 - **Convención**: 
   - Nombre en plural (`EmployeesService`)
   - Sufijo `Oracle` indica el escenario de base de datos
   - Está en carpeta `Escenarios/Oracle/` para separar por tipo de BD
-- **Nota**: Si hubiera SQL Server, habría `EmployeesServiceSqlServer.cs` en `Escenarios/SqlServer/`
+- **Nota**: Si hubiera SQL Server, habría `EmployeesServiceSqlServer.cs` en `Escenarios/SqlServer/` con sus propias reglas de negocio
 
 ---
 
@@ -109,17 +125,28 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 #### 5️⃣ Capa Web - Controller (1 archivo)
 
 **`src/AdministracionFlotillas.Web/Controllers/EmployeesController.cs`**
-- **Propósito**: Maneja las peticiones HTTP y coordina las capas
+- **Propósito**: Maneja las peticiones HTTP y coordina las capas (Controller limpio y legible)
 - **Contenido**:
   - **Método `Index()`**: Retorna la vista principal (`Views/Employees/Index.cshtml`)
-  - **Método `ObtenerEmployees()`**: Endpoint AJAX POST que retorna todos los empleados en JSON
-  - **Método `ObtenerEmployeePorId(int id)`**: Endpoint AJAX POST que retorna un empleado por ID en JSON
+  - **Método `ObtenerEmployees()`**: 
+    - Coordina: Llama al Service → Service aplica reglas de negocio → Convierte con Parseador → Retorna JSON
+    - El Service ya aplica validaciones y ordenamiento de negocio
+  - **Método `ObtenerEmployeePorId(int id)`**: 
+    - Coordina: Llama al Service → Service valida y aplica reglas → Convierte con Parseador → Retorna JSON
+  - **Métodos helper privados** (para mantener el Controller limpio):
+    - `CrearRespuestaExito(object datos)`: Crea respuesta JSON de éxito
+    - `CrearRespuestaError(string mensaje)`: Crea respuesta JSON de error
 - **Dependencias inyectadas**:
   - `IEmployeesService _servicio`: Para acceder a la lógica de negocio
 - **Uso del Parseador**:
   - Usa `EmployeeParseador.ConvertirListaAVista()` para convertir List<Employee> a List<EmployeeViewModel>
   - Usa `EmployeeParseador.ConvertirAVista()` para convertir Employee a EmployeeViewModel
   - El parseador es estático, no requiere inyección de dependencias
+- **Características del Controller**:
+  - **Limpio y legible**: Los métodos principales se leen como una receta paso a paso
+  - **Sin lógica de negocio**: Toda la lógica de negocio está en el Service
+  - **Sin parsing complejo**: Solo coordina la conversión usando el Parseador
+  - **Métodos helper**: Encapsula la creación de respuestas JSON para mantener el código DRY
 - **Convención**: 
   - Nombre en plural (`EmployeesController`)
   - Hereda de `Controller`
@@ -136,7 +163,7 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.Web/Views/Employees/Index.cshtml`**
 - **Propósito**: Vista principal que el usuario ve en el navegador
 - **Contenido**:
-  - HTML con título, descripción y breadcrumb de navegación
+  - HTML con breadcrumb de navegación (arriba del título), título y descripción
   - Incluye la vista parcial `_EmployeesGrid` usando `@await Html.PartialAsync("_EmployeesGrid")`
   - Modal para envío por email con validación
   - Sección `@section Scripts` con JavaScript completo para:
@@ -144,11 +171,37 @@ La vista Employees está completamente implementada y funcional. Está compuesta
     - Filtros personalizados (nombre, fecha, salario, departamento, email, teléfono)
     - Selección de empleados con checkboxes
     - Validación de email con SweetAlert2
-    - jQuery UI Datepicker para fechas
+    - jQuery UI Datepicker para fechas (localización en español)
     - Inputmask para formato de moneda
     - Tooltips de Bootstrap
+- **Funciones JavaScript principales** (todas en PascalCase):
+  - `AplicarFiltros()`: Aplica todos los filtros personalizados a la tabla
+  - `AgregarEmpleadoSeleccionado(checkbox)`: Agrega un empleado a la lista de seleccionados
+  - `RemoverEmpleadoSeleccionado(checkbox)`: Remueve un empleado de la lista de seleccionados
+  - `AbrirModalEnviarEmail()`: Abre el modal para enviar email con empleados seleccionados
+  - `ValidarEmail(email)`: Valida el formato del email con múltiples reglas
+  - `VerDetallesEmpleado(id)`: Muestra detalles de un empleado específico
+- **Variables principales** (camelCase, español):
+  - `empleadosSeleccionados`: Array con empleados seleccionados
+  - `fechaContratacionBase`: Fecha base para restricción de selección
+  - `tabla`: Instancia de DataTables
+  - `filtroPersonalizado`: Función de filtro personalizado para DataTables
+  - `textoFechaInicio`, `textoFechaFin`: Textos de fechas para parsing
+  - `partesFechaInicio`, `partesFechaFin`: Arrays con partes de fecha parseada
+  - `indiceFila`: Índice de fila en DataTables
+  - `textoSalarioMin`, `textoSalarioMax`: Textos de salarios para parsing
+  - `salarioNumerico`: Salario convertido a número para comparaciones
+  - `textoFiltroDepartamento`, `textoFiltroEmail`, `textoFiltroTelefono`: Textos de filtros de búsqueda
+  - `datosFila`: Datos de la fila actual en DataTables
+  - `checkboxEmpleado`, `fechaContratacionEmpleado`, `idEmpleadoSeleccionado`: Variables de selección
+  - `emailReceptor`, `resultadoValidacion`, `simboloArroba`: Variables de validación de email
+  - `datosEmpleado`, `respuestaServidor`, `mensajeDetalle`: Variables de detalle de empleado
+  - `instanciaModal`, `nombresEmpleados`: Variables del modal de email
+  - `boton`, `tituloAtributo`: Referencias a botones y sus tooltips
+  - `listaDesencadenadoresTooltip`, `listaTooltips`: Listas para inicializar tooltips
 - **Funcionalidades implementadas**:
-  - Breadcrumb: `Home > Employees`
+  - Breadcrumb: `Home > Employees` (arriba del título)
+  - Espaciado visual entre grupos (breadcrumb, título/descripción, filtros, tabla)
   - Modal de envío por email con tabla resumen
   - Validación robusta de email (9 validaciones diferentes)
   - Filtros en tiempo real
@@ -157,16 +210,26 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 - **Estructura**:
   ```html
   <div class="container-fluid">
-    <h2>Employees</h2>
-    <p>Descripción</p>
-    <nav aria-label="breadcrumb">...</nav>
+    <!-- Breadcrumb arriba del título -->
+    <nav aria-label="breadcrumb" class="mb-4">...</nav>
+    
+    <!-- Título y descripción -->
+    <div class="mb-5">
+      <h2>Employees</h2>
+      <p>Descripción</p>
+    </div>
+    
+    <!-- Vista parcial con filtros y tabla -->
     @await Html.PartialAsync("_EmployeesGrid")
   </div>
   <!-- Modal Enviar Email -->
   <div class="modal fade" id="modalEnviarEmail">...</div>
   @section Scripts {
     <script src="~/js/employees.js"></script>
-    <script>/* Inicialización completa DataTables y filtros */</script>
+    <script>
+      // Funciones: AplicarFiltros(), AgregarEmpleadoSeleccionado(), etc.
+      // Variables: empleadosSeleccionados, fechaContratacionBase, tabla, etc.
+    </script>
   }
   ```
 - **Convención**: 
@@ -222,15 +285,18 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.Web/wwwroot/js/employees.js`**
 - **Propósito**: Funciones JavaScript reutilizables para la vista Employees
 - **Contenido**:
-  - **`mostrarMensaje(tipo, mensaje, titulo)`**: Muestra toasts de Bootstrap (success/error/info)
-  - **`actualizarTabla()`**: Recarga la tabla DataTables
-  - **Manejo global de errores AJAX**: Captura errores de todas las peticiones AJAX
+  - **Espera a que jQuery esté disponible** antes de ejecutar código (función `EsperarJQuery`)
+  - **`window.mostrarMensaje(tipo, mensaje, titulo)`**: Muestra toasts de Bootstrap (success/error/info)
+  - **`window.actualizarTabla()`**: Recarga la tabla DataTables
+  - **Manejo global de errores AJAX**: Captura errores de todas las peticiones AJAX (función `RegistrarErrorAjax`)
 - **Uso**: Se incluye en `Index.cshtml` con `<script src="~/js/employees.js"></script>`
 - **Nota**: La mayoría de la lógica JavaScript está en el `@section Scripts` de `Index.cshtml` (inicialización de DataTables, filtros, validación, etc.)
 - **Convención**: 
   - Nombre en minúsculas y plural (`employees.js`)
   - Ubicación: `wwwroot/js/` (archivos estáticos)
-  - Variables y funciones en español según convenciones
+  - **Funciones en PascalCase** (ej: `EsperarJQuery`, `RegistrarErrorAjax`)
+  - **Variables en camelCase y español** (ej: `idToast`, `claseFondo`, `iconoMensaje`, `htmlToast`, `elementoToast`, `instanciaToast`, `tituloMensaje`, `evento`, `configuracion`, `mensajeError`)
+  - Funciones expuestas globalmente con `window.` para acceso desde otras partes del código
 
 ---
 
@@ -239,17 +305,28 @@ La vista Employees está completamente implementada y funcional. Está compuesta
 **`src/AdministracionFlotillas.Web/Views/Shared/_Layout.cshtml`**
 - **Propósito**: Layout principal que envuelve todas las vistas
 - **Contenido**:
-  - Referencias a DataTables CSS y JS (CDN) con extensiones (Buttons, Print, HTML5)
-  - Referencias a jQuery 3.7.1 y Bootstrap 5.3.2
-  - Font Awesome 5.15.4 (CDN) para iconos
-  - SweetAlert2 11.10.0 (CDN) para alertas personalizadas
-  - jQuery UI 1.13.2 (CDN) para datepicker
-  - jQuery UI Datepicker Spanish localization
-  - Inputmask 5.0.8 (CDN) para formato de moneda
+  - **Scripts cargados en orden oficial** (al final de `<body>`):
+    1. jQuery 3.7.1 (CDN, minificado)
+    2. Bootstrap JS (local)
+    3. jQuery UI 1.13.2 (CDN) para datepicker
+    4. jsZip (CDN) - requerido por DataTables Buttons
+    5. pdfmake (CDN) - requerido por DataTables Buttons
+    6. DataTables Core 1.13.7 (CDN)
+    7. DataTables Extensions: Buttons, HTML5, Print, Responsive (CDN)
+    8. Inputmask 5.0.8 (CDN) para formato de moneda
+    9. SweetAlert2 11 (CDN) para alertas personalizadas
+    10. Custom scripts (site.js, employees.js)
+  - **CSS cargados en `<head>`**:
+    - Bootstrap CSS (local)
+    - jQuery UI CSS (CDN)
+    - DataTables CSS (CDN) con extensiones
+    - Font Awesome 5.15.4 (CDN) para iconos
+    - Custom CSS (site.css)
   - Menú de navegación con enlace "Employees"
   - Padding consistente en toda la aplicación
 - **Uso**: Todas las vistas usan este layout (configurado en `_ViewStart.cshtml`)
 - **Convención**: Prefijo `_` indica que es compartido
+- **Nota**: El orden de carga de scripts es crítico y sigue la documentación oficial de cada librería
 
 **`src/AdministracionFlotillas.Web/Program.cs`**
 - **Propósito**: Configuración de la aplicación y Dependency Injection
@@ -300,7 +377,10 @@ La vista Employees está completamente implementada y funcional. Está compuesta
    ↓
 8. Repository retorna List<Employee> (datos mock por ahora)
    ↓
-9. Service aplica reglas de negocio y retorna List<Employee>
+9. Service aplica reglas de negocio:
+   - Valida salario mínimo (1000m)
+   - Ordena por antigüedad (más antiguos primero)
+   - Retorna List<Employee> con reglas aplicadas
    ↓
 10. Controller usa EmployeeParseador.ConvertirListaAVista() para convertir List<Employee> → List<EmployeeViewModel>
     ↓
@@ -481,7 +561,9 @@ Para crear una nueva vista completa (ej: Departments), necesitas crear **11 arch
 6. **Service aplica reglas de negocio**
    - `EmployeesServiceOracle.ObtenerEmployeesAsync()` se ejecuta
    - Llama a `_repositorio.ObtenerEmployeesAsync()`
-   - Aplica validaciones (ej: filtra empleados con salario > 0)
+   - Aplica validación de salario mínimo (1000m)
+   - Ordena por antigüedad (más antiguos primero)
+   - Retorna List<Employee> con reglas de negocio aplicadas
 
 7. **Repository obtiene datos**
    - `EmployeesRepository.ObtenerEmployeesAsync()` se ejecuta
@@ -499,6 +581,7 @@ Para crear una nueva vista completa (ej: Departments), necesitas crear **11 arch
    - Todas las propiedades se convierten a español (IdEmpleado, PrimerNombre, etc.)
 
 10. **Controller retorna JSON**
+    - Usa método helper `CrearRespuestaExito(modelosVista)` para mantener el código limpio
     - Retorna `Json(new { exito = true, datos = modelosVista })`
     - El JSON se envía al navegador
 

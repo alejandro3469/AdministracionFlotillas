@@ -26,6 +26,7 @@ public class EmployeesController : Controller
     
     /// <summary>
     /// Endpoint AJAX para obtener todos los empleados
+    /// El Service aplica reglas de negocio y devuelve datos listos para la vista
     /// </summary>
     [HttpPost]
     [IgnoreAntiforgeryToken]
@@ -36,16 +37,17 @@ public class EmployeesController : Controller
             var empleados = await _servicio.ObtenerEmployeesAsync();
             var modelosVista = EmployeeParseador.ConvertirListaAVista(empleados);
             
-            return Json(new { exito = true, datos = modelosVista });
+            return CrearRespuestaExito(modelosVista);
         }
         catch (Exception excepcion)
         {
-            return Json(new { exito = false, mensaje = excepcion.Message });
+            return CrearRespuestaError(excepcion.Message);
         }
     }
     
     /// <summary>
     /// Endpoint AJAX para obtener un empleado por ID
+    /// El Service valida y aplica reglas de negocio antes de devolver
     /// </summary>
     [HttpPost]
     [IgnoreAntiforgeryToken]
@@ -54,18 +56,35 @@ public class EmployeesController : Controller
         try
         {
             var empleado = await _servicio.ObtenerEmployeePorIdAsync(id);
+            
             if (empleado == null)
             {
-                return Json(new { exito = false, mensaje = "Empleado no encontrado" });
+                return CrearRespuestaError("Empleado no encontrado");
             }
             
             var modeloVista = EmployeeParseador.ConvertirAVista(empleado);
-            return Json(new { exito = true, datos = modeloVista });
+            return CrearRespuestaExito(modeloVista);
         }
         catch (Exception excepcion)
         {
-            return Json(new { exito = false, mensaje = excepcion.Message });
+            return CrearRespuestaError(excepcion.Message);
         }
+    }
+    
+    /// <summary>
+    /// Crea una respuesta JSON de éxito
+    /// </summary>
+    private IActionResult CrearRespuestaExito(object datos)
+    {
+        return Json(new { exito = true, datos = datos });
+    }
+    
+    /// <summary>
+    /// Crea una respuesta JSON de error
+    /// </summary>
+    private IActionResult CrearRespuestaError(string mensaje)
+    {
+        return Json(new { exito = false, mensaje = mensaje });
     }
 }
 

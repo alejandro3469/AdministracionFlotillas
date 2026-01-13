@@ -3,11 +3,8 @@
 }
 
 <div>
-    <h2>Employees</h2>
-    <p class="text-muted">Gestión de empleados de la empresa</p>
-    
     <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a asp-controller="Home" asp-action="Index">Home</a>
@@ -15,6 +12,12 @@
             <li class="breadcrumb-item active" aria-current="page">Employees</li>
         </ol>
     </nav>
+    
+    <!-- Título y Descripción -->
+    <div class="mb-5">
+        <h2>Employees</h2>
+        <p class="text-muted">Gestión de empleados de la empresa</p>
+    </div>
     
     <!-- Vista parcial del grid -->
     @await Html.PartialAsync("_EmployeesGrid")
@@ -138,7 +141,7 @@
                         }
                     }
                 ],
-                order: [[0, 'asc']],
+                order: [[1, 'asc']], // Ordenar por Nombre Completo (columna 1, ya que 0 es checkbox)
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
                 language: {
@@ -180,7 +183,7 @@
                         text: '<i class="fas fa-file-excel" aria-hidden="true"></i>',
                         className: 'btn btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5]
+                            columns: [1, 2, 3, 4, 5, 6] // Excluir checkbox (0) y acciones (7)
                         },
                         titleAttr: 'Exportar datos a Excel'
                     },
@@ -189,7 +192,7 @@
                         text: '<i class="fas fa-file-pdf" aria-hidden="true"></i>',
                         className: 'btn btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5]
+                            columns: [1, 2, 3, 4, 5, 6] // Excluir checkbox (0) y acciones (7)
                         },
                         titleAttr: 'Exportar datos a PDF'
                     },
@@ -202,7 +205,7 @@
                     {
                         text: '<i class="fas fa-envelope" aria-hidden="true"></i> Enviar por Email',
                         action: function(e, dt, node, config) {
-                            abrirModalEnviarEmail();
+                            AbrirModalEnviarEmail();
                         },
                         className: 'btn btn-sm btn-enviar-email',
                         titleAttr: 'Enviar información de empleados seleccionados por email'
@@ -213,13 +216,13 @@
                     // Inicializar tooltips de Bootstrap para botones de DataTables después de la inicialización
                     setTimeout(function() {
                         $('.dt-buttons .btn').each(function() {
-                            var $btn = $(this);
-                            var titleAttr = $btn.attr('title') || $btn.data('title-attr');
-                            if (titleAttr && !$btn.attr('data-bs-toggle')) {
-                                $btn.attr('data-bs-toggle', 'tooltip');
-                                $btn.attr('data-bs-placement', 'top');
-                                $btn.attr('title', titleAttr);
-                                new bootstrap.Tooltip($btn[0]);
+                            var boton = $(this);
+                            var tituloAtributo = boton.attr('title') || boton.data('title-attr');
+                            if (tituloAtributo && !boton.attr('data-bs-toggle')) {
+                                boton.attr('data-bs-toggle', 'tooltip');
+                                boton.attr('data-bs-placement', 'top');
+                                boton.attr('title', tituloAtributo);
+                                new bootstrap.Tooltip(boton[0]);
                             }
                         });
                     }, 100);
@@ -234,24 +237,24 @@
             // Inicializar tooltips de Bootstrap para botones de DataTables
             setTimeout(function() {
                 $('.dt-buttons .btn').each(function() {
-                    var $btn = $(this);
-                    var titleAttr = $btn.attr('title') || $btn.data('title-attr');
-                    if (titleAttr && !$btn.attr('data-bs-toggle')) {
-                        $btn.attr('data-bs-toggle', 'tooltip');
-                        $btn.attr('data-bs-placement', 'top');
-                        $btn.attr('title', titleAttr);
-                        new bootstrap.Tooltip($btn[0]);
+                    var boton = $(this);
+                    var tituloAtributo = boton.attr('title') || boton.data('title-attr');
+                    if (tituloAtributo && !boton.attr('data-bs-toggle')) {
+                        boton.attr('data-bs-toggle', 'tooltip');
+                        boton.attr('data-bs-placement', 'top');
+                        boton.attr('title', tituloAtributo);
+                        new bootstrap.Tooltip(boton[0]);
                     }
                 });
             }, 200);
 
             // Inicializar tooltips de Bootstrap para otros elementos
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+            var listaDesencadenadoresTooltip = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var listaTooltips = listaDesencadenadoresTooltip.map(function (elementoDesencadenador) {
+                return new bootstrap.Tooltip(elementoDesencadenador);
             });
 
-            // Configurar jQuery UI Datepicker en español (solo si jQuery UI está cargado)
+            // Configurar jQuery UI Datepicker en español
             if (typeof $.datepicker !== 'undefined') {
                 $.datepicker.regional['es'] = {
                     closeText: 'Cerrar',
@@ -274,7 +277,7 @@
                 };
                 $.datepicker.setDefaults($.datepicker.regional['es']);
 
-                // Inicializar Date Pickers para Fecha de Contratación (rango) solo si los elementos existen
+                // Inicializar Date Pickers para Fecha de Contratación (rango)
                 var filtroFechaInicio = $('#filtroFechaInicio');
                 var filtroFechaFin = $('#filtroFechaFin');
                 
@@ -288,7 +291,7 @@
                             if (filtroFechaFin.length > 0) {
                                 filtroFechaFin.datepicker('option', 'minDate', selectedDate);
                             }
-                            aplicarFiltros();
+                            AplicarFiltros();
                         }
                     });
                 }
@@ -303,18 +306,18 @@
                             if (filtroFechaInicio.length > 0) {
                                 filtroFechaInicio.datepicker('option', 'maxDate', selectedDate);
                             }
-                            aplicarFiltros();
+                            AplicarFiltros();
                         }
                     });
                 }
             }
 
-            // Inicializar formato de moneda para inputs de salario (solo si Inputmask está cargado y los elementos existen)
+            // Inicializar formato de moneda para inputs de salario
             if (typeof $.fn.inputmask !== 'undefined') {
                 var filtroSalarioMin = $('#filtroSalarioMin');
                 var filtroSalarioMax = $('#filtroSalarioMax');
                 
-                if (filtroSalarioMin.length > 0 && filtroSalarioMax.length > 0) {
+                if (filtroSalarioMin.length > 0) {
                     filtroSalarioMin.inputmask({
                         alias: 'numeric',
                         groupSeparator: ',',
@@ -325,13 +328,15 @@
                         placeholder: '0',
                         rightAlign: false,
                         oncomplete: function() {
-                            aplicarFiltros();
+                            AplicarFiltros();
                         },
                         oncleared: function() {
-                            aplicarFiltros();
+                            AplicarFiltros();
                         }
                     });
-                    
+                }
+                
+                if (filtroSalarioMax.length > 0) {
                     filtroSalarioMax.inputmask({
                         alias: 'numeric',
                         groupSeparator: ',',
@@ -342,43 +347,43 @@
                         placeholder: '0',
                         rightAlign: false,
                         oncomplete: function() {
-                            aplicarFiltros();
+                            AplicarFiltros();
                         },
                         oncleared: function() {
-                            aplicarFiltros();
+                            AplicarFiltros();
                         }
                     });
                 }
             }
 
-            // Filtro de búsqueda por nombre (solo columna de nombre)
+            // Filtro de búsqueda por nombre (solo columna de nombre - columna 1, ya que 0 es checkbox)
             $('#filtroBusqueda').on('keyup', function() {
-                tabla.column(0).search(this.value).draw();
+                tabla.column(1).search(this.value).draw();
             });
 
             // Filtros de departamento, email y teléfono
             $('#filtroDepartamento').on('keyup', function() {
-                aplicarFiltros();
+                AplicarFiltros();
             });
 
             $('#filtroEmail').on('keyup', function() {
-                aplicarFiltros();
+                AplicarFiltros();
             });
 
             $('#filtroTelefono').on('keyup', function() {
-                aplicarFiltros();
+                AplicarFiltros();
             });
 
             // Filtros de salario
             $('#filtroSalarioMin, #filtroSalarioMax').on('keyup change', function() {
-                aplicarFiltros();
+                AplicarFiltros();
             });
 
             // Variable para almacenar la función de filtro personalizado
             var filtroPersonalizado = null;
 
             // Función para aplicar todos los filtros personalizados
-            function aplicarFiltros() {
+            function AplicarFiltros() {
                 // Remover filtro anterior si existe
                 if (filtroPersonalizado !== null) {
                     $.fn.dataTable.ext.search.pop();
@@ -390,53 +395,54 @@
                         var fechaFin = null;
                         var salarioMin = null;
                         var salarioMax = null;
-                        var filtroDepartamento = $('#filtroDepartamento').val().toLowerCase();
-                        var filtroEmail = $('#filtroEmail').val().toLowerCase();
-                        var filtroTelefono = $('#filtroTelefono').val().toLowerCase();
+                        var textoFiltroDepartamento = $('#filtroDepartamento').val().toLowerCase();
+                        var textoFiltroEmail = $('#filtroEmail').val().toLowerCase();
+                        var textoFiltroTelefono = $('#filtroTelefono').val().toLowerCase();
 
                         // Filtro de fecha de contratación (rango)
-                        var fechaInicioText = $('#filtroFechaInicio').val();
-                        var fechaFinText = $('#filtroFechaFin').val();
+                        var textoFechaInicio = $('#filtroFechaInicio').val();
+                        var textoFechaFin = $('#filtroFechaFin').val();
                         
-                        if (fechaInicioText) {
-                            var fechaParts = fechaInicioText.split('/');
-                            if (fechaParts.length === 3) {
-                                fechaInicio = new Date(fechaParts[2], fechaParts[1] - 1, fechaParts[0]);
+                        if (textoFechaInicio) {
+                            var partesFechaInicio = textoFechaInicio.split('/');
+                            if (partesFechaInicio.length === 3) {
+                                fechaInicio = new Date(partesFechaInicio[2], partesFechaInicio[1] - 1, partesFechaInicio[0]);
                             }
                         }
                         
-                        if (fechaFinText) {
-                            var fechaParts = fechaFinText.split('/');
-                            if (fechaParts.length === 3) {
-                                fechaFin = new Date(fechaParts[2], fechaParts[1] - 1, fechaParts[0]);
+                        if (textoFechaFin) {
+                            var partesFechaFin = textoFechaFin.split('/');
+                            if (partesFechaFin.length === 3) {
+                                fechaFin = new Date(partesFechaFin[2], partesFechaFin[1] - 1, partesFechaFin[0]);
                                 fechaFin.setHours(23, 59, 59, 999);
                             }
                         }
 
                         // Filtro de salario
-                        var salarioMinText = $('#filtroSalarioMin').val();
-                        var salarioMaxText = $('#filtroSalarioMax').val();
+                        var textoSalarioMin = $('#filtroSalarioMin').val();
+                        var textoSalarioMax = $('#filtroSalarioMax').val();
                         
-                        if (salarioMinText) {
-                            salarioMin = parseFloat(salarioMinText.replace(/[^0-9.-]+/g, ''));
+                        if (textoSalarioMin) {
+                            salarioMin = parseFloat(textoSalarioMin.replace(/[^0-9.-]+/g, ''));
                         }
-                        if (salarioMaxText) {
-                            salarioMax = parseFloat(salarioMaxText.replace(/[^0-9.-]+/g, ''));
+                        if (textoSalarioMax) {
+                            salarioMax = parseFloat(textoSalarioMax.replace(/[^0-9.-]+/g, ''));
                         }
 
                         // Obtener datos de la fila
-                        var row = tabla.row(dataIndex);
-                        var rowData = row.data();
+                        var indiceFila = dataIndex;
+                        var fila = tabla.row(indiceFila);
+                        var datosFila = fila.data();
                         
-                        if (!rowData) return true;
+                        if (!datosFila) return true;
 
                         // Validar fecha de contratación (rango)
                         if (fechaInicio !== null || fechaFin !== null) {
-                            var fechaContratacion = rowData.fechaContratacion;
-                            if (fechaContratacion) {
-                                var fechaParts = fechaContratacion.split('/');
-                                if (fechaParts.length === 3) {
-                                    var fechaEmpleado = new Date(fechaParts[2], fechaParts[1] - 1, fechaParts[0]);
+                            var textoFechaContratacion = datosFila.fechaContratacion;
+                            if (textoFechaContratacion) {
+                                var partesFechaContratacion = textoFechaContratacion.split('/');
+                                if (partesFechaContratacion.length === 3) {
+                                    var fechaEmpleado = new Date(partesFechaContratacion[2], partesFechaContratacion[1] - 1, partesFechaContratacion[0]);
                                     
                                     if (fechaInicio !== null && fechaEmpleado < fechaInicio) {
                                         return false;
@@ -452,15 +458,15 @@
 
                         // Validar rango de salario
                         if (salarioMin !== null || salarioMax !== null) {
-                            var salarioText = rowData.salario;
-                            if (salarioText && salarioText !== '-') {
-                                var salario = parseFloat(salarioText.replace(/[^0-9.-]+/g, ''));
-                                if (isNaN(salario)) return false;
+                            var textoSalario = datosFila.salario;
+                            if (textoSalario && textoSalario !== '-') {
+                                var salarioNumerico = parseFloat(textoSalario.replace(/[^0-9.-]+/g, ''));
+                                if (isNaN(salarioNumerico)) return false;
                                 
-                                if (salarioMin !== null && salario < salarioMin) {
+                                if (salarioMin !== null && salarioNumerico < salarioMin) {
                                     return false;
                                 }
-                                if (salarioMax !== null && salario > salarioMax) {
+                                if (salarioMax !== null && salarioNumerico > salarioMax) {
                                     return false;
                                 }
                             } else {
@@ -469,25 +475,25 @@
                         }
 
                         // Validar filtro de departamento
-                        if (filtroDepartamento) {
-                            var departamento = (rowData.idDepartamento ? 'Dept. ' + rowData.idDepartamento : '').toLowerCase();
-                            if (departamento.indexOf(filtroDepartamento) === -1) {
+                        if (textoFiltroDepartamento) {
+                            var textoDepartamento = (datosFila.idDepartamento ? 'Dept. ' + datosFila.idDepartamento : '').toLowerCase();
+                            if (textoDepartamento.indexOf(textoFiltroDepartamento) === -1) {
                                 return false;
                             }
                         }
 
                         // Validar filtro de email
-                        if (filtroEmail) {
-                            var email = (rowData.correoElectronico || '').toLowerCase();
-                            if (email.indexOf(filtroEmail) === -1) {
+                        if (textoFiltroEmail) {
+                            var textoEmail = (datosFila.correoElectronico || '').toLowerCase();
+                            if (textoEmail.indexOf(textoFiltroEmail) === -1) {
                                 return false;
                             }
                         }
 
                         // Validar filtro de teléfono
-                        if (filtroTelefono) {
-                            var telefono = (rowData.numeroTelefono || '').toLowerCase();
-                            if (telefono.indexOf(filtroTelefono) === -1) {
+                        if (textoFiltroTelefono) {
+                            var textoTelefono = (datosFila.numeroTelefono || '').toLowerCase();
+                            if (textoTelefono.indexOf(textoFiltroTelefono) === -1) {
                                 return false;
                             }
                         }
@@ -504,17 +510,17 @@
 
             // Checkbox individual
             $('#employeesTable tbody').on('change', '.checkbox-empleado', function() {
-                var checkbox = $(this);
-                var fecha = checkbox.data('fecha');
+                var checkboxEmpleado = $(this);
+                var fechaContratacionEmpleado = checkboxEmpleado.data('fecha');
                 
-                if (checkbox.prop('checked')) {
+                if (checkboxEmpleado.prop('checked')) {
                     if (fechaContratacionBase === null) {
-                        fechaContratacionBase = fecha;
-                        agregarEmpleadoSeleccionado(checkbox);
-                    } else if (fecha === fechaContratacionBase) {
-                        agregarEmpleadoSeleccionado(checkbox);
+                        fechaContratacionBase = fechaContratacionEmpleado;
+                        AgregarEmpleadoSeleccionado(checkboxEmpleado);
+                    } else if (fechaContratacionEmpleado === fechaContratacionBase) {
+                        AgregarEmpleadoSeleccionado(checkboxEmpleado);
                     } else {
-                        checkbox.prop('checked', false);
+                        checkboxEmpleado.prop('checked', false);
                         Swal.fire({
                             icon: 'warning',
                             title: 'Fecha de Contratación Diferente',
@@ -523,7 +529,7 @@
                         });
                     }
                 } else {
-                    removerEmpleadoSeleccionado(checkbox);
+                    RemoverEmpleadoSeleccionado(checkboxEmpleado);
                     if (empleadosSeleccionados.length === 0) {
                         fechaContratacionBase = null;
                     }
@@ -532,36 +538,36 @@
 
             // Event listeners para botones de acción
             $('#employeesTable tbody').on('click', '.btn-ver', function() {
-                var idEmpleado = $(this).data('id');
-                verDetallesEmpleado(idEmpleado);
+                var idEmpleadoSeleccionado = $(this).data('id');
+                VerDetallesEmpleado(idEmpleadoSeleccionado);
             });
             
             // Reinicializar tooltips después de cargar datos en la tabla
             tabla.on('draw', function() {
                 // Reinicializar tooltips de botones de DataTables
                 $('.dt-buttons .btn').each(function() {
-                    var $btn = $(this);
-                    var existingTooltip = bootstrap.Tooltip.getInstance($btn[0]);
-                    if (existingTooltip) {
-                        existingTooltip.dispose();
+                    var boton = $(this);
+                    var tooltipExistente = bootstrap.Tooltip.getInstance(boton[0]);
+                    if (tooltipExistente) {
+                        tooltipExistente.dispose();
                     }
-                    var titleAttr = $btn.attr('title') || $btn.data('title-attr');
-                    if (titleAttr) {
-                        $btn.attr('data-bs-toggle', 'tooltip');
-                        $btn.attr('data-bs-placement', 'top');
-                        $btn.attr('title', titleAttr);
-                        new bootstrap.Tooltip($btn[0]);
+                    var tituloAtributo = boton.attr('title') || boton.data('title-attr');
+                    if (tituloAtributo) {
+                        boton.attr('data-bs-toggle', 'tooltip');
+                        boton.attr('data-bs-placement', 'top');
+                        boton.attr('title', tituloAtributo);
+                        new bootstrap.Tooltip(boton[0]);
                     }
                 });
                 
                 // Reinicializar otros tooltips
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.dt-buttons .btn)'));
-                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                    var existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
-                    if (existingTooltip) {
-                        existingTooltip.dispose();
+                var listaDesencadenadoresTooltip = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.dt-buttons .btn)'));
+                var listaTooltips = listaDesencadenadoresTooltip.map(function (elementoDesencadenador) {
+                    var tooltipExistente = bootstrap.Tooltip.getInstance(elementoDesencadenador);
+                    if (tooltipExistente) {
+                        tooltipExistente.dispose();
                     }
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                    return new bootstrap.Tooltip(elementoDesencadenador);
                 });
                 
                 // Restaurar checkboxes seleccionados
@@ -570,26 +576,26 @@
                 });
             });
 
-            function agregarEmpleadoSeleccionado(checkbox) {
-                var id = checkbox.data('id');
-                var nombre = checkbox.data('nombre');
-                var fecha = checkbox.data('fecha');
+            function AgregarEmpleadoSeleccionado(checkbox) {
+                var idEmpleado = checkbox.data('id');
+                var nombreEmpleado = checkbox.data('nombre');
+                var fechaContratacion = checkbox.data('fecha');
                 
-                if (!empleadosSeleccionados.find(e => e.id === id)) {
+                if (!empleadosSeleccionados.find(e => e.id === idEmpleado)) {
                     empleadosSeleccionados.push({
-                        id: id,
-                        nombre: nombre,
-                        fecha: fecha
+                        id: idEmpleado,
+                        nombre: nombreEmpleado,
+                        fecha: fechaContratacion
                     });
                 }
             }
 
-            function removerEmpleadoSeleccionado(checkbox) {
-                var id = checkbox.data('id');
-                empleadosSeleccionados = empleadosSeleccionados.filter(e => e.id !== id);
+            function RemoverEmpleadoSeleccionado(checkbox) {
+                var idEmpleado = checkbox.data('id');
+                empleadosSeleccionados = empleadosSeleccionados.filter(e => e.id !== idEmpleado);
             }
 
-            function abrirModalEnviarEmail() {
+            function AbrirModalEnviarEmail() {
                 if (empleadosSeleccionados.length === 0) {
                     Swal.fire({
                         icon: 'info',
@@ -604,17 +610,17 @@
                 // Obtener datos completos de empleados seleccionados
                 var datosCompletos = [];
                 tabla.rows().every(function() {
-                    var data = this.data();
-                    if (empleadosSeleccionados.find(e => e.id === data.idEmpleado)) {
-                        datosCompletos.push(data);
+                    var datosEmpleado = this.data();
+                    if (empleadosSeleccionados.find(e => e.id === datosEmpleado.idEmpleado)) {
+                        datosCompletos.push(datosEmpleado);
                     }
                 });
 
                 // Llenar tabla resumen
-                var tbody = $('#tablaResumenEmpleados');
-                tbody.empty();
+                var cuerpoTabla = $('#tablaResumenEmpleados');
+                cuerpoTabla.empty();
                 datosCompletos.forEach(function(empleado) {
-                    var row = '<tr>' +
+                    var fila = '<tr>' +
                         '<td>' + (empleado.nombreCompleto || empleado.primerNombre + ' ' + empleado.apellido) + '</td>' +
                         '<td>' + empleado.correoElectronico + '</td>' +
                         '<td>' + (empleado.numeroTelefono || '-') + '</td>' +
@@ -622,7 +628,7 @@
                         '<td>' + (empleado.salario || '-') + '</td>' +
                         '<td>' + (empleado.idDepartamento ? 'Dept. ' + empleado.idDepartamento : '-') + '</td>' +
                         '</tr>';
-                    tbody.append(row);
+                    cuerpoTabla.append(fila);
                 });
 
                 // Limpiar email
@@ -634,7 +640,7 @@
             }
 
             // Función para validar email
-            function validarEmail(email) {
+            function ValidarEmail(email) {
                 if (!email || email.trim().length === 0) {
                     return {
                         valido: false,
@@ -642,18 +648,18 @@
                     };
                 }
                 
-                var emailTrim = email.trim();
+                var emailRecortado = email.trim();
                 var arroba = String.fromCharCode(64);
                 
                 // Validaciones básicas
-                if (emailTrim.length < 5) {
+                if (emailRecortado.length < 5) {
                     return {
                         valido: false,
                         mensaje: 'El email es demasiado corto'
                     };
                 }
                 
-                if (emailTrim.length > 254) {
+                if (emailRecortado.length > 254) {
                     return {
                         valido: false,
                         mensaje: 'El email es demasiado largo (máximo 254 caracteres)'
@@ -661,7 +667,7 @@
                 }
                 
                 // Verificar que no tenga espacios
-                if (emailTrim.indexOf(' ') !== -1) {
+                if (emailRecortado.indexOf(' ') !== -1) {
                     return {
                         valido: false,
                         mensaje: 'El email no puede contener espacios'
@@ -669,7 +675,7 @@
                 }
                 
                 // Validar formato básico: debe tener arroba y al menos un punto después del arroba
-                var indiceArroba = emailTrim.indexOf(arroba);
+                var indiceArroba = emailRecortado.indexOf(arroba);
                 
                 if (indiceArroba <= 0) {
                     return {
@@ -678,7 +684,7 @@
                     };
                 }
                 
-                if (indiceArroba === emailTrim.length - 1) {
+                if (indiceArroba === emailRecortado.length - 1) {
                     return {
                         valido: false,
                         mensaje: 'El email debe contener un dominio después del símbolo ' + arroba
@@ -686,7 +692,7 @@
                 }
                 
                 // Verificar que tenga al menos un punto después del arroba
-                var parteDominio = emailTrim.substring(indiceArroba + 1);
+                var parteDominio = emailRecortado.substring(indiceArroba + 1);
                 if (parteDominio.indexOf('.') === -1) {
                     return {
                         valido: false,
@@ -703,7 +709,7 @@
                 }
                 
                 // Validar que no tenga múltiples arrobas
-                if (emailTrim.split(arroba).length > 2) {
+                if (emailRecortado.split(arroba).length > 2) {
                     return {
                         valido: false,
                         mensaje: 'El email no puede contener múltiples símbolos ' + arroba
@@ -718,17 +724,17 @@
 
             // Confirmar envío de email
             $('#btnConfirmarEnvio').on('click', function() {
-                var email = $('#emailReceptor').val();
-                var validacion = validarEmail(email);
+                var emailReceptor = $('#emailReceptor').val();
+                var resultadoValidacion = ValidarEmail(emailReceptor);
                 
-                if (!validacion.valido) {
-                    var arroba = String.fromCharCode(64);
+                if (!resultadoValidacion.valido) {
+                    var simboloArroba = String.fromCharCode(64);
                     Swal.fire({
                         icon: 'error',
                         title: 'Email Inválido',
-                        html: '<strong>' + validacion.mensaje + '</strong><br><br>' +
+                        html: '<strong>' + resultadoValidacion.mensaje + '</strong><br><br>' +
                               'Por favor ingrese un email válido con el formato:<br>' +
-                              '<code>ejemplo' + arroba + 'dominio.com</code>',
+                              '<code>ejemplo' + simboloArroba + 'dominio.com</code>',
                         confirmButtonText: 'Entendido'
                     });
                     return;
@@ -737,18 +743,18 @@
                 // TODO: Implementar envío real de email con template HTML
                 // Por ahora solo mostrar mensaje de éxito
                 
-                var nombres = empleadosSeleccionados.map(e => e.nombre).join(', ');
+                var nombresEmpleados = empleadosSeleccionados.map(e => e.nombre).join(', ');
                 
                 Swal.fire({
                     icon: 'success',
                     title: 'Email Enviado Exitosamente',
-                    html: 'El email ha sido enviado a: <strong>' + email + '</strong><br><br>' +
-                          'Empleados incluidos:<br>' + nombres,
+                    html: 'El email ha sido enviado a: <strong>' + emailReceptor + '</strong><br><br>' +
+                          'Empleados incluidos:<br>' + nombresEmpleados,
                     confirmButtonText: 'Aceptar'
                 }).then(function() {
                     // Cerrar modal
-                    var modal = bootstrap.Modal.getInstance(document.getElementById('modalEnviarEmail'));
-                    modal.hide();
+                    var instanciaModal = bootstrap.Modal.getInstance(document.getElementById('modalEnviarEmail'));
+                    instanciaModal.hide();
                     
                     // Limpiar selección
                     empleadosSeleccionados = [];
@@ -758,29 +764,29 @@
             });
         });
 
-        function verDetallesEmpleado(id) {
+        function VerDetallesEmpleado(idEmpleado) {
             $.ajax({
                 url: '/Employees/ObtenerEmployeePorId',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(id),
+                data: JSON.stringify(idEmpleado),
                 dataType: 'json',
-                success: function(respuesta) {
-                    if (respuesta.exito) {
-                        var empleado = respuesta.datos;
-                        var mensaje = 'ID Empleado: ' + empleado.idEmpleado + '\n' +
-                                     'Nombre: ' + empleado.nombreCompleto + '\n' +
-                                     'Email: ' + empleado.correoElectronico + '\n' +
-                                     'Teléfono: ' + (empleado.numeroTelefono || 'N/A') + '\n' +
-                                     'Fecha Contratación: ' + empleado.fechaContratacion + '\n' +
-                                     'Salario: ' + (empleado.salario || 'N/A');
-                        alert(mensaje);
+                success: function(respuestaServidor) {
+                    if (respuestaServidor.exito) {
+                        var datosEmpleado = respuestaServidor.datos;
+                        var mensajeDetalle = 'ID Empleado: ' + datosEmpleado.idEmpleado + '\n' +
+                                             'Nombre: ' + datosEmpleado.nombreCompleto + '\n' +
+                                             'Email: ' + datosEmpleado.correoElectronico + '\n' +
+                                             'Teléfono: ' + (datosEmpleado.numeroTelefono || 'N/A') + '\n' +
+                                             'Fecha Contratación: ' + datosEmpleado.fechaContratacion + '\n' +
+                                             'Salario: ' + (datosEmpleado.salario || 'N/A');
+                        alert(mensajeDetalle);
                     } else {
-                        mostrarMensaje('error', respuesta.mensaje || 'Error al cargar el empleado');
+                        mostrarMensaje('error', respuestaServidor.mensaje || 'Error al cargar el empleado');
                     }
                 },
-                error: function(xhr, status, error) {
-                    mostrarMensaje('error', 'Error al cargar el empleado: ' + error);
+                error: function(xhr, estado, mensajeError) {
+                    mostrarMensaje('error', 'Error al cargar el empleado: ' + mensajeError);
                 }
             });
         }

@@ -29,13 +29,12 @@
 - [ ] Crear proyecto Web (MVC)
 - [ ] Agregar proyectos a la solución
 - [ ] Configurar referencias entre proyectos
-- [x] Instalar AutoMapper en Web (v16.0.0)
-- [x] Instalar AutoMapper.Extensions.Microsoft.DependencyInjection en Web (v12.0.1)
+- [x] Instalar Microsoft.AspNetCore.Mvc.NewtonsoftJson en Web
+- [x] Instalar Oracle.ManagedDataAccess.Core en AccesoDatos
 - [ ] Crear repositorio GitHub (ver PLAN_ANTES_COMPARTIR_REPO.md - FASE 0)
-- [ ] Instalar Microsoft.AspNetCore.Mvc.NewtonsoftJson en Web
-- [ ] Instalar Oracle.ManagedDataAccess.Core en AccesoDatos
 - [ ] Configurar base de datos remota gratuita (Oracle Cloud/Azure/AWS)
 - [ ] Configurar conexión desde DataGrip
+- **Nota**: No se usa AutoMapper, se usa parseador manual estático
 
 ### Fase 2: Configuración de Base de Datos 
 
@@ -66,36 +65,36 @@
 - [ ] Usar modelos de ModelosComunes
 
 #### Capa de Aplicación - Parsers  NUEVO
-- [ ] Crear ViewModelParser o usar AutoMapper
+- [x] Crear parseador manual estático (EmployeeParseador.cs) - COMPLETADO
 - [ ] Implementar conversión ViewModel �� BusinessModel
 - [ ] Implementar conversión BusinessModel �� ViewModel
 
 #### Capa de Aplicación (Web)
-- [ ] Configurar Program.cs con inyección de dependencias
-- [ ] Instalar Kendo UI (última versión)
-- [ ] Configurar Bootstrap (última versión)
-- [ ] Crear ViewModels (FlotillaViewModel, etc.)
-- [ ] Crear FlotillasController con endpoints AJAX
-- [ ] Crear vista principal con Kendo Grid (REQUERIDO)
-- [ ] Crear vista parcial funcional (REQUERIDO)
-- [ ] Implementar llamadas AJAX/Kendo desde UI (REQUERIDO)
-- [ ] Implementar manejo de mensajes (error/success) (REQUERIDO)
-- [ ] Mostrar respuestas del servidor en tiempo real (REQUERIDO)
-- [ ] Crear archivos JavaScript para AJAX con Kendo
-- [ ] Configurar rutas y navegación
-- [ ] Crear dashboards gamificados con Kendo Charts
+- [x] Configurar Program.cs con inyección de dependencias
+- [x] Configurar DataTables (CDN, gratuito) en _Layout.cshtml
+- [x] Configurar Bootstrap (local) en _Layout.cshtml
+- [x] Crear ViewModels (EmployeeViewModel con propiedades en español)
+- [x] Crear EmployeesController con endpoints AJAX
+- [x] Crear vista principal con DataTables (COMPLETA)
+- [x] Crear vista parcial funcional (_EmployeesGrid.cshtml)
+- [x] Implementar llamadas AJAX desde UI (COMPLETO)
+- [x] Implementar manejo de mensajes (error/success) con Bootstrap Toasts
+- [x] Mostrar respuestas del servidor en tiempo real (COMPLETO)
+- [x] Crear archivos JavaScript para AJAX (employees.js)
+- [x] Configurar rutas y navegación (breadcrumb implementado)
+- [ ] Crear dashboards gamificados (pendiente)
 
 **Ver:** [PLAN_ANTES_COMPARTIR_REPO.md](./PLAN_ANTES_COMPARTIR_REPO.md) para detalles completos
 
 ### Fase 4: Funcionalidades 
 
-- [ ] Implementar búsqueda de flotillas con filtros Kendo
+- [ ] Implementar búsqueda de flotillas con filtros DataTables
 - [ ] Implementar creación de flotillas (modal)
 - [ ] Implementar edición de flotillas (modal)
 - [ ] Implementar eliminación lógica (por status, NO f�sica)
 - [ ] Agregar validaciones en frontend y backend
 - [ ] Agregar manejo de errores
-- [ ] Implementar visualizaciones creativas con Kendo
+- [ ] Implementar visualizaciones creativas con DataTables
 - [ ] Crear dashboards gamificados
 - [ ] Implementar diferentes formatos de visualización (tablas, gráficos, tarjetas)
 
@@ -117,7 +116,7 @@
 - [ ] Crear tests de integración
 - [ ] Probar en diferentes navegadores
 - [ ] Optimizar rendimiento
-- [ ] Verificar consistencia de estilos (solo Bootstrap/Kendo)
+- [x] Verificar consistencia de estilos (solo Bootstrap/DataTables, minimalista)
 
 ##  Historial de Cambios
 
@@ -142,12 +141,13 @@
   - [x] AccesoDatos -> ModelosComunes
 
 **Paquetes NuGet Instalados:**
-- [x] AutoMapper (v16.0.0) en Web
+- [x] Microsoft.AspNetCore.Mvc.NewtonsoftJson en Web
   - **Archivo modificado:** `src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj`
-  - **Comando ejecutado:** `cd src/AdministracionFlotillas.Web && dotnet add package AutoMapper`
-- [x] AutoMapper.Extensions.Microsoft.DependencyInjection (v12.0.1) en Web
-  - **Archivo modificado:** `src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj`
-  - **Comando ejecutado:** `cd src/AdministracionFlotillas.Web && dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection`
+  - **Comando ejecutado:** `cd src/AdministracionFlotillas.Web && dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson`
+- [x] Oracle.ManagedDataAccess.Core en AccesoDatos
+  - **Archivo modificado:** `src/AdministracionFlotillas.AccesoDatos/AdministracionFlotillas.AccesoDatos.csproj`
+  - **Comando ejecutado:** `cd src/AdministracionFlotillas.AccesoDatos && dotnet add package Oracle.ManagedDataAccess.Core`
+- **Nota**: No se usa AutoMapper, se usa parseador manual estático (EmployeeParseador.cs)
 
 **Repositorio y Configuración:**
 - [x] Git inicializado (`git init`)
@@ -245,11 +245,11 @@ Project `src/AdministracionFlotillas.AccesoDatos/AdministracionFlotillas.AccesoD
 - **Arquitectura**: 4 capas (Aplicación, Reglas de Negocio, Acceso a Datos, ModelosComunes)
 - **Patrón**: MVC (Model-View-Controller)
 - **.NET Version**: 10.0.101
-- **Frontend**: Kendo UI (última versión) + Bootstrap (última versión)
-- **Estilos**: Solo Bootstrap y Kendo por defecto (sin CSS custom)
-- **Parser**: ViewModelParser o AutoMapper para conversión ViewModel � BusinessModel
+- **Frontend**: DataTables (última versión) + Bootstrap (última versión)
+- **Estilos**: Solo Bootstrap y DataTables por defecto (sin CSS custom)
+- **Parser**: Parseador manual estático (EmployeeParseador.cs) para conversión ViewModel � BusinessModel
 - **CRUD**: Modales, eliminación lógica (por status)
-- **Visualización**: Dashboards gamificados con Kendo Charts
+- **Visualización**: Dashboards gamificados con DataTables Charts
 - **Control de Versiones**: GitHub con branching strategy
 
 ### Recursos y Referencias
@@ -325,8 +325,8 @@ dotnet run
 ### Meta Inmediata
 
 **Completar Fase 1 (Configuración Inicial)**: 95% completado
-- Completado: Estructura de proyectos, referencias, AutoMapper instalado
-- Pendiente: Instalar paquetes restantes, base de datos, Kendo UI
+- Completado: Estructura de proyectos, referencias, parseador manual implementado, DataTables configurado
+- Pendiente: Instalar paquetes restantes, base de datos, conexión Oracle
 
 **Próximo paso:**
 1. Hacer commit inicial y push a GitHub (FASE 0.5 en PLAN_ANTES_COMPARTIR_REPO.md)

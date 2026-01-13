@@ -521,10 +521,6 @@ git push -u origin main
 # En Web
 cd src/AdministracionFlotillas.Web
 
-# Instalar AutoMapper
-dotnet add package AutoMapper
-dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
-
 # Instalar NewtonsoftJson
 dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
 
@@ -617,7 +613,7 @@ libman install datatables.net-responsive --destination wwwroot/lib/datatables
 
 - Configurar inyección de dependencias
 - Configurar NewtonsoftJson para JSON
-- **Nota:** NO se configura AutoMapper, se usa parseador manual
+- **Nota:** Se usa parseador manual estático (sin AutoMapper)
 
 **Documento de referencia:** [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) - Sección "Configurar Program.cs"
 
@@ -671,14 +667,42 @@ using AdministracionFlotillas.Web.ViewModels;
 
 namespace AdministracionFlotillas.Web.Parseador;
 
-public class MappingProfile : Profile
+/// <summary>
+/// Parseador manual para convertir entre Employee (Modelo de Negocio) y EmployeeViewModel
+/// Realiza conversiones explícitas y formateo de datos para la UI
+/// </summary>
+public static class EmployeeParseador
 {
-    public MappingProfile()
+    /// <summary>
+    /// Convierte un Employee (Modelo de Negocio) a EmployeeViewModel
+    /// </summary>
+    public static EmployeeViewModel ConvertirAVista(Employee empleado)
     {
-        CreateMap<Flotilla, FlotillaViewModel>()
-            .ForMember(dest => dest.FechaCreacion, opt => opt.MapFrom(src => src.FechaCreacion.ToString("dd/MM/yyyy")));
-        
-        CreateMap<FlotillaViewModel, Flotilla>();
+        // Implementación manual de conversión
+        return new EmployeeViewModel
+        {
+            // Propiedades mapeadas manualmente
+        };
+    }
+
+    /// <summary>
+    /// Convierte una lista de Employee a lista de EmployeeViewModel
+    /// </summary>
+    public static List<EmployeeViewModel> ConvertirListaAVista(List<Employee> empleados)
+    {
+        return empleados.Select(ConvertirAVista).ToList();
+    }
+
+    /// <summary>
+    /// Convierte un EmployeeViewModel a Employee (Modelo de Negocio)
+    /// </summary>
+    public static Employee ConvertirAModelo(EmployeeViewModel modeloVista)
+    {
+        // Implementación manual de conversión inversa
+        return new Employee
+        {
+            // Propiedades mapeadas manualmente
+        };
     }
 }
 ```
@@ -717,7 +741,7 @@ public class FlotillasRepository : IFlotillasRepository
     // Implementación con datos mock realistas o conexión a BD
     public async Task<List<Flotilla>> ObtenerFlotillasAsync()
     {
-        // Datos mock realistas que simulan una situación empresarial
+        // Datos mock realistas que simulan una situación real
         return new List<Flotilla>
         {
             new Flotilla 
@@ -1778,7 +1802,7 @@ public class FlotillasService : IFlotillasService
 
 ```csharp
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
+// Parseador manual - no requiere using adicional
 using AdministracionFlotillas.ReglasNegocio.Servicios;
 using AdministracionFlotillas.Web.ViewModels;
 
@@ -2122,7 +2146,7 @@ public class FlotillasController : Controller
 
         $('#flotillasTable tbody').on('click', '.btn-ver', function() {
             var id = $(this).data('id');
-            verDetallesFlotilla(id);
+            VerDetallesEmpleado(id);
         });
 
         $('#flotillasTable tbody').on('click', '.btn-eliminar', function() {
@@ -2306,7 +2330,7 @@ function editarFlotilla(id) {
 }
 
 // Función para ver detalles de flotilla
-function verDetallesFlotilla(id) {
+function VerDetallesEmpleado(id) {
     // Similar a editar pero en modo solo lectura
     editarFlotilla(id);
     $('#formFlotilla input, #formFlotilla textarea, #formFlotilla select').prop('disabled', true);
@@ -2470,7 +2494,7 @@ Agregar contenedor para toasts de Bootstrap (ya se crea dinámicamente en JavaSc
 │    Flotilla     │  Modelo de dominio
 └────────┬────────┘
          │
-         │ AutoMapper
+         │ Parseador Manual
          ▼
 ┌─────────────────┐
 │  ViewModel      │  (Web/ViewModels)
@@ -2491,7 +2515,6 @@ Agregar contenedor para toasts de Bootstrap (ya se crea dinámicamente en JavaSc
 
 ```csharp
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 
 namespace AdministracionFlotillas.Web.Controllers;
 
@@ -2499,13 +2522,6 @@ namespace AdministracionFlotillas.Web.Controllers;
 [Route("api/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {
-    protected readonly IMapper _mapper;
-    
-    protected BaseApiController(IMapper mapper)
-    {
-        _mapper = mapper;
-    }
-    
     // Método helper para respuestas estándar
     protected IActionResult SuccessResponse<T>(T data, string message = null)
     {
@@ -2536,8 +2552,7 @@ public class FlotillasController : BaseApiController
 {
     private readonly IFlotillasService _service;
     
-    public FlotillasController(IFlotillasService service, IMapper mapper) 
-        : base(mapper)
+    public FlotillasController(IFlotillasService service)
     {
         _service = service;
     }
@@ -2549,7 +2564,7 @@ public class FlotillasController : BaseApiController
         try
         {
             var flotillas = await _service.ObtenerFlotillasAsync();
-            var viewModels = _mapper.Map<List<FlotillaViewModel>>(flotillas);
+            var viewModels = FlotillaParseador.ConvertirListaAVista(flotillas);
             
             // Si hay request de DataTables, aplicar paginación del servidor
             if (request != null && request.ServerSide)
@@ -2930,7 +2945,7 @@ function refreshDropdown(controllerName, dropdownSelector) {
             
             // Event listener para cuando se carga el dropdown
             $('#dropdownFlotillas').on('dropdown:loaded', function() {
-                console.log('Dropdown cargado correctamente');
+                // Dropdown cargado correctamente
             });
             
             // Event listener para cambio de selección en dropdown
@@ -2938,7 +2953,7 @@ function refreshDropdown(controllerName, dropdownSelector) {
                 var selectedId = $(this).val();
                 if (selectedId) {
                     // Filtrar tabla si es necesario
-                    console.log('Flotilla seleccionada:', selectedId);
+                    // Flotilla seleccionada
                 }
             });
         });
@@ -2956,8 +2971,7 @@ public class MiNuevoController : BaseApiController
 {
     private readonly IMiNuevoService _service;
     
-    public MiNuevoController(IMiNuevoService service, IMapper mapper) 
-        : base(mapper)
+    public MiNuevoController(IMiNuevoService service)
     {
         _service = service;
     }
@@ -2968,7 +2982,7 @@ public class MiNuevoController : BaseApiController
         try
         {
             var datos = await _service.ObtenerTodosAsync();
-            var viewModels = _mapper.Map<List<MiNuevoViewModel>>(datos);
+            var viewModels = MiNuevoParseador.ConvertirListaAVista(datos);
             
             // Aplicar paginación del servidor si es necesario
             if (request != null && request.ServerSide)
@@ -3033,15 +3047,13 @@ using AdministracionFlotillas.AccesoDatos.Repositorios;
 using AdministracionFlotillas.ReglasNegocio.Configuracion;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Factory;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
-using AdministracionFlotillas.Web.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson();
 
-// AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+// Parseador manual - no requiere registro en DI (métodos estáticos)
 
 // Configuración de escenario (desde appsettings.json)
 var escenarioConfig = builder.Configuration.GetSection("EscenarioConfiguracion")
@@ -3107,7 +3119,7 @@ Documentar:
 - [ ] Repositorio GitHub creado y conectado (FASE 0 - opcional)
 - [ ] Todos los commits realizados con nombres simples y descripciones breves (si se usa Git)
 - [ ] DataTables instalado y funcionando
-- [ ] AutoMapper configurado y funcionando
+- [ ] Parseador manual implementado y funcionando
 - [ ] Modelo en ModelosComunes creado
 - [ ] ViewModel en Web creado
 - [ ] Repositorio de ejemplo creado
@@ -3133,9 +3145,9 @@ Descripción breve de los cambios realizados
 
 **Ejemplos:**
 ```
-Agregar paquete AutoMapper
+Crear parseador manual
 
-- Instalado AutoMapper v16.0.0 en proyecto Web
+- Implementado EmployeeParseador con métodos estáticos
 - Para conversión ViewModel a BusinessModel
 ```
 
@@ -3147,10 +3159,10 @@ Crear modelo Flotilla
 ```
 
 ```
-Configurar AutoMapper en Program.cs
+Implementar parseador manual
 
-- Agregado AddAutoMapper con MappingProfile
-- Configurado para inyección de dependencias
+- Creado EmployeeParseador con métodos estáticos
+- No requiere configuración en Program.cs (métodos estáticos)
 ```
 
 **Reglas:**

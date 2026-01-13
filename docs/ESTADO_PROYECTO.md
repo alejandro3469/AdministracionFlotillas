@@ -21,11 +21,24 @@
 #### 3. Capa de Reglas de Negocio
 - **`src/AdministracionFlotillas.ReglasNegocio/Servicios/Interfaces/IEmployeesService.cs`**
   - Interfaz del servicio con métodos de negocio
+  - Métodos principales: `ObtenerEmployeesAsync()`, `ObtenerEmployeePorIdAsync()`
+  - Métodos de negocio: `ObtenerEmployeesActivosConSalarioMinimoAsync()`, `CalcularAntiguedadEnAnios()`, `EsElegibleParaBonificacion()`, `CalcularSalarioAnualEstimado()`
   
 - **`src/AdministracionFlotillas.ReglasNegocio/Servicios/Escenarios/Oracle/EmployeesServiceOracle.cs`**
-  - Implementación para escenario Oracle
-  - Aplica validaciones de negocio (filtra empleados con salario > 0)
-  - Valida parámetros (ej: ID debe ser mayor que cero)
+  - Implementación para escenario Oracle con lógica de negocio específica
+  - **Reglas de negocio aplicadas**:
+    - Validación de salario mínimo (1000m)
+    - Ordenamiento por antigüedad (más antiguos primero)
+    - Validación de criterios de negocio antes de devolver datos
+  - **Métodos de negocio implementados**:
+    - `CalcularAntiguedadEnAnios()`: Calcula antigüedad en años con ajuste por meses/días
+    - `EsElegibleParaBonificacion()`: Valida elegibilidad según antigüedad y salario mínimo
+    - `CalcularSalarioAnualEstimado()`: Calcula salario anual incluyendo comisiones estimadas
+    - `ObtenerEmployeesActivosConSalarioMinimoAsync()`: Filtra por salario mínimo
+  - **Constantes de negocio**:
+    - `SalarioMinimo = 1000m`
+    - `AntiguedadMinimaParaBonificacion = 1`
+    - `SalarioMinimoParaBonificacion = 2000m`
 
 #### 4. Capa Web - ViewModels y Parseador
 - **`src/AdministracionFlotillas.Web/ViewModels/EmployeeViewModel.cs`**
@@ -41,21 +54,46 @@
 
 #### 5. Capa Web - Controller
 - **`src/AdministracionFlotillas.Web/Controllers/EmployeesController.cs`**
-  - `Index()` - Vista principal
-  - `ObtenerEmployees()` - Endpoint AJAX POST para obtener todos los empleados
-  - `ObtenerEmployeePorId([FromBody] int id)` - Endpoint AJAX POST para obtener un empleado por ID
-  - Respuestas JSON con formato estándar: `{ exito: true/false, datos: ..., mensaje: ... }`
+  - **Métodos principales** (limpios y legibles como receta paso a paso):
+    - `Index()` - Vista principal
+    - `ObtenerEmployees()` - Coordina: llama al Service → convierte con Parseador → retorna JSON
+    - `ObtenerEmployeePorId([FromBody] int id)` - Coordina: llama al Service → valida → convierte → retorna JSON
+  - **Métodos helper privados** (para mantener el Controller limpio):
+    - `CrearRespuestaExito(object datos)` - Crea respuesta JSON de éxito
+    - `CrearRespuestaError(string mensaje)` - Crea respuesta JSON de error
+  - **Características**:
+    - Controller limpio: solo coordina llamadas, sin lógica de negocio ni parsing complejo
+    - El Service aplica toda la lógica de negocio antes de devolver datos
+    - El Parseador convierte BusinessModel a ViewModel
+    - Respuestas JSON con formato estándar: `{ exito: true/false, datos: ..., mensaje: ... }`
   - Atributos: `[AllowAnonymous]`, `[IgnoreAntiforgeryToken]` para desarrollo
 
 #### 6. Capa Web - Views
 - **`src/AdministracionFlotillas.Web/Views/Employees/Index.cshtml`**
-  - Vista principal con título, descripción y breadcrumb de navegación
+  - Vista principal con breadcrumb de navegación (arriba del título), título y descripción
+  - Espaciado visual entre grupos: breadcrumb, título/descripción, filtros, tabla
   - Incluye vista parcial `_EmployeesGrid`
   - Modal para envío por email con validación
   - Scripts en sección `@section Scripts` para inicializar DataTables
   - Configuración completa de DataTables con filtros personalizados
   - Validación de email con SweetAlert2
   - Lógica de selección de empleados con restricción por fecha de contratación
+  - **Funciones JavaScript** (PascalCase): `AplicarFiltros()`, `AgregarEmpleadoSeleccionado()`, `RemoverEmpleadoSeleccionado()`, `AbrirModalEnviarEmail()`, `ValidarEmail()`, `VerDetallesEmpleado()`
+  - **Variables** (camelCase, español, descriptivas):
+    - `empleadosSeleccionados`: Array con empleados seleccionados
+    - `fechaContratacionBase`: Fecha base para restricción de selección
+    - `tabla`: Instancia de DataTables
+    - `filtroPersonalizado`: Función de filtro personalizado
+    - `textoFechaInicio`, `textoFechaFin`: Textos de fechas para parsing
+    - `partesFechaInicio`, `partesFechaFin`: Partes parseadas de fechas
+    - `indiceFila`: Índice de fila en DataTables
+    - `datosFila`: Datos de la fila actual
+    - `textoFiltroDepartamento`, `textoFiltroEmail`, `textoFiltroTelefono`: Textos de filtros
+    - `salarioNumerico`: Salario convertido a número
+    - `emailReceptor`, `resultadoValidacion`, `simboloArroba`: Variables de validación de email
+    - `datosEmpleado`, `respuestaServidor`, `mensajeDetalle`: Variables de detalle de empleado
+    - `checkboxEmpleado`, `fechaContratacionEmpleado`, `idEmpleadoSeleccionado`: Variables de selección
+    - `instanciaModal`, `nombresEmpleados`: Variables del modal de email
 
 - **`src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGrid.cshtml`**
   - Vista parcial con tabla HTML para DataTables
@@ -65,20 +103,31 @@
 
 #### 7. Capa Web - JavaScript
 - **`src/AdministracionFlotillas.Web/wwwroot/js/employees.js`**
-  - Función `mostrarMensaje()` - Muestra toasts de Bootstrap (success/error/info)
-  - Función `actualizarTabla()` - Recarga la tabla DataTables
-  - Manejo global de errores AJAX
+  - Función `EsperarJQuery()` - Espera a que jQuery esté disponible antes de ejecutar código
+  - Función `window.mostrarMensaje()` - Muestra toasts de Bootstrap (success/error/info)
+  - Función `window.actualizarTabla()` - Recarga la tabla DataTables
+  - Función `RegistrarErrorAjax()` - Registra manejador global de errores AJAX
+  - **Convenciones**: Funciones en PascalCase, variables en camelCase y español
 
 #### 8. Capa Web - Layout y Configuración
 - **`src/AdministracionFlotillas.Web/Views/Shared/_Layout.cshtml`**
-  - DataTables CSS y JS (CDN) con extensiones (Buttons, Print, HTML5)
-  - jQuery (CDN)
-  - Bootstrap 5 (CDN)
-  - Font Awesome 5.15.4 (CDN) para iconos
-  - SweetAlert2 (CDN) para alertas personalizadas
-  - jQuery UI (CDN) para datepicker
-  - jQuery UI Datepicker Spanish localization
-  - Inputmask (CDN) para formato de moneda
+  - Scripts cargados en orden oficial según documentación:
+    1. jQuery 3.7.1 (CDN, minificado)
+    2. Bootstrap JS (local)
+    3. jQuery UI 1.13.2 (CDN) para datepicker
+    4. jsZip (CDN) - requerido por DataTables Buttons
+    5. pdfmake (CDN) - requerido por DataTables Buttons
+    6. DataTables Core 1.13.7 (CDN)
+    7. DataTables Extensions: Buttons, HTML5, Print, Responsive (CDN)
+    8. Inputmask 5.0.8 (CDN) para formato de moneda
+    9. SweetAlert2 11 (CDN) para alertas personalizadas
+    10. Custom scripts (site.js, employees.js)
+  - CSS cargados en `<head>`:
+    - Bootstrap CSS (local)
+    - jQuery UI CSS (CDN)
+    - DataTables CSS (CDN) con extensiones
+    - Font Awesome 5.15.4 (CDN) para iconos
+    - Custom CSS (site.css)
   - Enlace de navegación "Employees" en navbar
   - Padding consistente en toda la aplicación
 
@@ -159,8 +208,9 @@
 - Estilo: transparentes con fondo opaco en hover, texto negro
 
 ✅ **Navegación**
-- Breadcrumb debajo del título: `Home > Employees`
+- Breadcrumb arriba del título: `Home > Employees`
 - Enlace funcional a Home
+- Espaciado visual entre grupos de contenido (breadcrumb, título/descripción, filtros, tabla)
 
 ✅ **UI/UX**
 - Bootstrap Toasts para mensajes (success/error/info)
@@ -178,9 +228,12 @@
 
 ✅ **Arquitectura en Capas**
 - Separación completa: Web → ReglasNegocio → AccesoDatos
+- **Controller limpio**: Solo coordina llamadas, sin lógica de negocio ni parsing complejo
+- **Service con lógica de negocio**: Contiene toda la lógica de negocio y reglas del sistema
 - Parseador manual para conversión ViewModel ↔ BusinessModel (sin AutoMapper)
 - Patrón Strategy para diferentes escenarios (Oracle, SQL Server, Mock)
 - ViewModels con propiedades en español siguiendo convenciones oficiales
+- **Métodos de negocio**: Cálculo de antigüedad, validación de bonificaciones, salarios anuales estimados
 
 ### Tecnologías Utilizadas
 

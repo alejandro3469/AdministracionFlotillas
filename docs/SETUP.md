@@ -48,7 +48,7 @@ dotnet --version
 -  **Nuevo**: Proyecto ModelosComunes para modelos compartidos
 -  **Nuevo**: Parser ViewModel � BusinessModel
 -  **Nuevo**: Base de datos remota gratuita (Oracle Cloud recomendado)
--  **Nuevo**: Kendo UI + Bootstrap (últimas versiones)
+-  **Nuevo**: DataTables (gratuito) + Bootstrap (últimas versiones)
 -  **Nuevo**: CRUD con modales y eliminación lógica
 -  **Nuevo**: Dashboards gamificados
 -  **Nuevo**: Repositorio GitHub para colaboración
@@ -375,8 +375,7 @@ cd C:\Users\TU_USUARIO\Documents\AdministracionFlotillas\src\AdministracionFloti
 
 # Luego ejecuta cada comando (igual en ambos):
 dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
-dotnet add package AutoMapper
-dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
+# Nota: No se usa AutoMapper, se usa parseador manual estático
 ```
 
 **6.5. Verifica que se instalaron:**
@@ -449,7 +448,7 @@ cd C:\Users\TU_USUARIO\Documents\AdministracionFlotillas
 - Reemplaza `TU_CONTRASEÑA` con tu contraseña real
 - **NUNCA** subas este archivo con contraseñas reales a GitHub (usa variables de entorno en producción)
 
-### PASO 8: Configurar Kendo UI y Bootstrap  NUEVO
+### PASO 8: Configurar DataTables y Bootstrap  NUEVO
 
 #### Para Mac (Rider) y Windows (VS Code):
 
@@ -476,7 +475,7 @@ Deber�as ver algo como:
 </head>
 ```
 
-**8.4. Reemplaza o agrega las referencias a Bootstrap y Kendo UI:**
+**8.4. Reemplaza o agrega las referencias a Bootstrap y DataTables:**
 
 **Reemplaza las l�neas de Bootstrap y CSS con:**
 ```html
@@ -485,11 +484,12 @@ Deber�as ver algo como:
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - AdministracionFlotillas.Web</title>
     
-    <!-- Bootstrap 5.3 (última versión) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS (local) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     
-    <!-- Kendo UI (última versión) -->
-    <link href="https://kendo.cdn.telerik.com/latest/styles/kendo.default-main.min.css" rel="stylesheet">
+    <!-- DataTables CSS (CDN) -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 </head>
 ```
 
@@ -505,12 +505,15 @@ Deber�as ver algo como:
 
 **8.6. Reemplaza con:**
 ```html
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (CDN) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
-    <!-- Kendo UI (última versión) -->
-    <script src="https://kendo.cdn.telerik.com/latest/js/jquery.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/latest/js/kendo.all.min.js"></script>
+    <!-- Bootstrap JS (local) -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DataTables JS (CDN) -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     
     <script src="~/js/site.js"></script>
 </body>
@@ -521,9 +524,9 @@ Deber�as ver algo como:
 - **Windows (VS Code)**: `Ctrl + S`
 
 ** IMPORTANTE**: 
-- Solo usar estilos por defecto de Bootstrap y Kendo
-- NO crear archivos CSS personalizados
-- NO modificar los estilos de Bootstrap o Kendo
+- Solo usar estilos por defecto de Bootstrap y DataTables
+- NO crear archivos CSS personalizados (excepto site.css para padding consistente)
+- NO modificar los estilos de Bootstrap o DataTables
 - Esto garantiza consistencia en estilos
 
 ### PASO 9: Crear Repositorio GitHub  NUEVO
@@ -751,7 +754,7 @@ Antes de continuar, verifica que tienes:
 - [ ]  Todas las referencias entre proyectos configuradas
 - [ ]  Todos los paquetes NuGet instalados
 - [ ]  Base de datos remota configurada (o en proceso)
-- [ ]  Kendo UI y Bootstrap agregados a `_Layout.cshtml`
+- [ ]  DataTables y Bootstrap agregados a `_Layout.cshtml`
 - [ ]  Repositorio GitHub creado y conectado
 - [ ]  `dotnet build` ejecuta sin errores
 
