@@ -209,7 +209,22 @@
                         enabled: false
                     }
                 ],
-                responsive: true
+                responsive: true,
+                initComplete: function() {
+                    // Inicializar tooltips de Bootstrap para botones de DataTables después de la inicialización
+                    setTimeout(function() {
+                        $('.dt-buttons .btn').each(function() {
+                            var $btn = $(this);
+                            var titleAttr = $btn.attr('title') || $btn.data('title-attr');
+                            if (titleAttr && !$btn.attr('data-bs-toggle')) {
+                                $btn.attr('data-bs-toggle', 'tooltip');
+                                $btn.attr('data-bs-placement', 'top');
+                                $btn.attr('title', titleAttr);
+                                new bootstrap.Tooltip($btn[0]);
+                            }
+                        });
+                    }, 100);
+                }
             });
 
             // Guardar referencia global de la tabla
@@ -217,7 +232,21 @@
             window.empleadosSeleccionados = empleadosSeleccionados;
             window.fechaContratacionBase = fechaContratacionBase;
 
-            // Inicializar tooltips de Bootstrap
+            // Inicializar tooltips de Bootstrap para botones de DataTables
+            setTimeout(function() {
+                $('.dt-buttons .btn').each(function() {
+                    var $btn = $(this);
+                    var titleAttr = $btn.attr('title') || $btn.data('title-attr');
+                    if (titleAttr && !$btn.attr('data-bs-toggle')) {
+                        $btn.attr('data-bs-toggle', 'tooltip');
+                        $btn.attr('data-bs-placement', 'top');
+                        $btn.attr('title', titleAttr);
+                        new bootstrap.Tooltip($btn[0]);
+                    }
+                });
+            }, 200);
+
+            // Inicializar tooltips de Bootstrap para otros elementos
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -441,8 +470,29 @@
             
             // Reinicializar tooltips después de cargar datos en la tabla
             tabla.on('draw', function() {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                // Reinicializar tooltips de botones de DataTables
+                $('.dt-buttons .btn').each(function() {
+                    var $btn = $(this);
+                    var existingTooltip = bootstrap.Tooltip.getInstance($btn[0]);
+                    if (existingTooltip) {
+                        existingTooltip.dispose();
+                    }
+                    var titleAttr = $btn.attr('title') || $btn.data('title-attr');
+                    if (titleAttr) {
+                        $btn.attr('data-bs-toggle', 'tooltip');
+                        $btn.attr('data-bs-placement', 'top');
+                        $btn.attr('title', titleAttr);
+                        new bootstrap.Tooltip($btn[0]);
+                    }
+                });
+                
+                // Reinicializar otros tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.dt-buttons .btn)'));
                 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    var existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+                    if (existingTooltip) {
+                        existingTooltip.dispose();
+                    }
                     return new bootstrap.Tooltip(tooltipTriggerEl);
                 });
                 
