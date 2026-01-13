@@ -23,5 +23,143 @@
 
 @section Scripts {
     <script src="~/js/employees.js"></script>
+    <script>
+        $(document).ready(function() {
+            var table = $('#employeesTable').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: {
+                    url: '/Employees/ObtenerEmployees',
+                    type: 'POST',
+                    dataType: 'json',
+                    dataSrc: function(json) {
+                        if (json.success) {
+                            return json.data;
+                        } else {
+                            mostrarMensaje('error', json.message || 'Error al cargar datos');
+                            return [];
+                        }
+                    },
+                    error: function(xhr, error, thrown) {
+                        mostrarMensaje('error', 'Error al cargar los employees: ' + thrown);
+                    }
+                },
+                columns: [
+                    { data: 'employeeId', name: 'EmployeeId', width: '5%' },
+                    { 
+                        data: 'fullName', 
+                        name: 'FullName', 
+                        width: '20%',
+                        render: function(data, type, row) {
+                            return data || (row.firstName + ' ' + row.lastName);
+                        }
+                    },
+                    { data: 'email', name: 'Email', width: '15%' },
+                    { data: 'phoneNumber', name: 'PhoneNumber', width: '12%' },
+                    { data: 'hireDate', name: 'HireDate', width: '12%' },
+                    { 
+                        data: 'salary', 
+                        name: 'Salary', 
+                        width: '12%',
+                        render: function(data, type, row) {
+                            return data || '-';
+                        }
+                    },
+                    { 
+                        data: 'departmentId', 
+                        name: 'DepartmentId', 
+                        width: '10%',
+                        render: function(data, type, row) {
+                            return data ? 'Dept. ' + data : '-';
+                        }
+                    },
+                    {
+                        data: null,
+                        name: 'Acciones',
+                        width: '12%',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return '<div class="btn-group btn-group-sm" role="group">' +
+                                   '<button type="button" class="btn btn-outline-info btn-ver" data-id="' + row.employeeId + '" title="Ver Detalles">' +
+                                   '<i class="bi bi-eye"></i></button>' +
+                                   '</div>';
+                        }
+                    }
+                ],
+                order: [[0, 'asc']],
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="bi bi-file-excel"></i> Exportar Excel',
+                        className: 'btn btn-success btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="bi bi-file-pdf"></i> Exportar PDF',
+                        className: 'btn btn-danger btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="bi bi-printer"></i> Imprimir',
+                        className: 'btn btn-secondary btn-sm'
+                    }
+                ],
+                responsive: true
+            });
+
+            // Guardar referencia global de la tabla
+            window.employeesTable = table;
+
+            // Event listeners para botones de acción
+            $('#employeesTable tbody').on('click', '.btn-ver', function() {
+                var id = $(this).data('id');
+                verDetallesEmployee(id);
+            });
+
+            $('#btnRefrescar').on('click', function() {
+                table.ajax.reload();
+            });
+        });
+
+        function verDetallesEmployee(id) {
+            $.ajax({
+                url: '/Employees/ObtenerEmployeePorId',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(id),
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        var employee = response.data;
+                        var mensaje = 'Employee ID: ' + employee.employeeId + '\n' +
+                                     'Nombre: ' + employee.fullName + '\n' +
+                                     'Email: ' + employee.email + '\n' +
+                                     'Teléfono: ' + (employee.phoneNumber || 'N/A') + '\n' +
+                                     'Fecha Contratación: ' + employee.hireDate + '\n' +
+                                     'Salario: ' + (employee.salary || 'N/A');
+                        alert(mensaje);
+                    } else {
+                        mostrarMensaje('error', response.message || 'Error al cargar el employee');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    mostrarMensaje('error', 'Error al cargar el employee: ' + error);
+                }
+            });
+        }
+    </script>
 }
 
