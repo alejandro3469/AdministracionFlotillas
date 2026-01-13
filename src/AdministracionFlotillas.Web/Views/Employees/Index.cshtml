@@ -2,21 +2,10 @@
     ViewData["Title"] = "Employees";
 }
 
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2 class="mb-0">
-                <i class="bi bi-people"></i> Employees
-            </h2>
-            <p class="text-muted">Gestión de empleados de la empresa</p>
-        </div>
-        <div class="col-md-4 text-end">
-            <button type="button" class="btn btn-secondary" id="btnRefrescar">
-                <i class="bi bi-arrow-clockwise"></i> Actualizar
-            </button>
-        </div>
-    </div>
-
+<div>
+    <h2>Employees</h2>
+    <p class="text-muted">Gestión de empleados de la empresa</p>
+    
     <!-- Vista parcial del grid -->
     @await Html.PartialAsync("_EmployeesGrid")
 </div>
@@ -80,10 +69,7 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            return '<div class="btn-group btn-group-sm" role="group">' +
-                                   '<button type="button" class="btn btn-outline-info btn-ver" data-id="' + row.idEmpleado + '" title="Ver Detalles">' +
-                                   '<i class="bi bi-eye"></i></button>' +
-                                   '</div>';
+                            return '<button type="button" class="btn btn-outline-info btn-sm btn-ver" data-id="' + row.idEmpleado + '" title="Ver Detalles">Ver</button>';
                         }
                     }
                 ],
@@ -117,8 +103,15 @@
                 dom: 'Bfrtip',
                 buttons: [
                     {
+                        text: 'Actualizar',
+                        action: function(e, dt, node, config) {
+                            dt.ajax.reload();
+                        },
+                        className: 'btn btn-secondary btn-sm'
+                    },
+                    {
                         extend: 'excel',
-                        text: '<i class="bi bi-file-excel"></i> Exportar Excel',
+                        text: 'Exportar Excel',
                         className: 'btn btn-success btn-sm',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6]
@@ -126,7 +119,7 @@
                     },
                     {
                         extend: 'pdf',
-                        text: '<i class="bi bi-file-pdf"></i> Exportar PDF',
+                        text: 'Exportar PDF',
                         className: 'btn btn-danger btn-sm',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4, 5, 6]
@@ -134,7 +127,7 @@
                     },
                     {
                         extend: 'print',
-                        text: '<i class="bi bi-printer"></i> Imprimir',
+                        text: 'Imprimir',
                         className: 'btn btn-secondary btn-sm'
                     }
                 ],
@@ -148,10 +141,6 @@
             $('#employeesTable tbody').on('click', '.btn-ver', function() {
                 var idEmpleado = $(this).data('id');
                 verDetallesEmpleado(idEmpleado);
-            });
-
-            $('#btnRefrescar').on('click', function() {
-                tabla.ajax.reload();
             });
         });
 
