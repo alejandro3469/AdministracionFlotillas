@@ -138,7 +138,7 @@
                         }
                     }
                 ],
-                order: [[1, 'asc']],
+                order: [[0, 'asc']],
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
                 language: {
@@ -180,7 +180,7 @@
                         text: '<i class="fas fa-file-excel" aria-hidden="true"></i>',
                         className: 'btn btn-sm',
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6]
+                            columns: [0, 1, 2, 3, 4, 5]
                         },
                         titleAttr: 'Exportar datos a Excel'
                     },
@@ -189,7 +189,7 @@
                         text: '<i class="fas fa-file-pdf" aria-hidden="true"></i>',
                         className: 'btn btn-sm',
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6]
+                            columns: [0, 1, 2, 3, 4, 5]
                         },
                         titleAttr: 'Exportar datos a PDF'
                     },
@@ -294,7 +294,7 @@
 
             // Filtro de búsqueda por nombre (solo columna de nombre)
             $('#filtroBusqueda').on('keyup', function() {
-                tabla.column(1).search(this.value).draw();
+                tabla.column(0).search(this.value).draw();
             });
 
             // Filtros de departamento, email y teléfono
@@ -443,29 +443,6 @@
             }
 
 
-            // Seleccionar todos
-            $('#selectAll').on('change', function() {
-                var isChecked = $(this).prop('checked');
-                $('.checkbox-empleado').each(function() {
-                    var checkbox = $(this);
-                    var fecha = checkbox.data('fecha');
-                    
-                    if (isChecked) {
-                        if (fechaContratacionBase === null) {
-                            fechaContratacionBase = fecha;
-                        }
-                        if (fecha === fechaContratacionBase) {
-                            checkbox.prop('checked', true);
-                            agregarEmpleadoSeleccionado(checkbox);
-                        }
-                    } else {
-                        checkbox.prop('checked', false);
-                        fechaContratacionBase = null;
-                        empleadosSeleccionados = [];
-                    }
-                });
-            });
-
             // Checkbox individual
             $('#employeesTable tbody').on('change', '.checkbox-empleado', function() {
                 var checkbox = $(this);
@@ -492,7 +469,6 @@
                         fechaContratacionBase = null;
                     }
                 }
-                $('#selectAll').prop('checked', false);
             });
 
             // Event listeners para botones de acción
@@ -634,7 +610,6 @@
                     empleadosSeleccionados = [];
                     fechaContratacionBase = null;
                     $('.checkbox-empleado').prop('checked', false);
-                    $('#selectAll').prop('checked', false);
                 });
             });
         });
