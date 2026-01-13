@@ -6,6 +6,16 @@
     <h2>Employees</h2>
     <p class="text-muted">Gestión de empleados de la empresa</p>
     
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Employees</li>
+        </ol>
+    </nav>
+    
     <!-- Vista parcial del grid -->
     @await Html.PartialAsync("_EmployeesGrid")
 </div>
