@@ -135,6 +135,7 @@ cd AdministracionFlotillas
 dir
 
 # Deberías ver:
+# - AdministracionFlotillas.sln
 # - AdministracionFlotillas.slnx
 # - src/
 # - docs/
@@ -174,6 +175,7 @@ cd AdministracionFlotillas
 ls -la
 
 # Deberías ver:
+# - AdministracionFlotillas.sln
 # - AdministracionFlotillas.slnx
 # - src/
 # - docs/
@@ -235,7 +237,7 @@ Restore succeeded.
 
 **5.1. Asegúrate de estar en la raíz del proyecto:**
 ```bash
-# Verifica que estás en la raíz (donde está el .slnx)
+# Verifica que estás en la raíz (donde están los archivos de solución)
 pwd
 ```
 
@@ -386,7 +388,7 @@ Después de clonar y configurar, verifica que todo está bien:
 - [ ] Repositorio clonado correctamente
 - [ ] `dotnet restore` ejecutado sin errores
 - [ ] `dotnet build` ejecutado sin errores
-- [ ] Proyecto abierto en IDE (VS Code o Rider)
+- [ ] Proyecto abierto en IDE (VS Code, Visual Studio o Rider)
 - [ ] IDE detecta .NET correctamente
 - [ ] (Opcional) Base de datos configurada
 - [ ] (Opcional) Aplicación ejecuta correctamente
