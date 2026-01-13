@@ -90,6 +90,21 @@ dotnet --version
 
 ---
 
+## IMPORTANTE: Archivos de Solución (.sln vs .slnx)
+
+El repositorio contiene dos archivos de solución:
+- **`AdministracionFlotillas.slnx`** - Formato nuevo de Visual Studio 2022 (solo para Visual Studio)
+- **`AdministracionFlotillas.sln`** - Formato tradicional (compatible con VS Code y Visual Studio)
+
+**Para usuarios de VS Code (Windows):**
+- ✅ **USA**: `AdministracionFlotillas.sln` (archivo tradicional)
+- ❌ **NO uses**: `AdministracionFlotillas.slnx` (VS Code no lo reconoce)
+
+**Para usuarios de Visual Studio 2022:**
+- Puedes usar cualquiera de los dos archivos
+
+---
+
 ## PASO 3: Clonar el Repositorio
 
 ### Para Windows:
@@ -308,10 +323,20 @@ info: Microsoft.Hosting.Lifetime[14]
 - Busca "Visual Studio Code" en el menú Inicio
 - O presiona `Win + R`, escribe `code` y presiona Enter
 
-**8.2. Abre la carpeta del proyecto:**
+**8.2. Abre el proyecto:**
+Tienes dos opciones:
+
+**Opción A: Abrir la carpeta (Recomendado)**
 - Ve a: **File** → **Open Folder...**
 - Navega a: `C:\Users\TU_USUARIO\Documents\AdministracionFlotillas`
 - Haz clic en "Select Folder"
+- VS Code detectará automáticamente los proyectos .NET
+
+**Opción B: Abrir el archivo de solución**
+- Ve a: **File** → **Open File...**
+- Navega a: `C:\Users\TU_USUARIO\Documents\AdministracionFlotillas`
+- **IMPORTANTE**: Selecciona `AdministracionFlotillas.sln` (NO uses `.slnx`)
+- VS Code abrirá la solución con todos los proyectos
 
 **8.3. Verifica que VS Code detecta .NET:**
 - Abre la Terminal integrada: `Ctrl + `` (backtick)
@@ -321,6 +346,7 @@ info: Microsoft.Hosting.Lifetime[14]
 **8.4. (Opcional) Instalar extensiones recomendadas:**
 - VS Code puede sugerirte instalar extensiones
 - Asegúrate de tener la extensión "C#" de Microsoft instalada
+- Si VS Code no detecta los proyectos, instala la extensión "C# Dev Kit" de Microsoft
 
 ### Para Mac (Rider):
 
@@ -411,6 +437,19 @@ dotnet sln list
 - El archivo .csproj puede estar corrupto
 - Verifica que clonaste el repositorio completo
 - Intenta clonar nuevamente en una carpeta diferente
+
+### Error: "El archivo seleccionado no es un archivo de solución válido" (VS Code)
+
+**Solución:**
+- VS Code no puede abrir archivos `.slnx` (formato de Visual Studio 2022)
+- **Usa el archivo `.sln` tradicional**:
+  - Abre VS Code
+  - Ve a: **File** → **Open File...**
+  - Selecciona `AdministracionFlotillas.sln` (NO `.slnx`)
+- O simplemente abre la carpeta del proyecto:
+  - **File** → **Open Folder...**
+  - Selecciona la carpeta `AdministracionFlotillas`
+  - VS Code detectará automáticamente los proyectos
 
 ### La aplicación no se ejecuta (error de puerto)
 
