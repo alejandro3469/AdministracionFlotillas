@@ -205,8 +205,7 @@
                             abrirModalEnviarEmail();
                         },
                         className: 'btn btn-sm btn-enviar-email',
-                        titleAttr: 'Enviar información de empleados seleccionados por email',
-                        enabled: false
+                        titleAttr: 'Enviar información de empleados seleccionados por email'
                     }
                 ],
                 responsive: true,
@@ -429,7 +428,6 @@
                         empleadosSeleccionados = [];
                     }
                 });
-                actualizarBotonEnviarEmail();
             });
 
             // Checkbox individual
@@ -458,7 +456,6 @@
                         fechaContratacionBase = null;
                     }
                 }
-                actualizarBotonEnviarEmail();
                 $('#selectAll').prop('checked', false);
             });
 
@@ -521,21 +518,13 @@
                 empleadosSeleccionados = empleadosSeleccionados.filter(e => e.id !== id);
             }
 
-            function actualizarBotonEnviarEmail() {
-                var boton = tabla.button(4); // Índice del botón "Enviar por Email"
-                if (empleadosSeleccionados.length > 0) {
-                    boton.enable();
-                } else {
-                    boton.disable();
-                }
-            }
-
             function abrirModalEnviarEmail() {
                 if (empleadosSeleccionados.length === 0) {
                     Swal.fire({
-                        icon: 'warning',
-                        title: 'Sin Selección',
-                        text: 'Debe seleccionar al menos un empleado',
+                        icon: 'info',
+                        title: 'Selección Requerida',
+                        html: 'Debe seleccionar al menos un elemento de la tabla para enviar por email.<br><br>' +
+                              '<i class="fas fa-info-circle"></i> Use los checkboxes en la primera columna para seleccionar empleados.',
                         confirmButtonText: 'Entendido'
                     });
                     return;
@@ -610,7 +599,6 @@
                     fechaContratacionBase = null;
                     $('.checkbox-empleado').prop('checked', false);
                     $('#selectAll').prop('checked', false);
-                    actualizarBotonEnviarEmail();
                 });
             });
         });
