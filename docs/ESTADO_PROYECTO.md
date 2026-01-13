@@ -269,25 +269,42 @@
 
 ## 📊 Resumen de Archivos por Vista
 
-### Vista Employees (COMPLETA)
+> **📖 Para información detallada sobre qué archivos componen cada vista, ver: [ESTRUCTURA_VISTAS.md](./ESTRUCTURA_VISTAS.md)**
+
+### Vista Employees (COMPLETA) - 11 archivos principales
+
+**Capa ModelosComunes (1 archivo):**
 - ✅ Modelo: `Employee.cs`
+
+**Capa AccesoDatos (2 archivos):**
 - ✅ Repository Interface: `IEmployeesRepository.cs`
 - ✅ Repository: `EmployeesRepository.cs`
+
+**Capa ReglasNegocio (2 archivos):**
 - ✅ Service Interface: `IEmployeesService.cs`
 - ✅ Service: `EmployeesServiceOracle.cs`
+
+**Capa Web (6 archivos):**
 - ✅ ViewModel: `EmployeeViewModel.cs`
 - ✅ Mapping: `MappingProfile.cs` (incluye Employee)
 - ✅ Controller: `EmployeesController.cs`
 - ✅ View Principal: `Views/Employees/Index.cshtml`
 - ✅ View Parcial: `Views/Employees/_EmployeesGrid.cshtml`
 - ✅ JavaScript: `wwwroot/js/employees.js`
+
+**Configuración (3 archivos compartidos):**
 - ✅ Configuración DI: `Program.cs` (registrado)
 - ✅ Layout: `_Layout.cshtml` (enlace de navegación)
+- ✅ Configuración: `appsettings.json`
 
-### Vista Home (BÁSICA - No funcional)
+### Vista Home (BÁSICA - No funcional) - 3 archivos
+
+**Capa Web (3 archivos):**
 - ⚠️ Controller: `HomeController.cs` (básico)
 - ⚠️ View: `Views/Home/Index.cshtml` (por defecto)
 - ⚠️ View: `Views/Home/Privacy.cshtml` (por defecto)
+
+**Nota**: Esta vista no tiene Model, Repository, Service, ViewModel ni JavaScript personalizado.
 
 ---
 
