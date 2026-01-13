@@ -91,17 +91,18 @@ AdministracionFlotillas/
 - **BusinessModels** (Modelos de la capa de reglas de negocio)
 
 **Implementación**:
-- Crear clase `ViewModelParser` o usar AutoMapper
+- Parseador manual (sin AutoMapper) - Métodos estáticos en español
 - Métodos de conversión bidireccional
 - Validaciones durante la conversión
 
 **Ejemplo de Estructura**:
 ```csharp
-// En AdministracionFlotillas.Web/Helpers/
-public class ViewModelParser
+// En AdministracionFlotillas.Web/Parseador/
+public static class EmployeeParseador
 {
-    public static BusinessModel ToBusinessModel(ViewModel viewModel) { }
-    public static ViewModel ToViewModel(BusinessModel businessModel) { }
+    public static EmployeeViewModel ConvertirAVista(Employee empleado) { }
+    public static List<EmployeeViewModel> ConvertirListaAVista(List<Employee> empleados) { }
+    public static Employee ConvertirAModelo(EmployeeViewModel modeloVista) { }
 }
 ```
 
@@ -190,8 +191,8 @@ public class ViewModelParser
 
 **Capa Web**:
 - `Microsoft.AspNetCore.Mvc.NewtonsoftJson` - Para JSON/AJAX
-- `AutoMapper` (opcional, para parsing de ViewModels)
-- Kendo UI (via CDN o NuGet si está disponible)
+- **Parseador Manual** - Sin dependencias externas, métodos estáticos en español
+- DataTables (via CDN, gratuito)
 
 ##  Flujo de Datos
 
@@ -231,10 +232,10 @@ Procedimiento Almacenado
 
 ### Nomenclatura
 
-- **ViewModels**: `*ViewModel` (ej: `FlotillaViewModel`)
-- **BusinessModels**: `*` (ej: `Flotilla`) en `ModelosComunes`
-- **DTOs**: `*Dto` (ej: `FlotillaDto`)
-- **Parsers**: `*Parser` (ej: `FlotillaParser`)
+- **ViewModels**: `*ViewModel` (ej: `EmployeeViewModel`) - Propiedades en español
+- **BusinessModels**: `*` (ej: `Employee`) en `ModelosComunes`
+- **DTOs**: `*Dto` (ej: `EmployeeDto`)
+- **Parseadores**: `*Parseador` (ej: `EmployeeParseador`) - Métodos estáticos en español, ubicación: `Parseador/`
 
 ### Estructura de Archivos
 

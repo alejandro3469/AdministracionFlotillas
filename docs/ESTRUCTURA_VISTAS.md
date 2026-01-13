@@ -438,8 +438,9 @@ Para crear una nueva vista completa (ej: Departments), necesitas crear **11 arch
    - Controller recibe `List<Employee>`
 
 9. **Controller convierte a ViewModel**
-   - Usa AutoMapper: `_mapeador.Map<List<EmployeeViewModel>>(empleados)`
-   - Convierte fechas a string, salarios a formato moneda, etc.
+   - Usa parseador manual: `EmployeeParseador.ConvertirListaAVista(empleados)`
+   - Convierte fechas a string, salarios a formato moneda, porcentajes, etc.
+   - Todas las propiedades se convierten a español (IdEmpleado, PrimerNombre, etc.)
 
 10. **Controller retorna JSON**
     - Retorna `Json(new { exito = true, datos = modelosVista })`
@@ -463,8 +464,8 @@ Para crear una nueva vista completa (ej: Departments), necesitas crear **11 arch
 | **AccesoDatos** | `EmployeesRepository.cs` | Implementación del repositorio |
 | **ReglasNegocio** | `IEmployeesService.cs` | Interfaz del servicio |
 | **ReglasNegocio** | `EmployeesServiceOracle.cs` | Implementación del servicio |
-| **Web** | `EmployeeViewModel.cs` | Modelo para la vista |
-| **Web** | `MappingProfile.cs` | Mapeo AutoMapper |
+| **Web** | `EmployeeViewModel.cs` | Modelo para la vista (propiedades en español) |
+| **Web** | `Parseador/EmployeeParseador.cs` | Parseador manual (sin AutoMapper) |
 | **Web** | `EmployeesController.cs` | Controller MVC |
 | **Web** | `Views/Employees/Index.cshtml` | Vista principal |
 | **Web** | `Views/Employees/_EmployeesGrid.cshtml` | Vista parcial (tabla) |

@@ -210,11 +210,10 @@ cd src/AdministracionFlotillas.AccesoDatos
 dotnet add package Oracle.ManagedDataAccess.Core
 cd ../..
 
-# En Web (para JSON y AutoMapper para parsing)
+# En Web (para JSON - NO se usa AutoMapper, se usa parseador manual)
 cd src/AdministracionFlotillas.Web
 dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson
-dotnet add package AutoMapper
-dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
+# Nota: NO se instala AutoMapper, se usa parseador manual en carpeta Parseador/
 cd ../..
 ```
 

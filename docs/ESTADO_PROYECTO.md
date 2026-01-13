@@ -69,10 +69,10 @@
 
 - **`src/AdministracionFlotillas.Web/Program.cs`**
   - Dependency Injection configurado:
-    - AutoMapper
     - IEmployeesRepository → EmployeesRepository
     - IEmployeesService → EmployeesServiceOracle
   - NewtonsoftJson para respuestas AJAX
+  - **Nota**: No se usa AutoMapper, se usa parseador manual estático
 
 - **`src/AdministracionFlotillas.Web/appsettings.json`**
   - ConnectionStrings configurado (placeholder para Oracle)
@@ -99,13 +99,14 @@
 
 ✅ **Arquitectura en Capas**
 - Separación completa: Web → ReglasNegocio → AccesoDatos
-- AutoMapper para conversión ViewModel ↔ BusinessModel
+- Parseador manual para conversión ViewModel ↔ BusinessModel (sin AutoMapper)
 - Patrón Strategy para diferentes escenarios (Oracle, SQL Server, Mock)
+- ViewModels con propiedades en español siguiendo convenciones oficiales
 
 ### Tecnologías Utilizadas
 
 - **Frontend**: DataTables (gratis), Bootstrap 5, jQuery, Bootstrap Icons
-- **Backend**: ASP.NET Core MVC, AutoMapper, NewtonsoftJson
+- **Backend**: ASP.NET Core MVC, Parseador Manual, NewtonsoftJson
 - **Arquitectura**: 4 capas (Web, ReglasNegocio, AccesoDatos, ModelosComunes)
 - **Base de Datos**: Oracle HR (actualmente con datos mock)
 
@@ -173,7 +174,7 @@
    - `src/AdministracionFlotillas.Web/Views/Departments/Index.cshtml`
    - `src/AdministracionFlotillas.Web/Views/Departments/_DepartmentsGrid.cshtml`
 9. **JavaScript**: `src/AdministracionFlotillas.Web/wwwroot/js/departments.js`
-10. **Mapping**: Agregar mapeo en `MappingProfile.cs`
+10. **Parseador**: Crear `DepartmentParseador.cs` en carpeta `Parseador/`
 11. **DI**: Registrar en `Program.cs`
 
 ---
@@ -290,7 +291,7 @@
 
 **Capa Web (6 archivos):**
 - ✅ ViewModel: `EmployeeViewModel.cs`
-- ✅ Mapping: `MappingProfile.cs` (incluye Employee)
+- ✅ Parseador: `EmployeeParseador.cs` (parseador manual)
 - ✅ Controller: `EmployeesController.cs`
 - ✅ View Principal: `Views/Employees/Index.cshtml`
 - ✅ View Parcial: `Views/Employees/_EmployeesGrid.cshtml`

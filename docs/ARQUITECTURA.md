@@ -12,8 +12,8 @@ graph TB
     
     subgraph "Capa de Aplicación - Web"
         CTRL[Controllers<br/>EmployeesController]
-        VM[ViewModels<br/>EmployeeViewModel]
-        PARSER[AutoMapper<br/>MappingProfile]
+        VM[ViewModels<br/>EmployeeViewModel<br/>Propiedades en español]
+        PARSER[Parseador Manual<br/>EmployeeParseador]
         CTRL --> VM
         CTRL --> PARSER
     end
@@ -57,24 +57,24 @@ sequenceDiagram
     participant U as Usuario
     participant DT as DataTables
     participant C as Controller
-    participant P as AutoMapper
+    participant P as Parseador Manual
     participant S as Servicio
     participant R as Repositorio
     participant O as Oracle DB
     
     U->>DT: 1. Carga página /Employees
     DT->>C: 2. POST /Employees/ObtenerEmployees<br/>(AJAX)
-    C->>P: 3. Convierte ViewModel
-    P->>S: 4. BusinessModel
-    S->>R: 5. ObtenerEmployeesAsync()
-    R->>O: 6. SELECT * FROM EMPLOYEES<br/>(o datos mock)
-    O-->>R: 7. Resultados
-    R-->>S: 8. List<Employee>
-    S->>S: 9. Aplica reglas de negocio
-    S-->>P: 10. List<Employee>
-    P->>P: 11. Convierte a ViewModel
+    C->>S: 3. ObtenerEmployeesAsync()
+    S->>R: 4. ObtenerEmployeesAsync()
+    R->>O: 5. SELECT * FROM EMPLOYEES<br/>(o datos mock)
+    O-->>R: 6. Resultados
+    R-->>S: 7. List<Employee>
+    S->>S: 8. Aplica reglas de negocio
+    S-->>C: 9. List<Employee>
+    C->>P: 10. ConvertirListaAVista(empleados)
+    P->>P: 11. Convierte a ViewModel<br/>(propiedades en español)
     P-->>C: 12. List<EmployeeViewModel>
-    C-->>DT: 13. JSON Response
+    C-->>DT: 13. JSON Response<br/>(propiedades en español)
     DT->>DT: 14. Actualiza DataTables
     DT-->>U: 15. Muestra resultados
 ```
@@ -129,7 +129,7 @@ flowchart TD
     Validate -->|Error| ShowError[Mostrar errores]
     Validate -->|OK| SendAJAX[Enviar AJAX POST]
     SendAJAX --> Controller[Controller recibe]
-    Controller --> ParseVM[AutoMapper: ViewModel → BusinessModel]
+    Controller --> ParseVM[Parseador Manual: Employee → EmployeeViewModel]
     ParseVM --> Service[Servicio valida reglas]
     Service -->|Error Negocio| ReturnError[Retornar error]
     Service -->|OK| Repo[Repositorio inserta]
@@ -151,14 +151,13 @@ flowchart LR
     A[Usuario ingresa filtros] --> B[DataTables aplica filtros]
     B --> C[Enviar petición AJAX]
     C --> D[Controller recibe filtros]
-    D --> E[AutoMapper convierte]
-    E --> F[Servicio procesa]
-    F --> G[Repositorio construye query]
-    G --> H[Ejecuta SELECT con WHERE]
-    H --> I[(Oracle DB)]
-    I --> J[Retorna resultados]
-    J --> K[Transforma resultados]
-    K --> L[AutoMapper convierte a ViewModel]
+    D --> E[Servicio procesa]
+    E --> F[Repositorio construye query]
+    F --> G[Ejecuta SELECT con WHERE]
+    G --> H[(Oracle DB)]
+    H --> I[Retorna resultados]
+    I --> J[Transforma resultados]
+    J --> K[Parseador convierte a ViewModel<br/>(propiedades en español)]
     L --> M[Retorna JSON]
     M --> N[DataTables actualiza]
     N --> O[Usuario ve resultados]
@@ -225,7 +224,7 @@ mindmap
       Bootstrap
       JavaScript/AJAX
       ViewModels
-      AutoMapper
+      Parseador Manual
     ReglasNegocio
       Servicios
       Lógica de negocio
