@@ -1,67 +1,135 @@
 # Índice de Documentación
 
-Este documento es un índice de toda la documentación disponible del proyecto AdministracionFlotillas. Toda la documentación está en español.
+Este documento es un índice de toda la documentación disponible del proyecto AdministracionFlotillas. Toda la documentación está en español y está organizada por categorías.
+
+## Estructura de Documentación
+
+La documentación está organizada en las siguientes carpetas:
+
+- **[GET_STARTED/](GET_STARTED/)** - Guías de inicio rápido y configuración inicial
+- **[ARQUITECTURA/](ARQUITECTURA/)** - Arquitectura, estructura y estado del proyecto
+- **[UI/](UI/)** - Documentación sobre interfaz de usuario y migración a Syncfusion
+- **[CONFIGURACION/](CONFIGURACION/)** - Configuración del entorno y compatibilidad
+- **[BASE_DATOS/](BASE_DATOS/)** - Guías de base de datos Oracle
+- **[DESARROLLO/](DESARROLLO/)** - Guías de desarrollo, comandos y ejercicios
+
+---
 
 ## Documentos Principales
 
-- [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md) - **LEER PRIMERO** - Estructura actual del proyecto, arquitectura basada en módulos, sistema de bundles, componentes implementados y explicación de conceptos fundamentales
-- [ESTADO_IMPLEMENTACION_ACTUAL.md](../ESTADO_IMPLEMENTACION_ACTUAL.md) - **ESTADO ACTUAL** - Todo lo que está implementado, funcionando y en uso actualmente, con referencias a archivos y rutas específicas
-- [ARQUITECTURA.md](../ARQUITECTURA.md) - Arquitectura del proyecto, diagramas, flujos de datos y estructura en capas
-- [REQUISITOS_PROYECTO.md](../REQUISITOS_PROYECTO.md) - Requisitos completos del proyecto, tecnologías y estructura
+### Arquitectura y Estado
 
-## Guías de Inicio
+- [ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md](ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md) - **LEER PRIMERO** - Estructura actual del proyecto, arquitectura basada en módulos, sistema de bundles, componentes implementados y explicación de conceptos fundamentales
+- [ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md](ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md) - **ESTADO ACTUAL** - Todo lo que está implementado, funcionando y en uso actualmente, con referencias a archivos y rutas específicas
+- [ARQUITECTURA/ARQUITECTURA.md](ARQUITECTURA/ARQUITECTURA.md) - Arquitectura del proyecto, diagramas, flujos de datos y estructura en capas
+- [ARQUITECTURA/REQUISITOS_PROYECTO.md](ARQUITECTURA/REQUISITOS_PROYECTO.md) - Requisitos completos del proyecto, tecnologías y estructura
 
-- [CLONAR_REPOSITORIO.md](../CLONAR_REPOSITORIO.md) - Guía paso a paso para clonar el repositorio y configurarlo
-- [INSTALACION_HERRAMIENTAS.md](../INSTALACION_HERRAMIENTAS.md) - Guía de instalación de herramientas necesarias
-- [INICIO_RAPIDO_WINDOWS.md](../INICIO_RAPIDO_WINDOWS.md) - Guía específica para Windows con Visual Studio
-- [QUICK_START_CROSS_PLATFORM.md](../QUICK_START_CROSS_PLATFORM.md) - Inicio rápido multiplataforma
+---
 
-## Compatibilidad y Configuración
+## GET_STARTED - Inicio Rápido
 
-- [COMPATIBILIDAD_CROSS_PLATFORM.md](../COMPATIBILIDAD_CROSS_PLATFORM.md) - Compatibilidad entre Windows y Mac, configuración de versiones
-- [DIAGNOSTICO_SDK.md](../DIAGNOSTICO_SDK.md) - Comandos de diagnóstico para problemas con el SDK
-- [SOLUCION_COMPATIBILIDAD_SDK.md](../SOLUCION_COMPATIBILIDAD_SDK.md) - Soluciones a problemas de compatibilidad del SDK
-- [INSTALAR_RUNTIME_NET8.md](../INSTALAR_RUNTIME_NET8.md) - Instalación del runtime de .NET 8
+Guías para comenzar a trabajar con el proyecto:
 
-## Base de Datos
+- [GET_STARTED/CLONAR_REPOSITORIO.md](GET_STARTED/CLONAR_REPOSITORIO.md) - Guía paso a paso para clonar el repositorio y configurarlo
+- [GET_STARTED/INSTALACION_HERRAMIENTAS.md](GET_STARTED/INSTALACION_HERRAMIENTAS.md) - Guía de instalación de herramientas necesarias
+- [GET_STARTED/INICIO_RAPIDO_WINDOWS.md](GET_STARTED/INICIO_RAPIDO_WINDOWS.md) - Guía específica para Windows con Visual Studio
+- [GET_STARTED/QUICK_START_CROSS_PLATFORM.md](GET_STARTED/QUICK_START_CROSS_PLATFORM.md) - Inicio rápido multiplataforma
+- [GET_STARTED/SETUP.md](GET_STARTED/SETUP.md) - Configuración inicial del proyecto
+- [GET_STARTED/QUICK_START.md](GET_STARTED/QUICK_START.md) - Inicio rápido general
 
-- [GUIA_BASE_DATOS.md](../GUIA_BASE_DATOS.md) - Guía de configuración de base de datos Oracle
-- [ORACLE_XE_LOCAL.md](../ORACLE_XE_LOCAL.md) - Guía para instalar Oracle XE localmente
+---
+
+## UI - Interfaz de Usuario
+
+Documentación sobre la migración a Syncfusion ASP.NET Core MVC:
+
+### Instalación y Configuración
+
+- [UI/INSTALACION_SYNCFUSION_MAC.md](UI/INSTALACION_SYNCFUSION_MAC.md) - **PARA MAC** - Guía paso a paso para instalar Syncfusion Essential Studio en macOS
+- [UI/INSTALACION_SYNCFUSION_WINDOWS.md](UI/INSTALACION_SYNCFUSION_WINDOWS.md) - **PARA WINDOWS** - Guía paso a paso para instalar Syncfusion Essential Studio en Windows
+- [UI/REGISTRO_LICENCIA_SYNCFUSION.md](UI/REGISTRO_LICENCIA_SYNCFUSION.md) - **IMPORTANTE** - Cómo registrar la licencia temporal y permanente en el proyecto (Mac y Windows)
+
+### Información sobre Licencias
+
+- [UI/LICENCIA_SYNCFUSION.md](UI/LICENCIA_SYNCFUSION.md) - Información detallada sobre la Community License: gratuita permanente, requisitos y preguntas frecuentes
+- [UI/PROCESO_SOLICITUD_LICENCIA.md](UI/PROCESO_SOLICITUD_LICENCIA.md) - Guía paso a paso del proceso real de solicitud de Community License (incluye clave de 7 días y validación)
+
+### Selección y Componentes
+
+- [UI/SELECCION_UI_LIBRARY.md](UI/SELECCION_UI_LIBRARY.md) - Selección de biblioteca UI basada en requisitos específicos del proyecto
+- [UI/COMPONENTES_SYNCFUSION.md](UI/COMPONENTES_SYNCFUSION.md) - Componentes Syncfusion: guía visual, capacidades y ejemplos de uso
+- [UI/RECOMENDACIONES_UI_LIBRARIES.md](UI/RECOMENDACIONES_UI_LIBRARIES.md) - Comparación inicial de bibliotecas UI consideradas
+
+### Migración
+
+- [UI/PLAN_MIGRACION_UI.md](UI/PLAN_MIGRACION_UI.md) - **ESTRATEGIA ACTUALIZADA** - Plan de creación de nuevo módulo con Syncfusion basado en Oracle Sample Schema CO, manteniendo módulo Employees intacto como referencia (V1) (**EN PAUSA - Esperando aprobación de licencia**)
+- [UI/GUIA_PREPARACION_MIGRACION.md](UI/GUIA_PREPARACION_MIGRACION.md) - **PREPARACIÓN ACTIVA** - Guía de tareas que se pueden adelantar mientras se espera la aprobación de la licencia (configuración de BD, análisis, diseño)
+- [UI/VERIFICACION_DOCUMENTACION.md](UI/VERIFICACION_DOCUMENTACION.md) - Verificación de que toda la documentación está actualizada, correctamente referenciada y alineada con la documentación oficial
+
+**Nota sobre Estrategia**: El proyecto mantiene el módulo Employees (V1) completamente intacto con DataTables + Bootstrap. El nuevo módulo de Órdenes/Ventas (V2) se desarrollará desde cero con Syncfusion y Oracle Sample Schema CO, permitiendo comparación directa y aprendizaje gradual sin interrumpir el trabajo actual.
+
+---
+
+## CONFIGURACION - Configuración y Compatibilidad
+
+Guías para configurar el entorno de desarrollo:
+
+- [CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md](CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md) - Compatibilidad entre Windows y Mac, configuración de versiones
+- [CONFIGURACION/DIAGNOSTICO_SDK.md](CONFIGURACION/DIAGNOSTICO_SDK.md) - Comandos de diagnóstico para problemas con el SDK
+- [CONFIGURACION/SOLUCION_COMPATIBILIDAD_SDK.md](CONFIGURACION/SOLUCION_COMPATIBILIDAD_SDK.md) - Soluciones a problemas de compatibilidad del SDK
+- [CONFIGURACION/INSTALAR_RUNTIME_NET8.md](CONFIGURACION/INSTALAR_RUNTIME_NET8.md) - Instalación del runtime de .NET 8
+
+---
+
+## BASE_DATOS - Base de Datos
+
+Guías para configurar y trabajar con Oracle Database:
+
+- [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md) - **RECOMENDADO** - Configuración de Oracle Cloud Always Free con Sample Schema CO (Customer Orders) para datos reales de ventas y facturación
+- [BASE_DATOS/ORACLE_XE_LOCAL.md](BASE_DATOS/ORACLE_XE_LOCAL.md) - Guía para instalar Oracle XE localmente (alternativa)
 - [../scripts/](../scripts/) - Scripts SQL para migración y configuración de base de datos
 
-## Desarrollo
+**Nota**: El proyecto utiliza Oracle Cloud Always Free con el Sample Schema CO (Customer Orders) que contiene datos realistas de ventas, órdenes, clientes, productos e inventario. Ver [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md) para configuración completa.
 
-- [COMANDOS_UTILES.md](../COMANDOS_UTILES.md) - Comandos útiles para desarrollo diario
-- [GUIA_GIT.md](../GUIA_GIT.md) - Guía de Git con conceptos básicos, buenas prácticas y flujo de trabajo recomendado
-- [EJERCICIOS_PRACTICA.md](../EJERCICIOS_PRACTICA.md) - Ejercicios de práctica progresivos con diferentes niveles de dificultad
+---
 
-## Migración UI (En Pausa)
+## DESARROLLO - Desarrollo
 
-- [SELECCION_UI_LIBRARY.md](../SELECCION_UI_LIBRARY.md) - Selección de biblioteca UI basada en requisitos específicos del proyecto
-- [COMPONENTES_SYNCFUSION.md](../COMPONENTES_SYNCFUSION.md) - Componentes Syncfusion: guía visual, capacidades y ejemplos de uso
-- [LICENCIA_SYNCFUSION.md](../LICENCIA_SYNCFUSION.md) - Información detallada sobre la Community License: gratuita permanente, requisitos y preguntas frecuentes
-- [PROCESO_SOLICITUD_LICENCIA.md](../PROCESO_SOLICITUD_LICENCIA.md) - Guía paso a paso del proceso real de solicitud de Community License (incluye clave de 7 días y validación)
-- [PLAN_MIGRACION_UI.md](../PLAN_MIGRACION_UI.md) - Plan detallado de migración de UI actual a Syncfusion ASP.NET Core MVC (**EN PAUSA - Esperando aprobación de licencia**)
-- [GUIA_PREPARACION_MIGRACION.md](../GUIA_PREPARACION_MIGRACION.md) - **PREPARACIÓN ACTIVA** - Guía de tareas que se pueden adelantar mientras se espera la aprobación de la licencia
-- [VERIFICACION_DOCUMENTACION.md](../VERIFICACION_DOCUMENTACION.md) - Verificación de que toda la documentación está actualizada, correctamente referenciada y alineada con la documentación oficial
+Guías y herramientas para el desarrollo diario:
+
+- [DESARROLLO/COMANDOS_UTILES.md](DESARROLLO/COMANDOS_UTILES.md) - Comandos útiles para desarrollo diario
+- [DESARROLLO/GUIA_GIT.md](DESARROLLO/GUIA_GIT.md) - Guía de Git con conceptos básicos, buenas prácticas y flujo de trabajo recomendado
+- [DESARROLLO/EJERCICIOS_PRACTICA.md](DESARROLLO/EJERCICIOS_PRACTICA.md) - Ejercicios de práctica progresivos con diferentes niveles de dificultad
+- [DESARROLLO/COMO_CONTINUAR.md](DESARROLLO/COMO_CONTINUAR.md) - Guía paso a paso para continuar el desarrollo
+- [DESARROLLO/ESTRUCTURA_VISTAS.md](DESARROLLO/ESTRUCTURA_VISTAS.md) - Estructura detallada de las vistas, archivos que las componen y flujos
+
+---
 
 ## Flujo Recomendado de Lectura
 
 ### Para nuevos miembros del equipo
 
-1. [INSTALACION_HERRAMIENTAS.md](../INSTALACION_HERRAMIENTAS.md) - Instalar herramientas necesarias
-2. [CLONAR_REPOSITORIO.md](../CLONAR_REPOSITORIO.md) - Clonar y configurar el repositorio
-3. [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md) - **IMPORTANTE** - Entender la estructura actual, arquitectura basada en módulos y sistema de bundles
-4. [ESTADO_IMPLEMENTACION_ACTUAL.md](../ESTADO_IMPLEMENTACION_ACTUAL.md) - **ESTADO ACTUAL** - Ver qué está implementado, funcionando y en uso actualmente
-5. [ARQUITECTURA.md](../ARQUITECTURA.md) - Entender la arquitectura completa del proyecto
-6. [EJERCICIOS_PRACTICA.md](../EJERCICIOS_PRACTICA.md) - Practicar con ejercicios progresivos
+1. [GET_STARTED/INSTALACION_HERRAMIENTAS.md](GET_STARTED/INSTALACION_HERRAMIENTAS.md) - Instalar herramientas necesarias
+2. [GET_STARTED/CLONAR_REPOSITORIO.md](GET_STARTED/CLONAR_REPOSITORIO.md) - Clonar y configurar el repositorio
+3. [ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md](ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md) - **IMPORTANTE** - Entender la estructura actual, arquitectura basada en módulos y sistema de bundles
+4. [ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md](ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md) - **ESTADO ACTUAL** - Ver qué está implementado, funcionando y en uso actualmente
+5. [ARQUITECTURA/ARQUITECTURA.md](ARQUITECTURA/ARQUITECTURA.md) - Entender la arquitectura completa del proyecto
+6. [DESARROLLO/EJERCICIOS_PRACTICA.md](DESARROLLO/EJERCICIOS_PRACTICA.md) - Practicar con ejercicios progresivos
 
 ### Para desarrolladores
 
-1. [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md) - Entender la estructura de módulos y cómo organizar código
-2. [ESTADO_IMPLEMENTACION_ACTUAL.md](../ESTADO_IMPLEMENTACION_ACTUAL.md) - Ver qué está implementado y funcionando
-3. [GUIA_GIT.md](../GUIA_GIT.md) - Aprender conceptos básicos de Git y buenas prácticas para commits
-4. [COMANDOS_UTILES.md](../COMANDOS_UTILES.md) - Comandos útiles para desarrollo diario
+1. [ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md](ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md) - Entender la estructura de módulos y cómo organizar código
+2. [ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md](ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md) - Ver qué está implementado y funcionando
+3. [DESARROLLO/GUIA_GIT.md](DESARROLLO/GUIA_GIT.md) - Aprender conceptos básicos de Git y buenas prácticas para commits
+4. [DESARROLLO/COMANDOS_UTILES.md](DESARROLLO/COMANDOS_UTILES.md) - Comandos útiles para desarrollo diario
+
+### Para configuración de entorno
+
+1. [GET_STARTED/INSTALACION_HERRAMIENTAS.md](GET_STARTED/INSTALACION_HERRAMIENTAS.md) - Instalar herramientas
+2. [BASE_DATOS/GUIA_BASE_DATOS.md](BASE_DATOS/GUIA_BASE_DATOS.md) - Configurar base de datos
+3. [CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md](CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md) - Verificar compatibilidad
+
+---
 
 ## Conceptos Clave Explicados en la Documentación
 
@@ -93,7 +161,9 @@ Los namespaces son objetos que agrupan funcionalidad relacionada, evitando confl
 El proyecto usa inyección de dependencias de ASP.NET Core para registrar y resolver servicios, repositorios y otros componentes. Esto facilita el testing y mantiene el código desacoplado.
 
 ### Control de Versiones con Git
-Git permite rastrear cambios en el proyecto. Los mensajes de commit deben ser breves (menos de 10 palabras) y descriptivos para facilitar la identificación de cambios en el historial. Ver [GUIA_GIT.md](../GUIA_GIT.md) para más detalles.
+Git permite rastrear cambios en el proyecto. Los mensajes de commit deben ser breves (menos de 10 palabras) y descriptivos para facilitar la identificación de cambios en el historial. Ver [DESARROLLO/GUIA_GIT.md](DESARROLLO/GUIA_GIT.md) para más detalles.
+
+---
 
 ## Notas Importantes
 

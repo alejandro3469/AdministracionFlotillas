@@ -1,20 +1,115 @@
-# Guía de Preparación para Migración a Syncfusion
+# Guía de Preparación para Nuevo Módulo con Syncfusion
 
-Este documento detalla todas las tareas que se pueden adelantar mientras se espera la aprobación de la Community License de Syncfusion. Estas tareas preparatorias permitirán que la migración sea más rápida y eficiente una vez que se apruebe la licencia.
+Este documento detalla todas las tareas que se pueden adelantar mientras se espera la aprobación de la Community License de Syncfusion. Estas tareas preparatorias permitirán que el desarrollo del nuevo módulo sea más rápido y eficiente una vez que se apruebe la licencia.
 
 **Estado**: Preparación en curso - Esperando aprobación de licencia (Ticket #803702)
 
+**Estrategia**: Crear nuevo módulo basado en Oracle Sample Schema CO (Customer Orders) con Syncfusion, manteniendo el módulo Employees intacto como referencia.
+
 ## Objetivo
 
-Preparar el proyecto para la migración a Syncfusion sin necesidad de tener la licencia activa, de manera que cuando se apruebe, la implementación sea inmediata.
+Preparar el proyecto para el desarrollo del nuevo módulo de Órdenes/Ventas con Syncfusion sin necesidad de tener la licencia activa, de manera que cuando se apruebe, la implementación sea inmediata.
 
 ## Tareas Preparatorias (Sin Licencia)
 
-### 1. Análisis y Documentación
+### 1. Configuración de Base de Datos
 
-#### 1.1 Mapeo de Funcionalidades Actuales
+#### 1.1 Configurar Oracle Cloud Always Free
 
-**Tarea**: Documentar todas las funcionalidades del módulo Employees que deben migrarse.
+**Tarea**: Crear cuenta y provisionar Autonomous Database Always Free
+
+**Pasos**:
+1. Crear cuenta en Oracle Cloud (https://www.oracle.com/cloud/free/)
+2. Provisionar Autonomous Database Always Free
+3. Descargar Wallet de conexión
+4. Configurar conexión en DataGrip
+
+**Checklist**:
+- [ ] Cuenta Oracle Cloud creada
+- [ ] Autonomous Database Always Free provisionada
+- [ ] Wallet descargado y extraído
+- [ ] Conexión probada en DataGrip
+- [ ] Connection string guardado de forma segura
+
+**Tiempo estimado**: 1-2 horas
+
+**Documentación**: [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)
+
+#### 1.2 Instalar Sample Schema CO
+
+**Tarea**: Instalar el schema CO (Customer Orders) en la base de datos
+
+**Pasos**:
+1. Conectarse a Database Actions como ADMIN
+2. Descargar scripts del schema CO desde GitHub de Oracle
+3. Ejecutar script `co_main.sql`
+4. Verificar instalación y datos
+
+**Checklist**:
+- [ ] Scripts del schema CO descargados
+- [ ] Schema CO instalado correctamente
+- [ ] Tablas principales verificadas (ORDERS, CUSTOMERS, PRODUCTS, etc.)
+- [ ] Datos de ejemplo verificados (miles de registros)
+- [ ] Usuario CO configurado con permisos
+
+**Tiempo estimado**: 30 minutos
+
+**Documentación**: [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)
+
+#### 1.3 Explorar Estructura del Schema CO
+
+**Tarea**: Familiarizarse con las tablas y relaciones del schema CO
+
+**Tablas a Explorar**:
+- ORDERS (órdenes principales)
+- ORDER_ITEMS (items de órdenes)
+- CUSTOMERS (clientes)
+- PRODUCTS (productos)
+- STORES (tiendas)
+- SHIPMENTS (envíos)
+- INVENTORY (inventario)
+- EMPLOYEES (empleados de tiendas)
+
+**Consultas de Exploración**:
+```sql
+-- Ver estructura de tablas
+SELECT table_name, num_rows 
+FROM all_tables 
+WHERE owner = 'CO' 
+ORDER BY table_name;
+
+-- Ver relaciones (foreign keys)
+SELECT 
+    a.table_name, 
+    a.column_name, 
+    c.table_name AS referenced_table,
+    c.column_name AS referenced_column
+FROM all_cons_columns a
+JOIN all_constraints b ON a.constraint_name = b.constraint_name
+JOIN all_cons_columns c ON b.r_constraint_name = c.constraint_name
+WHERE b.constraint_type = 'R' 
+AND a.owner = 'CO'
+ORDER BY a.table_name;
+
+-- Ver datos de ejemplo
+SELECT * FROM co.orders WHERE ROWNUM <= 10;
+SELECT * FROM co.order_items WHERE ROWNUM <= 10;
+SELECT * FROM co.customers WHERE ROWNUM <= 10;
+```
+
+**Checklist**:
+- [ ] Estructura de tablas documentada
+- [ ] Relaciones entre tablas entendidas
+- [ ] Datos de ejemplo revisados
+- [ ] Consultas de ejemplo preparadas
+
+**Tiempo estimado**: 1 hora
+
+### 2. Análisis y Diseño
+
+#### 2.1 Mapear Funcionalidades del Módulo Employees
+
+**Tarea**: Documentar todas las funcionalidades de Employees que se replicarán en el nuevo módulo
 
 **Archivos a Revisar**:
 - `src/AdministracionFlotillas.Web/Views/Employees/Index.cshtml`
@@ -22,593 +117,342 @@ Preparar el proyecto para la migración a Syncfusion sin necesidad de tener la l
 - `src/AdministracionFlotillas.Web/Scripts/Employees/Employees.js`
 - `src/AdministracionFlotillas.Web/Controllers/EmployeesController.cs`
 
-**Checklist de Funcionalidades**:
-- [ ] Tabla con datos de empleados
-- [ ] Filtrado por nombre
-- [ ] Filtrado por rango de fechas (desde/hasta)
-- [ ] Filtrado por rango de salario (mínimo/máximo)
-- [ ] Filtrado por departamento
-- [ ] Filtrado por email
-- [ ] Filtrado por teléfono
+**Funcionalidades a Documentar**:
+- [ ] Tabla con datos (Grid)
+- [ ] Filtrado por múltiples campos
 - [ ] Ordenamiento por columnas
-- [ ] Selección múltiple con checkboxes
-- [ ] Exportación a Excel
-- [ ] Exportación a PDF
-- [ ] Exportación a CSV
-- [ ] Copiar al portapapeles
-- [ ] Visualización de detalles de empleado
-- [ ] Modal de envío de email
+- [ ] Selección múltiple
 - [ ] Paginación
+- [ ] Exportación (Excel, PDF, CSV)
 - [ ] Búsqueda global
-- [ ] Formateo de fechas
-- [ ] Formateo de moneda
+- [ ] Formateo de fechas y moneda
+- [ ] Vista de detalles
+- [ ] Modal de acciones
 
-**Resultado Esperado**: Documento con lista completa de funcionalidades y su ubicación en el código actual.
+**Resultado**: Documento con lista completa de funcionalidades y su implementación actual
 
-#### 1.2 Mapeo de Namespaces JavaScript
+**Tiempo estimado**: 2 horas
 
-**Tarea**: Documentar la estructura actual de namespaces JavaScript para mantenerla en Syncfusion.
+#### 2.2 Diseñar Funcionalidades Especializadas
 
-**Archivo Actual**: `src/AdministracionFlotillas.Web/Scripts/Employees/Employees.js`
+**Tarea**: Diseñar funcionalidades adicionales específicas para el módulo de Órdenes
 
-**Estructura Actual**:
-```javascript
-Employees.Table.*
-Employees.Filters.*
-Employees.Selection.*
-Employees.Email.*
-Employees.Details.*
-Employees.Events.*
+**Funcionalidades Especializadas a Diseñar**:
+- [ ] Dashboard con métricas de ventas
+- [ ] Calendario de órdenes por fecha
+- [ ] Gráficos de análisis (ventas, productos, tiendas)
+- [ ] Vista de detalle con tabs (orden, items, cliente, envío)
+- [ ] Query Builder para búsquedas avanzadas
+- [ ] Tree Grid para jerarquía orden → items → productos
+- [ ] Kanban para gestión de estados
+- [ ] Editor avanzado de órdenes
+
+**Resultado**: Especificación de funcionalidades con mockups o descripciones detalladas
+
+**Tiempo estimado**: 3 horas
+
+#### 2.3 Diseñar Estructura de Modelos
+
+**Tarea**: Diseñar modelos basados en las tablas del schema CO
+
+**Modelos a Diseñar**:
+- Order (basado en ORDERS)
+- OrderItem (basado en ORDER_ITEMS)
+- Customer (basado en CUSTOMERS)
+- Product (basado en PRODUCTS)
+- Store (basado en STORES)
+- Shipment (basado en SHIPMENTS)
+- Inventory (basado en INVENTORY)
+
+**Estructura de Ejemplo**:
+```csharp
+public class Order
+{
+    public int OrderId { get; set; }
+    public int CustomerId { get; set; }
+    public int StoreId { get; set; }
+    public int? SalesRepId { get; set; }
+    public DateTime OrderDate { get; set; }
+    public string OrderStatus { get; set; }
+    public decimal OrderTotal { get; set; }
+    // Relaciones
+    public Customer Customer { get; set; }
+    public Store Store { get; set; }
+    public List<OrderItem> OrderItems { get; set; }
+}
 ```
 
-**Tarea Preparatoria**:
-- [ ] Documentar cada método y su propósito
-- [ ] Identificar qué métodos se mantendrán igual
-- [ ] Identificar qué métodos necesitarán adaptación
-- [ ] Crear documento de equivalencias (DataTables → Syncfusion Grid)
+**Checklist**:
+- [ ] Modelos diseñados para todas las tablas principales
+- [ ] Relaciones entre modelos definidas
+- [ ] Propiedades documentadas
+- [ ] Validaciones identificadas
 
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/MAPEO_FUNCIONALIDADES_EMPLOYEES.md`
+**Tiempo estimado**: 2 horas
 
-#### 1.3 Análisis de Endpoints AJAX
+#### 2.4 Diseñar Reglas de Negocio
 
-**Tarea**: Documentar todos los endpoints del controlador que se usarán con Syncfusion.
+**Tarea**: Identificar y documentar reglas de negocio para el módulo de Órdenes
 
-**Archivo**: `src/AdministracionFlotillas.Web/Controllers/EmployeesController.cs`
+**Reglas de Negocio a Identificar**:
+- [ ] Validación de estados de órdenes
+- [ ] Cálculo de totales con impuestos
+- [ ] Validación de disponibilidad de inventario
+- [ ] Aplicación de descuentos
+- [ ] Validación de fechas de envío
+- [ ] Cálculo de comisiones
+- [ ] Validación de límites de crédito
+- [ ] Reglas de cancelación
 
-**Endpoints Actuales**:
-- `POST /Employees/ObtenerEmployees` - Obtener lista de empleados
+**Resultado**: Documento con reglas de negocio detalladas
 
-**Tarea Preparatoria**:
-- [ ] Verificar que los endpoints retornen JSON correctamente
-- [ ] Documentar estructura de respuesta JSON
-- [ ] Verificar compatibilidad con Syncfusion Grid DataSource
-- [ ] Preparar ejemplos de respuesta esperada
+**Tiempo estimado**: 2 horas
 
-**Resultado**: Documento con estructura de datos y ejemplos de respuestas JSON.
+### 3. Preparación de Estructura de Archivos
 
-### 2. Preparación de Estructura de Archivos
+#### 3.1 Crear Estructura de Carpetas
 
-#### 2.1 Crear Estructura de Carpetas para Syncfusion
-
-**Tarea**: Crear carpetas y estructura de archivos que se usarán con Syncfusion.
+**Tarea**: Crear carpetas para el nuevo módulo Orders
 
 **Estructura a Crear**:
 ```
 src/AdministracionFlotillas.Web/
-├── Views/Employees/
-│   ├── Index.cshtml (actual - mantener)
-│   ├── _EmployeesGrid.cshtml (actual - mantener)
-│   └── _EmployeesGridSyncfusion.cshtml (nuevo - preparar estructura)
-├── Scripts/Employees/
-│   ├── Employees.js (actual - mantener)
-│   └── EmployeesSyncfusion.js (nuevo - preparar estructura)
-└── Helpers/ (nuevo - si es necesario)
-    └── SyncfusionHelpers.cs (preparar helpers si se necesitan)
+├── Views/Orders/ (NUEVO)
+│   ├── Index.cshtml
+│   ├── _OrdersGrid.cshtml
+│   ├── Details.cshtml
+│   ├── Calendar.cshtml
+│   └── Analytics.cshtml
+└── Scripts/Orders/ (NUEVO)
+    └── Orders.js
 ```
 
+**Checklist**:
+- [ ] Carpetas creadas
+- [ ] Archivos placeholder creados (opcional)
+
+**Tiempo estimado**: 15 minutos
+
+#### 3.2 Preparar Templates HTML
+
+**Tarea**: Crear templates HTML base para componentes Syncfusion (sin funcionalidad aún)
+
+**Templates a Preparar**:
+- Template para Grid de órdenes
+- Template para Dashboard
+- Template para Calendario
+- Template para Gráficos
+- Template para Vista de detalle
+
+**Nota**: Estos templates pueden crearse como comentarios o archivos separados para referencia
+
+**Tiempo estimado**: 1 hora
+
+### 4. Investigación y Aprendizaje
+
+#### 4.1 Estudiar Documentación de Syncfusion
+
+**Tarea**: Revisar documentación oficial de Syncfusion para componentes que se usarán
+
+**Componentes a Estudiar**:
+- [ ] Grid (https://help.syncfusion.com/aspnet-core/grid/getting-started)
+- [ ] Charts (https://help.syncfusion.com/aspnet-core/chart/getting-started)
+- [ ] Schedule/Calendar (https://help.syncfusion.com/aspnet-core/schedule/getting-started)
+- [ ] Dashboard Layout (https://help.syncfusion.com/aspnet-core/dashboard-layout/getting-started)
+- [ ] Tabs (https://help.syncfusion.com/aspnet-core/tabs/getting-started)
+- [ ] Query Builder (https://help.syncfusion.com/aspnet-core/query-builder/getting-started)
+- [ ] Tree Grid (https://help.syncfusion.com/aspnet-core/treegrid/getting-started)
+- [ ] Kanban (https://help.syncfusion.com/aspnet-core/kanban/getting-started)
+
+**Checklist**:
+- [ ] Documentación de cada componente revisada
+- [ ] Ejemplos de código guardados
+- [ ] Notas tomadas sobre características importantes
+
+**Tiempo estimado**: 4 horas
+
+#### 4.2 Revisar Demos Interactivos
+
+**Tarea**: Explorar demos interactivos de Syncfusion
+
+**URL**: https://ej2.syncfusion.com/aspnetcore/demos/
+
+**Demos a Revisar**:
+- [ ] Grid con todas las características
+- [ ] Charts con diferentes tipos
+- [ ] Schedule/Calendar
+- [ ] Dashboard Layout
+- [ ] Query Builder
+- [ ] Tree Grid
+- [ ] Kanban
+
+**Checklist**:
+- [ ] Demos explorados
+- [ ] Funcionalidades interesantes identificadas
+- [ ] Screenshots o notas guardadas
+
+**Tiempo estimado**: 2 horas
+
+#### 4.3 Estudiar Oracle Sample Schema CO
+
+**Tarea**: Estudiar en profundidad el schema CO y sus datos
+
+**Recursos**:
+- GitHub: https://github.com/oracle-samples/db-sample-schemas
+- Documentación oficial de Oracle
+
 **Tareas**:
-- [ ] Crear carpeta `Helpers/` si no existe
-- [ ] Crear archivo `_EmployeesGridSyncfusion.cshtml` con estructura básica (comentado)
-- [ ] Crear archivo `EmployeesSyncfusion.js` con estructura de namespaces (vacío, solo estructura)
-- [ ] Documentar estructura en comentarios
+- [ ] Leer documentación del schema CO
+- [ ] Entender relaciones entre tablas
+- [ ] Analizar tipos de datos
+- [ ] Revisar procedimientos almacenados de ejemplo (si existen)
+- [ ] Crear consultas de ejemplo complejas
 
-**Archivos a Crear** (sin implementar aún):
-- `src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGridSyncfusion.cshtml`
-- `src/AdministracionFlotillas.Web/Scripts/Employees/EmployeesSyncfusion.js`
+**Tiempo estimado**: 2 horas
 
-#### 2.2 Preparar Configuración de Bundles
+### 5. Preparación de Código Base
 
-**Tarea**: Preparar configuración de bundles para incluir scripts de Syncfusion.
+#### 5.1 Crear Modelos Comunes (Sin Implementación Completa)
 
-**Archivo Actual**: `src/AdministracionFlotillas.Web/bundleconfig.json`
+**Tarea**: Crear clases de modelos con estructura básica
 
-**Tarea Preparatoria**:
-- [ ] Agregar bundle para Syncfusion (comentado o preparado)
-- [ ] Documentar qué scripts se incluirán
-- [ ] Preparar estructura de bundles futura
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.ModelosComunes/Order.cs`
+- `src/AdministracionFlotillas.ModelosComunes/OrderItem.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Customer.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Product.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Store.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Shipment.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Inventory.cs`
 
-**Ejemplo de Configuración Preparada**:
-```json
+**Nota**: Crear solo la estructura básica, sin implementación completa aún
+
+**Tiempo estimado**: 1 hora
+
+#### 5.2 Crear Interfaces de Repositorios
+
+**Tarea**: Crear interfaces de repositorios sin implementación
+
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/IOrdersRepository.cs`
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/ICustomersRepository.cs`
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/IProductsRepository.cs`
+
+**Estructura de Ejemplo**:
+```csharp
+public interface IOrdersRepository
 {
-  "outputFileName": "wwwroot/js/bundles/employees-syncfusion.min.js",
-  "inputFiles": [
-    "Scripts/Common/Utils.js",
-    "Scripts/Employees/EmployeesSyncfusion.js"
-  ],
-  "minify": {
-    "enabled": true,
-    "renameLocals": true
-  },
-  "sourceMap": false
+    Task<List<Order>> ObtenerOrdersAsync();
+    Task<Order> ObtenerOrderPorIdAsync(int orderId);
+    Task<List<OrderItem>> ObtenerOrderItemsAsync(int orderId);
+    // Más métodos según necesidades
 }
 ```
 
-**Estado**: Preparar configuración sin activarla aún.
+**Tiempo estimado**: 1 hora
 
-### 3. Análisis de Datos y ViewModels
+#### 5.3 Crear Interfaces de Servicios
 
-#### 3.1 Verificar Compatibilidad de ViewModels
-
-**Tarea**: Verificar que los ViewModels actuales sean compatibles con Syncfusion Grid.
-
-**Archivo**: `src/AdministracionFlotillas.Web/ViewModels/EmployeeViewModel.cs`
-
-**Verificaciones**:
-- [ ] Propiedades tienen nombres compatibles
-- [ ] Tipos de datos son compatibles
-- [ ] Formateo de datos es correcto
-- [ ] No hay propiedades que causen problemas
-
-**Resultado**: Lista de ViewModels verificados y listos para usar.
-
-#### 3.2 Preparar Ejemplos de Datos
-
-**Tarea**: Crear ejemplos de datos en formato JSON para probar Syncfusion Grid.
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/EJEMPLOS_DATOS_SYNCFUSION.md`
-
-**Contenido**:
-- Ejemplo de respuesta JSON del endpoint actual
-- Ejemplo de estructura esperada por Syncfusion Grid
-- Mapeo de campos
-
-**Tarea**:
-- [ ] Extraer ejemplo de respuesta JSON del controlador
-- [ ] Documentar estructura
-- [ ] Crear ejemplos de prueba
-
-### 4. Preparación de Templates HTML
-
-#### 4.1 Diseñar Templates HTML para Syncfusion
-
-**Tarea**: Diseñar templates HTML que se usarán con Syncfusion Grid para estilos condicionales.
-
-**Referencia Actual**: `src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGrid.cshtml`
-
-**Templates a Preparar**:
-- [ ] Template para columna de nombre (con estilos condicionales)
-- [ ] Template para columna de salario (formateo de moneda)
-- [ ] Template para columna de fecha (formateo de fecha)
-- [ ] Template para columna de acciones (botones)
-- [ ] Template para filas (estilos condicionales basados en datos)
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/TEMPLATES_SYNCFUSION.md`
-
-**Contenido**: Diseños de templates con comentarios explicativos, sin implementar aún.
-
-#### 4.2 Preparar Estilos CSS
-
-**Tarea**: Identificar estilos CSS actuales que se mantendrán o adaptarán.
-
-**Archivos a Revisar**:
-- `src/AdministracionFlotillas.Web/wwwroot/css/site.css`
-- Estilos inline en vistas
-
-**Tareas**:
-- [ ] Documentar estilos actuales
-- [ ] Identificar qué estilos se mantendrán
-- [ ] Preparar estilos adicionales para Syncfusion (si es necesario)
-- [ ] Crear archivo de estilos para Syncfusion (preparado, sin activar)
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/wwwroot/css/syncfusion-custom.css` (vacío, preparado)
-
-### 5. Documentación de Configuración
-
-#### 5.1 Preparar Guía de Configuración Inicial
-
-**Tarea**: Crear guía paso a paso de configuración inicial de Syncfusion.
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/CONFIGURACION_SYNCFUSION.md`
-
-**Contenido a Preparar**:
-- Pasos de instalación de paquetes NuGet
-- Configuración en `Program.cs`
-- Configuración en `_Layout.cshtml`
-- Registro de licencia
-- Configuración inicial de Grid
-
-**Estado**: Preparar estructura y pasos, sin implementar aún.
-
-#### 5.2 Preparar Checklist de Migración
-
-**Tarea**: Crear checklist detallado de pasos de migración.
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/CHECKLIST_MIGRACION_SYNCFUSION.md`
-
-**Contenido**:
-- Checklist de preparación (estas tareas)
-- Checklist de instalación
-- Checklist de migración de código
-- Checklist de pruebas
-- Checklist de validación
-
-**Tarea**: Crear checklist completo con todas las tareas identificadas.
-
-### 6. Preparación de Código (Estructura Sin Implementar)
-
-#### 6.1 Crear Archivos de Migración con Estructura
-
-**Tarea**: Crear archivos nuevos con estructura básica y comentarios, sin implementar aún.
+**Tarea**: Crear interfaces de servicios sin implementación
 
 **Archivos a Crear**:
+- `src/AdministracionFlotillas.ReglasNegocio/Servicios/Interfaces/IOrdersService.cs`
 
-**1. Vista Syncfusion (estructura)**:
-```html
-<!-- src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGridSyncfusion.cshtml -->
-@* 
-    VISTA DE GRID CON SYNCFUSION
-    Esta vista reemplazará _EmployeesGrid.cshtml una vez que se apruebe la licencia
-    
-    TODO cuando se apruebe la licencia:
-    1. Implementar Grid de Syncfusion
-    2. Configurar columnas
-    3. Configurar filtros
-    4. Configurar exportación
-    5. Configurar selección múltiple
-*@
+**Tiempo estimado**: 30 minutos
 
-<div id="employeesGridSyncfusion">
-    @* Grid de Syncfusion se implementará aquí *@
-</div>
-```
+### 6. Documentación
 
-**2. JavaScript Syncfusion (estructura de namespaces)**:
-```javascript
-// src/AdministracionFlotillas.Web/Scripts/Employees/EmployeesSyncfusion.js
-/**
- * Namespace de Empleados para Syncfusion
- * Esta implementación reemplazará Employees.js una vez que se apruebe la licencia
- * 
- * TODO cuando se apruebe la licencia:
- * 1. Implementar inicialización de Grid
- * 2. Migrar métodos de filtros
- * 3. Migrar métodos de selección
- * 4. Migrar métodos de exportación
- * 5. Adaptar eventos
- */
+#### 6.1 Actualizar Documentación de Base de Datos
 
-(function(window) {
-    'use strict';
-
-    window.Employees = window.Employees || {};
-
-    // Variables privadas
-    var _grid = null;
-
-    /**
-     * Gestión de Grid Syncfusion
-     */
-    window.Employees.Table = {
-        /**
-         * Inicializa el Grid de Syncfusion
-         * TODO: Implementar cuando se apruebe la licencia
-         */
-        Initialize: function() {
-            // Implementación pendiente
-        },
-
-        /**
-         * Recarga los datos del grid
-         * TODO: Implementar cuando se apruebe la licencia
-         */
-        Reload: function() {
-            // Implementación pendiente
-        }
-    };
-
-    /**
-     * Gestión de Filtros
-     * TODO: Migrar métodos de Employees.Filters cuando se apruebe la licencia
-     */
-    window.Employees.Filters = {
-        // Estructura preparada, implementación pendiente
-    };
-
-    // ... resto de namespaces con estructura preparada
-
-})(window);
-```
-
-**Tareas**:
-- [ ] Crear `_EmployeesGridSyncfusion.cshtml` con estructura y comentarios
-- [ ] Crear `EmployeesSyncfusion.js` con estructura de namespaces
-- [ ] Documentar qué métodos se migrarán
-
-#### 6.2 Preparar Helpers (Si Es Necesario)
-
-**Tarea**: Identificar si se necesitan helpers de Razor para Syncfusion y preparar estructura.
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/Helpers/SyncfusionHelpers.cs` (si es necesario)
-
-**Tarea**:
-- [ ] Investigar si se necesitan helpers personalizados
-- [ ] Preparar estructura si es necesario
-- [ ] Documentar propósito
-
-### 7. Preparación de Pruebas
-
-#### 7.1 Preparar Casos de Prueba
-
-**Tarea**: Documentar casos de prueba para validar la migración.
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/CASOS_PRUEBA_MIGRACION.md`
-
-**Contenido**:
-- Casos de prueba de funcionalidad actual
-- Casos de prueba esperados después de migración
-- Checklist de validación
-
-**Tareas**:
-- [ ] Documentar todos los casos de prueba actuales
-- [ ] Preparar casos de prueba para Syncfusion
-- [ ] Crear checklist de validación
-
-#### 7.2 Preparar Datos de Prueba
-
-**Tarea**: Preparar conjunto de datos de prueba para validar la migración.
-
-**Tareas**:
-- [ ] Documentar datos de prueba actuales
-- [ ] Preparar datos de prueba adicionales si es necesario
-- [ ] Documentar escenarios de prueba
-
-### 8. Investigación y Aprendizaje
-
-#### 8.1 Revisar Documentación de Syncfusion
-
-**Tarea**: Revisar documentación oficial de Syncfusion ASP.NET Core MVC Grid.
-
-**Recursos**:
-- [Documentación oficial ASP.NET Core](https://help.syncfusion.com/aspnet-core)
-- [Getting Started con Grid](https://help.syncfusion.com/aspnet-core/grid/getting-started)
-- [Demos interactivos Grid](https://ej2.syncfusion.com/aspnetcore/Grid/Overview)
-- [API Reference](https://help.syncfusion.com/cr/aspnetcore)
-- [Ejemplos de código GitHub](https://github.com/SyncfusionExamples)
-- [NuGet Package](https://www.nuget.org/packages/Syncfusion.EJ2.AspNet.Core)
-
-**Nota**: 
-- Esta documentación es específica para **ASP.NET Core** (no ASP.NET MVC clásico)
-- Compatible con .NET 8.0.300+ (Windows) y .NET 8.0.417+ (Mac)
-- Soporta Tag Helpers (recomendado) y HTML Helpers
-
-**Tareas**:
-- [ ] Revisar documentación de Grid
-- [ ] Revisar ejemplos de filtrado
-- [ ] Revisar ejemplos de exportación
-- [ ] Revisar ejemplos de selección múltiple
-- [ ] Revisar ejemplos de templates HTML
-- [ ] Revisar ejemplos de binding a controladores
-- [ ] Documentar ejemplos relevantes
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/RECURSOS_SYNCFUSION.md`
-
-**Contenido**: Enlaces y notas sobre documentación relevante.
-
-#### 8.2 Revisar Tutoriales y Videos
-
-**Tarea**: Revisar tutoriales y videos de Syncfusion.
-
-**Recursos**:
-- [Tutorial Videos](https://www.syncfusion.com/tutorial-videos)
-- [Video Guides](https://help.syncfusion.com/aspnet-core/video-guide)
-
-**Tareas**:
-- [ ] Revisar videos de Grid
-- [ ] Revisar videos de filtrado
-- [ ] Revisar videos de exportación
-- [ ] Documentar videos relevantes
-
-### 9. Preparación de Configuración del Proyecto
-
-#### 9.1 Preparar Cambios en .csproj
-
-**Tarea**: Preparar cambios en el archivo de proyecto para cuando se instalen los paquetes.
-
-**Archivo**: `src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj`
-
-**Tarea Preparatoria**:
-- [ ] Documentar qué paquetes se instalarán
-- [ ] Preparar comentarios en el archivo indicando dónde agregar paquetes
-- [ ] Documentar versiones a usar
-
-**Ejemplo de Preparación**:
-```xml
-<!-- TODO: Agregar cuando se apruebe la licencia de Syncfusion -->
-<!-- <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.1.23" /> -->
-<!-- Nota: Solo se requiere Syncfusion.EJ2.AspNet.Core para ASP.NET Core MVC -->
-<!-- Ver versión actual en: https://www.nuget.org/packages/Syncfusion.EJ2.AspNet.Core -->
-```
-
-#### 9.2 Preparar Cambios en Program.cs
-
-**Tarea**: Preparar cambios en Program.cs con comentarios.
-
-**Archivo**: `src/AdministracionFlotillas.Web/Program.cs`
-
-**Tarea Preparatoria**:
-- [ ] Agregar comentarios indicando dónde registrar la licencia
-- [ ] Agregar comentarios indicando dónde agregar servicios de Syncfusion
-- [ ] Documentar cambios necesarios
-
-**Ejemplo de Preparación**:
-```csharp
-// TODO: Agregar cuando se apruebe la licencia de Syncfusion
-// using Syncfusion.EJ2;
-// using Syncfusion.Licensing;
-//
-// // Registrar licencia
-// SyncfusionLicenseProvider.RegisterLicense("LICENCIA_AQUI");
-//
-// // Agregar servicios
-// builder.Services.AddSyncfusion();
-```
-
-#### 9.3 Preparar Cambios en _Layout.cshtml
-
-**Tarea**: Preparar cambios en _Layout.cshtml con comentarios.
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/Shared/_Layout.cshtml`
-
-**Tarea Preparatoria**:
-- [ ] Agregar comentarios indicando dónde agregar CSS de Syncfusion
-- [ ] Agregar comentarios indicando dónde agregar JS de Syncfusion
-- [ ] Documentar cambios necesarios
-
-**Ejemplo de Preparación**:
-```html
-<!-- TODO: Agregar cuando se apruebe la licencia de Syncfusion -->
-<!-- <link href="https://cdn.syncfusion.com/ej2/32.1.23/material.css" rel="stylesheet" /> -->
-<!-- Nota: Usar versión más reciente. Verificar en: https://www.nuget.org/packages/Syncfusion.EJ2.AspNet.Core -->
-<!-- Temas disponibles: material, bootstrap, fabric, highcontrast, etc. -->
-
-<!-- Antes de </body> -->
-<!-- TODO: Agregar cuando se apruebe la licencia de Syncfusion -->
-<!-- <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script> -->
-```
-
-### 10. Preparación de Documentación
-
-#### 10.1 Actualizar Documentación Existente
-
-**Tarea**: Actualizar documentación existente con información sobre la preparación.
+**Tarea**: Actualizar documentos de base de datos para reflejar el uso del schema CO
 
 **Archivos a Actualizar**:
-- [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md) - Agregar nota sobre preparación
-- [PLAN_MIGRACION_UI.md](../PLAN_MIGRACION_UI.md) - Referenciar esta guía
+- [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md) (ya creado)
+- README.md (actualizar referencias)
 
-**Tareas**:
-- [ ] Agregar referencias a esta guía en documentos relacionados
-- [ ] Actualizar estado de migración en documentos
+**Tiempo estimado**: 30 minutos
 
-#### 10.2 Crear Documento de Equivalencias
+#### 6.2 Crear Documentación de Diseño del Nuevo Módulo
 
-**Tarea**: Crear documento que mapee funcionalidades actuales a equivalentes en Syncfusion.
-
-**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/EQUIVALENCIAS_DATATABLES_SYNCFUSION.md`
+**Tarea**: Crear documento con diseño detallado del nuevo módulo
 
 **Contenido**:
-- Tabla de equivalencias DataTables → Syncfusion Grid
-- Mapeo de métodos JavaScript
-- Mapeo de configuraciones
-- Mapeo de eventos
+- Estructura de archivos
+- Funcionalidades planificadas
+- Componentes Syncfusion a usar
+- Reglas de negocio
+- Flujos de usuario
 
-**Tareas**:
-- [ ] Documentar equivalencias de funcionalidades
-- [ ] Documentar equivalencias de métodos
-- [ ] Documentar equivalencias de eventos
-- [ ] Crear tabla comparativa
+**Archivo a Crear**: `src/AdministracionFlotillas.Web/docs/DESARROLLO/DISENO_MODULO_ORDERS.md`
+
+**Tiempo estimado**: 2 horas
 
 ## Checklist General de Preparación
 
-### Análisis y Documentación
-- [ ] Mapeo completo de funcionalidades actuales
-- [ ] Mapeo de namespaces JavaScript
-- [ ] Análisis de endpoints AJAX
-- [ ] Documentación de ViewModels
-- [ ] Ejemplos de datos preparados
+### Base de Datos
+- [ ] Oracle Cloud Always Free configurada
+- [ ] Schema CO instalado y verificado
+- [ ] Conexión probada desde DataGrip
+- [ ] Connection string configurado en appsettings.json
+- [ ] Estructura del schema CO documentada
 
-### Estructura de Archivos
-- [ ] Carpetas creadas
-- [ ] Archivos de estructura creados (con comentarios)
-- [ ] Configuración de bundles preparada
-- [ ] Helpers preparados (si es necesario)
-
-### Templates y Estilos
-- [ ] Templates HTML diseñados
-- [ ] Estilos CSS identificados
-- [ ] Archivo de estilos Syncfusion preparado
-
-### Configuración
-- [ ] Guía de configuración preparada
-- [ ] Checklist de migración creado
-- [ ] Cambios en .csproj preparados (comentados)
-- [ ] Cambios en Program.cs preparados (comentados)
-- [ ] Cambios en _Layout.cshtml preparados (comentados)
+### Análisis y Diseño
+- [ ] Funcionalidades de Employees documentadas
+- [ ] Funcionalidades especializadas diseñadas
+- [ ] Modelos diseñados
+- [ ] Reglas de negocio identificadas
+- [ ] Estructura de archivos planificada
 
 ### Investigación
 - [ ] Documentación de Syncfusion revisada
-- [ ] Tutoriales y videos revisados
-- [ ] Ejemplos relevantes documentados
+- [ ] Demos interactivos explorados
+- [ ] Schema CO estudiado en profundidad
+- [ ] Ejemplos de código guardados
 
-### Pruebas
-- [ ] Casos de prueba documentados
-- [ ] Datos de prueba preparados
+### Código Base
+- [ ] Modelos comunes creados (estructura básica)
+- [ ] Interfaces de repositorios creadas
+- [ ] Interfaces de servicios creadas
+- [ ] Estructura de carpetas creada
 
 ### Documentación
-- [ ] Documentación actualizada
-- [ ] Documento de equivalencias creado
+- [ ] Documentación de base de datos actualizada
+- [ ] Documentación de diseño del módulo creada
+- [ ] README.md actualizado
 
-## Tareas que Requieren Licencia
+## Tiempo Total Estimado
 
-Las siguientes tareas **NO** se pueden hacer sin la licencia aprobada:
+| Categoría | Tiempo Estimado |
+|-----------|-----------------|
+| Configuración de Base de Datos | 2-3 horas |
+| Análisis y Diseño | 9 horas |
+| Investigación | 8 horas |
+| Preparación de Código Base | 2.5 horas |
+| Documentación | 2.5 horas |
+| **Total** | **~24 horas (~3 días)** |
 
-- ❌ Instalar paquetes NuGet de Syncfusion
-- ❌ Registrar licencia en código
-- ❌ Implementar Grid de Syncfusion
-- ❌ Probar funcionalidad en navegador
-- ❌ Validar que todo funcione correctamente
+## Próximos Pasos Después de Aprobación de Licencia
 
-## Próximos Pasos Después de Aprobación
+Una vez aprobada la Community License:
 
-Una vez que se apruebe la Community License:
+1. **Registrar licencia** en Program.cs (ver [REGISTRO_LICENCIA_SYNCFUSION.md](REGISTRO_LICENCIA_SYNCFUSION.md))
+2. **Instalar paquetes NuGet** de Syncfusion
+3. **Configurar Syncfusion** en _Layout.cshtml y _ViewImports.cshtml
+4. **Implementar repositorios** con conexión Oracle real
+5. **Implementar servicios** con reglas de negocio
+6. **Desarrollar vistas** con componentes Syncfusion
+7. **Crear JavaScript** con namespaces
+8. **Probar y validar** funcionalidad completa
 
-1. **Inmediato** (5 minutos):
-   - Instalar paquetes NuGet
-   - Registrar licencia en `Program.cs`
-   - Agregar referencias CSS/JS en `_Layout.cshtml`
+## Recursos de Referencia
 
-2. **Corto Plazo** (1-2 horas):
-   - Implementar Grid básico en `_EmployeesGridSyncfusion.cshtml`
-   - Migrar métodos principales de JavaScript
-   - Probar carga de datos
-
-3. **Mediano Plazo** (4-8 horas):
-   - Migrar todos los filtros
-   - Migrar selección múltiple
-   - Migrar exportación
-   - Migrar funcionalidades restantes
-
-4. **Validación** (2-4 horas):
-   - Probar todas las funcionalidades
-   - Validar que todo funcione igual que antes
-   - Ajustar estilos si es necesario
-
-## Referencias
-
-- [PLAN_MIGRACION_UI.md](../PLAN_MIGRACION_UI.md) - Plan completo de migración
-- [ESTADO_IMPLEMENTACION_ACTUAL.md](../ESTADO_IMPLEMENTACION_ACTUAL.md) - Estado actual del proyecto
-- [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md) - Estructura del proyecto
-- [COMPONENTES_SYNCFUSION.md](../COMPONENTES_SYNCFUSION.md) - Componentes de Syncfusion
-- [PROCESO_SOLICITUD_LICENCIA.md](../PROCESO_SOLICITUD_LICENCIA.md) - Proceso de solicitud de licencia
-
-## Notas Importantes
-
-- Todas las tareas preparatorias se pueden hacer **sin afectar** el código actual
-- Los archivos nuevos se crean con estructura y comentarios, **sin implementar**
-- El código actual sigue funcionando normalmente
-- Una vez aprobada la licencia, la implementación será más rápida gracias a esta preparación
+- **Oracle Sample Schemas**: https://github.com/oracle-samples/db-sample-schemas
+- **Oracle Cloud Always Free**: https://www.oracle.com/cloud/free/
+- **Syncfusion Documentation**: https://help.syncfusion.com/aspnet-core
+- **Syncfusion Demos**: https://ej2.syncfusion.com/aspnetcore/demos/
 
 ---
 
-**Última actualización**: Enero 2026  
-**Estado**: Preparación en curso - Esperando aprobación de licencia (Ticket #803702)
+**Última actualización**: Enero 2026
+**Versión**: 2.0 (Estrategia de Módulos Paralelos)
+**Schema de Base de Datos**: CO (Customer Orders)

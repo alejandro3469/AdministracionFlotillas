@@ -2,13 +2,40 @@
 
 **ESTADO ACTUAL: EN PAUSA - ESPERANDO APROBACIÓN DE LICENCIA**
 
-Este documento detalla el plan de migración de la implementación actual (DataTables + Bootstrap) a Syncfusion ASP.NET Core MVC, manteniendo la arquitectura basada en módulos y los patrones de trabajo existentes.
+Este documento detalla la estrategia de migración a Syncfusion ASP.NET Core MVC usando un enfoque de módulos paralelos, manteniendo el módulo Employees intacto como referencia (V1) y creando un nuevo módulo basado en Oracle Sample Schema CO (Customer Orders) con Syncfusion desde el inicio (V2).
+
+## Estrategia de Migración: Módulos Paralelos
+
+### Enfoque Adoptado
+
+En lugar de migrar el módulo Employees existente, se implementará una estrategia de **módulos paralelos**:
+
+- **Módulo Employees (V1)**: Se mantiene **completamente intacto** con DataTables + Bootstrap
+  - Sin modificaciones
+  - Funcional al 100%
+  - Sirve como referencia y ejemplo de la UI actual
+  - Continúa funcionando para el equipo que trabaja con él
+
+- **Módulo Ventas/Órdenes (V2)**: Nuevo módulo creado desde cero con Syncfusion
+  - Basado en Oracle Sample Schema CO (Customer Orders)
+  - Usa Syncfusion UI desde el inicio
+  - Implementa todas las funcionalidades de Employees y más
+  - Demuestra capacidades avanzadas de Syncfusion
+  - Conectado a base de datos Oracle real
+
+### Ventajas de Este Enfoque
+
+1. **Sin interrupciones**: El equipo puede seguir trabajando con Employees sin cambios
+2. **Comparación directa**: Permite comparar ambas implementaciones lado a lado
+3. **Aprendizaje gradual**: El equipo aprende Syncfusion sin presión
+4. **Rollback innecesario**: Si hay problemas, Employees sigue funcionando
+5. **Datos reales**: El nuevo módulo usa datos reales de Oracle, no mocks
 
 ## Estado de la Migración
 
-### ⏸️ Migración en Pausa
+### Migración en Pausa
 
-La migración a Syncfusion está **actualmente en pausa** mientras se espera la aprobación de la Community License.
+La creación del nuevo módulo con Syncfusion está **actualmente en pausa** mientras se espera la aprobación de la Community License.
 
 **Información del Proceso de Licencia**:
 - **Ticket de referencia**: #803702
@@ -19,690 +46,520 @@ La migración a Syncfusion está **actualmente en pausa** mientras se espera la 
 
 **Próximos Pasos**:
 1. Esperar respuesta de Syncfusion (48 horas hábiles desde la solicitud)
-2. Una vez aprobada la Community License, reanudar la migración
+2. Una vez aprobada la Community License, comenzar desarrollo del nuevo módulo
 3. Reemplazar la clave de prueba temporal con la licencia permanente
 
 **Documentación Relacionada**:
-- [PROCESO_SOLICITUD_LICENCIA.md](../PROCESO_SOLICITUD_LICENCIA.md) - Proceso completo de solicitud
-- [LICENCIA_SYNCFUSION.md](../LICENCIA_SYNCFUSION.md) - Información sobre la licencia
+- [PROCESO_SOLICITUD_LICENCIA.md](PROCESO_SOLICITUD_LICENCIA.md) - Proceso completo de solicitud
+- [LICENCIA_SYNCFUSION.md](LICENCIA_SYNCFUSION.md) - Información sobre la licencia
+- [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md) - Configuración de Oracle Cloud con Schema CO
 
-### Implementación Actual (En Uso)
+## Base de Datos: Oracle Sample Schema CO
 
-Mientras se espera la aprobación de la licencia, el proyecto continúa usando la implementación actual:
+### Schema CO (Customer Orders)
 
-- **UI Framework**: DataTables + Bootstrap + jQuery UI
-- **JavaScript**: Organizado en namespaces por módulo (ver [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md))
-- **Bundles**: Sistema de bundles configurado y funcionando
-- **Módulo Employees**: Completamente implementado y funcional
+El nuevo módulo se basará en el **Oracle Sample Schema CO (Customer Orders)**, que incluye:
 
-Ver [ESTRUCTURA_ACTUAL_PROYECTO.md](../ESTRUCTURA_ACTUAL_PROYECTO.md) para detalles completos de la implementación actual.
+**Tablas Principales**:
+- **ORDERS**: Órdenes de venta con información completa
+- **ORDER_ITEMS**: Items individuales de cada orden
+- **CUSTOMERS**: Información de clientes
+- **PRODUCTS**: Catálogo de productos
+- **STORES**: Tiendas/almacenes
+- **SHIPMENTS**: Información de envíos
+- **INVENTORY**: Control de inventario
+- **EMPLOYEES**: Empleados asociados a tiendas
+- **REGIONS, COUNTRIES, LOCATIONS**: Datos geográficos
 
-## Objetivos de la Migración
+**Características**:
+- Miles de registros realistas
+- Relaciones complejas (foreign keys, joins)
+- Datos históricos para análisis temporal
+- Múltiples estados de órdenes
+- Soporte para JSON en algunas tablas
 
-1. ✅ Mantener la arquitectura basada en módulos
-2. ✅ Preservar los namespaces JavaScript existentes
-3. ✅ Adaptar a estilos condicionales con HTML templates
-4. ✅ Implementar binding directo a controladores
-5. ✅ Mantener compatibilidad con .NET 8.0.300+ (Windows) y .NET 8.0.417+ (Mac)
-6. ✅ Migrar gradualmente sin romper funcionalidad existente
+**Documentación Completa**: Ver [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)
 
-## Fase 1: Preparación y Configuración
+## Fase 1: Configuración de Base de Datos
 
-### 1.1 Solicitar Community License
+### 1.1 Configurar Oracle Cloud Always Free
 
-**Tarea**: Registrar organización para obtener licencia gratuita PERMANENTE
-
-**Importante**: La Community License es **gratuita para siempre**, no es una prueba temporal. Ver [LICENCIA_SYNCFUSION.md](../LICENCIA_SYNCFUSION.md) para detalles completos.
+**Tarea**: Crear cuenta y provisionar Autonomous Database Always Free
 
 **Pasos**:
-1. Visitar https://www.syncfusion.com/products/communitylicense
-2. Completar formulario con información de la organización
-3. Verificar requisitos:
-   - Menos de $1M USD en ingresos anuales
-   - Menos de 5 desarrolladores
-   - Menos de 10 empleados totales
-4. Enviar solicitud
+1. Crear cuenta en Oracle Cloud (https://www.oracle.com/cloud/free/)
+2. Provisionar Autonomous Database Always Free
+3. Descargar Wallet de conexión
+4. Configurar conexión en DataGrip
 
-**Respuesta Inmediata** (en minutos):
-- ✅ Recibirás un email con una **clave de prueba de 7 días** (Trial Key)
-- ✅ Ticket de referencia (ej: #803702)
-- ⚠️ **IMPORTANTE**: Esta clave de 7 días es TEMPORAL, solo para comenzar a trabajar
+**Tiempo estimado**: 1-2 horas
 
-**Validación** (48 horas hábiles):
-- Syncfusion valida tu solicitud
-- Pueden solicitar documentación adicional
-- Revisan requisitos de elegibilidad
+**Documentación**: [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)
 
-**Aprobación** (después de validación):
-- ✅ Recibirás la **Community License PERMANENTE** por email
-- ✅ Esta es la licencia que usarás a largo plazo
-- ✅ Reemplaza la clave de prueba de 7 días
+### 1.2 Instalar Sample Schema CO
 
-**Tiempo estimado**: 
-- Clave de prueba: Inmediata (minutos)
-- Licencia permanente: 48 horas hábiles (2-3 días)
+**Tarea**: Instalar el schema CO en la base de datos Oracle Cloud
 
-**Nota**: 
-- La clave de 7 días es solo para empezar a trabajar mientras validan
-- La Community License permanente es la que usarás a largo plazo
-- La licencia permanente no requiere renovación mientras se cumplan los requisitos
+**Pasos**:
+1. Conectarse a Database Actions como ADMIN
+2. Descargar scripts del schema CO desde GitHub de Oracle
+3. Ejecutar script `co_main.sql`
+4. Verificar instalación y datos
 
-### 1.2 Instalar Paquetes NuGet
+**Tiempo estimado**: 30 minutos
 
-**Archivo**: `src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj`
+**Documentación**: [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](../BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)
+
+### 1.3 Configurar Conexión en Proyecto
+
+**Tarea**: Configurar connection string en appsettings.json
+
+**Archivo**: `src/AdministracionFlotillas.Web/appsettings.json`
 
 **Cambios**:
-```xml
-<ItemGroup>
-  <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="32.1.23" />
-</ItemGroup>
-```
-
-**Comando**:
-```bash
-cd src/AdministracionFlotillas.Web
-dotnet add package Syncfusion.EJ2.AspNet.Core
-```
-
-**Nota**: 
-- Solo se requiere el paquete `Syncfusion.EJ2.AspNet.Core` para ASP.NET Core MVC
-- La versión se actualiza automáticamente a la más reciente compatible con .NET 8.0
-- Verificar versión actual en: https://www.nuget.org/packages/Syncfusion.EJ2.AspNet.Core
-
-**Tiempo estimado**: 5 minutos
-
-### 1.3 Configurar Program.cs
-
-**Archivo**: `src/AdministracionFlotillas.Web/Program.cs`
-
-**Cambios**:
-```csharp
-using Syncfusion.EJ2;
-using Syncfusion.Licensing;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Registrar licencia de Syncfusion
-SyncfusionLicenseProvider.RegisterLicense("TU_LICENCIA_AQUI");
-
-// Agregar servicios de Syncfusion
-builder.Services.AddSyncfusion();
-
-// ... resto del código existente
-```
-
-**Tiempo estimado**: 5 minutos
-
-### 1.4 Actualizar _Layout.cshtml
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/Shared/_Layout.cshtml`
-
-**Cambios en `<head>`**:
-```html
-<!-- Syncfusion CSS (agregar después de Bootstrap) -->
-<link href="https://cdn.syncfusion.com/ej2/32.1.23/material.css" rel="stylesheet" />
-```
-
-**Cambios antes de `</body>`**:
-```html
-<!-- Syncfusion JS (agregar después de jQuery) -->
-<script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script>
-```
-
-**Nota**: 
-- Usar la versión más reciente de Syncfusion EJ2 (actualmente 32.1.23)
-- Verificar versión actual en: https://www.nuget.org/packages/Syncfusion.EJ2.AspNet.Core
-- El tema puede cambiarse (material, bootstrap, fabric, etc.)
-
-**Tiempo estimado**: 5 minutos
-
-### 1.5 Actualizar _ViewImports.cshtml
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/_ViewImports.cshtml`
-
-**Cambios**:
-```csharp
-@using Syncfusion.EJ2
-@addTagHelper *, Syncfusion.EJ2
-```
-
-**Nota**: 
-- `@addTagHelper *, Syncfusion.EJ2` habilita los Tag Helpers de Syncfusion
-- Permite usar `<ejs-grid>`, `<ejs-button>`, etc. en las vistas
-- Ver documentación: https://help.syncfusion.com/aspnet-core/getting-started
-
-**Tiempo estimado**: 2 minutos
-
-**Total Fase 1**: ~20 minutos + tiempo de espera de licencia
-
-## Fase 2: Migración del Módulo Employees (Piloto)
-
-El módulo Employees servirá como piloto para validar el proceso de migración.
-
-### 2.1 Migrar Grid de DataTables a Syncfusion Grid
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGrid.cshtml`
-
-**Antes (DataTables)**:
-```html
-<table id="employeesTable" class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-```
-
-**Después (Syncfusion Grid con Tag Helper - Recomendado)**:
-```html
-<ejs-grid id="employeesGrid" 
-          dataSource="@Url.Action("ObtenerEmployees", "Employees")"
-          allowPaging="true"
-          allowFiltering="true"
-          allowSorting="true"
-          allowSelection="true"
-          rowSelected="Employees.Grid.OnRowSelected">
-    <e-grid-pagesettings pageSize="10"></e-grid-pagesettings>
-    <e-grid-selectionsettings type="Multiple"></e-grid-selectionsettings>
-    <e-grid-columns>
-        <e-grid-column field="idEmpleado" headerText="ID" width="80"></e-grid-column>
-        <e-grid-column field="nombreCompleto" headerText="Nombre Completo" width="200"></e-grid-column>
-        <e-grid-column field="correoElectronico" headerText="Email" width="200"></e-grid-column>
-        <e-grid-column field="numeroTelefono" headerText="Teléfono" width="150"></e-grid-column>
-        <e-grid-column field="fechaContratacion" headerText="Fecha Contratación" width="150" format="dd/MM/yyyy"></e-grid-column>
-        <e-grid-column field="salario" headerText="Salario" width="120" format="C2"></e-grid-column>
-        <e-grid-column field="idDepartamento" headerText="Departamento" width="120"></e-grid-column>
-        <e-grid-column headerText="Acciones" width="100" template="#actionTemplate"></e-grid-column>
-    </e-grid-columns>
-</ejs-grid>
-
-<script id="actionTemplate" type="text/x-template">
-    <button class="btn btn-sm btn-info" onclick="Employees.Details.View(${idEmpleado})">
-        <i class="fas fa-eye"></i>
-    </button>
-</script>
-```
-
-**Alternativa con HTML Helper**:
-```html
-@Html.EJS().Grid("employeesGrid")
-    .DataSource(Url.Action("ObtenerEmployees", "Employees"))
-    .AllowPaging(true)
-    .PageSettings(page => page.PageSize(10))
-    .AllowFiltering(true)
-    .AllowSorting(true)
-    .AllowSelection(true)
-    .SelectionSettings(select => select.Type(Syncfusion.EJ2.Grids.SelectionType.Multiple))
-    .Columns(col =>
-    {
-        col.Field("idEmpleado").HeaderText("ID").Width("80").Add();
-        col.Field("nombreCompleto").HeaderText("Nombre Completo").Width("200").Add();
-        col.Field("correoElectronico").HeaderText("Email").Width("200").Add();
-        col.Field("numeroTelefono").HeaderText("Teléfono").Width("150").Add();
-        col.Field("fechaContratacion").HeaderText("Fecha Contratación").Width("150").Format("dd/MM/yyyy").Add();
-        col.Field("salario").HeaderText("Salario").Width("120").Format("C2").Add();
-        col.Field("idDepartamento").HeaderText("Departamento").Width("120").Add();
-        col.HeaderText("Acciones").Width("100").Template("#actionTemplate").Add();
-    })
-    .RowSelected("Employees.Grid.OnRowSelected")
-    .Render()
-```
-
-**Nota**: 
-- Los Tag Helpers (`<ejs-grid>`) son la forma moderna recomendada para ASP.NET Core
-- Los HTML Helpers (`@Html.EJS()`) también son compatibles
-- Ver documentación oficial: https://help.syncfusion.com/aspnet-core/grid/getting-started
-
-**Tiempo estimado**: 2 horas
-
-### 2.2 Adaptar JavaScript a Syncfusion
-
-**Archivo**: `src/AdministracionFlotillas.Web/Scripts/Employees/Employees.js`
-
-**Cambios en namespace Table**:
-```javascript
-window.Employees.Table = {
-    Initialize: function() {
-        // Syncfusion Grid se inicializa automáticamente
-        // Solo configurar eventos adicionales si es necesario
-        this._configureEvents();
-    },
-    
-    Reload: function() {
-        var grid = document.getElementById('employeesGrid').ej2_instances[0];
-        if (grid) {
-            grid.refresh();
-        }
-    },
-    
-    GetInstance: function() {
-        return document.getElementById('employeesGrid').ej2_instances[0];
-    },
-    
-    OnRowDataBound: function(args) {
-        // Aplicar estilos condicionales
-        if (args.data.salario && parseFloat(args.data.salario.replace(/[^0-9.-]+/g, '')) > 5000) {
-            args.row.classList.add('salario-alto');
-        }
-    },
-    
-    OnRowSelected: function(args) {
-        // Manejar selección de filas
-        Employees.Selection.HandleSelection(args);
-    },
-    
-    _configureEvents: function() {
-        // Eventos adicionales si son necesarios
-    }
-};
-```
-
-**Tiempo estimado**: 3 horas
-
-### 2.3 Migrar Filtros a Componentes Syncfusion
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/Employees/_EmployeesGrid.cshtml`
-
-**Filtro de Fecha (DatePicker)**:
-```html
-<div class="col-md-4">
-    <label class="form-label">Fecha de Contratación</label>
-    <div class="input-group">
-        @Html.EJS().DatePicker("filtroFechaInicio")
-            .Placeholder("Desde")
-            .Change("Employees.Filters.OnFechaInicioChange")
-            .Render()
-        <span class="input-group-text">-</span>
-        @Html.EJS().DatePicker("filtroFechaFin")
-            .Placeholder("Hasta")
-            .Change("Employees.Filters.OnFechaFinChange")
-            .Render()
-    </div>
-</div>
-```
-
-**Filtro de Salario (NumericTextBox)**:
-```html
-<div class="col-md-4">
-    <label class="form-label">Rango de Salario</label>
-    <div class="input-group">
-        <span class="input-group-text">$</span>
-        @Html.EJS().NumericTextBox("filtroSalarioMin")
-            .Placeholder("Mínimo")
-            .Format("C2")
-            .Change("Employees.Filters.OnSalarioChange")
-            .Render()
-        <span class="input-group-text">-</span>
-        @Html.EJS().NumericTextBox("filtroSalarioMax")
-            .Placeholder("Máximo")
-            .Format("C2")
-            .Change("Employees.Filters.OnSalarioChange")
-            .Render()
-    </div>
-</div>
-```
-
-**Filtro de Texto (TextBox)**:
-```html
-<div class="col-md-4">
-    <label for="filtroBusqueda" class="form-label">Buscar por Nombre</label>
-    @Html.EJS().TextBox("filtroBusqueda")
-        .Placeholder("Buscar por nombre...")
-        .Change("Employees.Filters.OnBusquedaChange")
-        .Render()
-</div>
-```
-
-**Tiempo estimado**: 2 horas
-
-### 2.4 Adaptar Filtros JavaScript
-
-**Archivo**: `src/AdministracionFlotillas.Web/Scripts/Employees/Employees.js`
-
-**Cambios en namespace Filters**:
-```javascript
-window.Employees.Filters = {
-    Initialize: function() {
-        // Los componentes Syncfusion se inicializan automáticamente
-        // Solo configurar eventos si es necesario
-    },
-    
-    Apply: function() {
-        var grid = Employees.Table.GetInstance();
-        if (grid) {
-            // Aplicar filtros usando API de Syncfusion Grid
-            var filterSettings = this._buildFilterSettings();
-            grid.filterSettings = filterSettings;
-            grid.refresh();
-        }
-    },
-    
-    OnFechaInicioChange: (args) => {
-        Employees.Filters.Apply();
-    },
-    
-    OnFechaFinChange: (args) => {
-        Employees.Filters.Apply();
-    },
-    
-    OnSalarioChange: (args) => {
-        Employees.Filters.Apply();
-    },
-    
-    OnBusquedaChange: (args) => {
-        Employees.Filters.Apply();
-    },
-    
-    _buildFilterSettings: function() {
-        // Construir configuración de filtros
-        var filters = [];
-        
-        var fechaInicio = document.getElementById('filtroFechaInicio').ej2_instances[0]?.value;
-        if (fechaInicio) {
-            filters.push({
-                field: 'fechaContratacion',
-                operator: 'greaterthanorequal',
-                value: fechaInicio
-            });
-        }
-        
-        // ... más filtros
-        
-        return { columns: filters };
-    }
-};
-```
-
-**Tiempo estimado**: 3 horas
-
-### 2.5 Migrar Botones a Syncfusion Button
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/Employees/Index.cshtml`
-
-**Botón Enviar Email**:
-```html
-@Html.EJS().Button("btnEnviarEmail")
-    .Content("Enviar por Email")
-    .IconCss("fas fa-envelope")
-    .CssClass("e-primary")
-    .Click("Employees.Email.OpenModal")
-    .Render()
-```
-
-**Botón Confirmar Envío (en modal)**:
-```html
-@Html.EJS().Button("btnConfirmarEnvio")
-    .Content("Enviar")
-    .IconCss("fas fa-paper-plane")
-    .CssClass("e-success")
-    .Click("Employees.Email.Send")
-    .Render()
-```
-
-**Tiempo estimado**: 1 hora
-
-### 2.6 Migrar Modal a Syncfusion Dialog
-
-**Archivo**: `src/AdministracionFlotillas.Web/Views/Employees/Index.cshtml`
-
-**Antes (Bootstrap Modal)**:
-```html
-<div class="modal fade" id="modalEnviarEmail">
-    <!-- contenido -->
-</div>
-```
-
-**Después (Syncfusion Dialog)**:
-```html
-@Html.EJS().Dialog("modalEnviarEmail")
-    .Header("Enviar Información por Email")
-    .ContentTemplate("#emailModalContent")
-    .ShowCloseIcon(true)
-    .Width("600px")
-    .IsModal(true)
-    .Visible(false)
-    .Render()
-
-<div id="emailModalContent">
-    <div class="mb-3">
-        <label for="emailReceptor" class="form-label">Email del Receptor</label>
-        @Html.EJS().TextBox("emailReceptor")
-            .Placeholder("ejemplo@empresa.com")
-            .InputType("email")
-            .Render()
-    </div>
-    <!-- tabla resumen -->
-</div>
-```
-
-**JavaScript para abrir/cerrar**:
-```javascript
-window.Employees.Email = {
-    OpenModal: () => {
-        var dialog = document.getElementById('modalEnviarEmail').ej2_instances[0];
-        if (dialog) {
-            dialog.show();
-        }
-    },
-    
-    CloseModal: () => {
-        var dialog = document.getElementById('modalEnviarEmail').ej2_instances[0];
-        if (dialog) {
-            dialog.hide();
-        }
-    }
-};
-```
-
-**Tiempo estimado**: 2 horas
-
-### 2.7 Actualizar Controller (si es necesario)
-
-**Archivo**: `src/AdministracionFlotillas.Web/Controllers/EmployeesController.cs`
-
-**Cambios mínimos**: El controlador puede mantenerse igual, ya que Syncfusion Grid puede consumir el mismo endpoint JSON.
-
-**Opcional - Mejorar respuesta para Syncfusion**:
-```csharp
-[HttpPost]
-[IgnoreAntiforgeryToken]
-public async Task<IActionResult> ObtenerEmployees([FromBody] DataManagerRequest dm)
+```json
 {
-    try
-    {
-        var empleados = await _servicio.ObtenerEmployeesAsync();
-        var modelosVista = EmployeeParseador.ConvertirListaAVista(empleados);
-        
-        // Syncfusion puede trabajar con formato simple
-        return Json(modelosVista);
-        
-        // O con formato DataManager si se necesita paginación del servidor
-        // return Json(new { result = modelosVista, count = modelosVista.Count });
-    }
-    catch (Exception excepcion)
-    {
-        return CrearRespuestaError(excepcion.Message);
-    }
+  "ConnectionStrings": {
+    "OracleConnection": "Data Source=ADMINFLOTILLAS_high?TNS_ADMIN=/ruta/al/wallet;User Id=CO;Password=TU_PASSWORD;"
+  }
 }
 ```
 
-**Tiempo estimado**: 1 hora (opcional)
+**Tiempo estimado**: 15 minutos
 
-**Total Fase 2**: ~14 horas
+**Total Fase 1**: ~2-3 horas
 
-## Fase 3: Validación y Pruebas
+## Fase 2: Desarrollo del Backend (Nuevo Módulo)
 
-### 3.1 Pruebas Funcionales
+### 2.1 Crear Modelos Comunes
 
-**Checklist**:
-- [ ] Grid carga datos correctamente
-- [ ] Filtros funcionan (fecha, salario, texto)
-- [ ] Ordenamiento funciona
-- [ ] Paginación funciona
-- [ ] Selección múltiple funciona
-- [ ] Botón ver detalles funciona
-- [ ] Modal de email se abre y cierra
-- [ ] Validación de email funciona
-- [ ] Exportación a Excel funciona
-- [ ] Exportación a PDF funciona
-- [ ] Diseño responsive funciona
+**Tarea**: Crear modelos basados en las tablas del schema CO
+
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.ModelosComunes/Order.cs`
+- `src/AdministracionFlotillas.ModelosComunes/OrderItem.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Customer.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Product.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Store.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Shipment.cs`
+- `src/AdministracionFlotillas.ModelosComunes/Inventory.cs`
+
+**Estructura de ejemplo (Order.cs)**:
+```csharp
+namespace AdministracionFlotillas.ModelosComunes;
+
+public class Order
+{
+    public int OrderId { get; set; }
+    public int CustomerId { get; set; }
+    public int StoreId { get; set; }
+    public int? SalesRepId { get; set; }
+    public DateTime OrderDate { get; set; }
+    public string OrderStatus { get; set; }
+    public decimal OrderTotal { get; set; }
+    // ... más propiedades según tabla ORDERS
+}
+```
+
+**Tiempo estimado**: 2 horas
+
+### 2.2 Crear Repositorios
+
+**Tarea**: Crear repositorios con conexión real a Oracle
+
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/IOrdersRepository.cs`
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/OrdersRepository.cs`
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/ICustomersRepository.cs`
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/CustomersRepository.cs`
+- Y más según necesidades
+
+**Implementación con Oracle**:
+```csharp
+public async Task<List<Order>> ObtenerOrdersAsync()
+{
+    using var connection = new OracleConnection(_connectionString);
+    await connection.OpenAsync();
+    
+    var query = @"
+        SELECT 
+            ORDER_ID, CUSTOMER_ID, STORE_ID, 
+            ORDER_DATE, ORDER_STATUS, ORDER_TOTAL
+        FROM CO.ORDERS
+        ORDER BY ORDER_DATE DESC";
+    
+    var orders = await connection.QueryAsync<Order>(query);
+    return orders.ToList();
+}
+```
 
 **Tiempo estimado**: 4 horas
 
-### 3.2 Pruebas de Compatibilidad
+### 2.3 Crear Servicios de Negocio
+
+**Tarea**: Crear servicios con reglas de negocio especializadas
+
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.ReglasNegocio/Servicios/Interfaces/IOrdersService.cs`
+- `src/AdministracionFlotillas.ReglasNegocio/Servicios/Escenarios/Oracle/OrdersServiceOracle.cs`
+
+**Reglas de Negocio a Implementar**:
+- Validar estado de órdenes
+- Calcular totales con impuestos
+- Validar disponibilidad de inventario
+- Aplicar descuentos según reglas
+- Validar fechas de envío
+- Y más según requerimientos
+
+**Tiempo estimado**: 3 horas
+
+### 2.4 Crear ViewModels y Parseadores
+
+**Tarea**: Crear ViewModels y parseadores para el nuevo módulo
+
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.Web/ViewModels/OrderViewModel.cs`
+- `src/AdministracionFlotillas.Web/ViewModels/CustomerViewModel.cs`
+- `src/AdministracionFlotillas.Web/ViewModels/DashboardViewModel.cs`
+- `src/AdministracionFlotillas.Web/Parseador/OrderParseador.cs`
+
+**Tiempo estimado**: 2 horas
+
+### 2.5 Crear Controladores
+
+**Tarea**: Crear controladores con endpoints AJAX
+
+**Archivos a Crear**:
+- `src/AdministracionFlotillas.Web/Controllers/OrdersController.cs`
+
+**Endpoints a Implementar**:
+- `GET /Orders` - Vista principal
+- `POST /Orders/ObtenerOrders` - Obtener lista de órdenes
+- `POST /Orders/ObtenerOrderPorId` - Obtener orden específica
+- `POST /Orders/ObtenerOrderItems` - Obtener items de una orden
+- `POST /Orders/ObtenerCustomers` - Obtener clientes
+- `POST /Orders/ObtenerProducts` - Obtener productos
+- Y más según necesidades
+
+**Tiempo estimado**: 2 horas
+
+**Total Fase 2**: ~13 horas
+
+## Fase 3: Desarrollo del Frontend con Syncfusion
+
+### 3.1 Configurar Syncfusion en Proyecto
+
+**Tarea**: Instalar y configurar Syncfusion (ver [REGISTRO_LICENCIA_SYNCFUSION.md](REGISTRO_LICENCIA_SYNCFUSION.md))
+
+**Pasos**:
+1. Agregar paquete NuGet
+2. Registrar licencia en Program.cs
+3. Agregar Tag Helper en _ViewImports.cshtml
+4. Agregar estilos y scripts en _Layout.cshtml
+5. Agregar servicios en Program.cs
+
+**Tiempo estimado**: 30 minutos
+
+### 3.2 Crear Vista Principal con Dashboard
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Orders/Index.cshtml`
+
+**Componentes Syncfusion a Usar**:
+- **Dashboard Layout**: Para paneles de métricas
+- **Grid**: Para tabla de órdenes
+- **Charts**: Para gráficos de análisis
+- **Cards**: Para métricas resumidas
+
+**Estructura**:
+```html
+@{
+    ViewData["Title"] = "Órdenes de Venta";
+}
+
+<div class="container-fluid">
+    <!-- Dashboard con métricas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <ejs-card>
+                <div class="card-content">
+                    <h4>Total Órdenes</h4>
+                    <h2>@ViewBag.TotalOrders</h2>
+                </div>
+            </ejs-card>
+        </div>
+        <!-- Más métricas -->
+    </div>
+    
+    <!-- Grid de órdenes -->
+    <ejs-grid id="ordersGrid" 
+              dataSource="@Url.Action("ObtenerOrders", "Orders")"
+              allowPaging="true"
+              allowFiltering="true"
+              allowSorting="true">
+        <!-- Columnas -->
+    </ejs-grid>
+</div>
+```
+
+**Tiempo estimado**: 4 horas
+
+### 3.3 Implementar Grid de Órdenes
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Orders/_OrdersGrid.cshtml`
+
+**Funcionalidades** (igual que Employees pero con Syncfusion):
+- Filtrado avanzado
+- Ordenamiento múltiple
+- Paginación
+- Selección múltiple
+- Exportación a Excel/PDF
+- Formateo de fechas y moneda
+- Estilos condicionales según estado
+
+**Tiempo estimado**: 3 horas
+
+### 3.4 Implementar Vista de Detalle con Tabs
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Orders/Details.cshtml`
+
+**Componente**: Syncfusion Tabs
+
+**Pestañas**:
+1. **Información General**: Datos de la orden
+2. **Items**: Sub-grid con ORDER_ITEMS
+3. **Cliente**: Información del cliente
+4. **Envío**: Información de SHIPMENTS
+5. **Historial**: Timeline de cambios
+
+**Tiempo estimado**: 3 horas
+
+### 3.5 Implementar Calendario de Órdenes
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Orders/Calendar.cshtml`
+
+**Componente**: Syncfusion Schedule/Calendar
+
+**Funcionalidades**:
+- Vista mensual/semanal de órdenes por fecha
+- Filtrado por estado
+- Drag & drop para cambiar fechas
+- Alertas de órdenes vencidas
+
+**Tiempo estimado**: 2 horas
+
+### 3.6 Implementar Gráficos y Análisis
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Orders/Analytics.cshtml`
+
+**Componente**: Syncfusion Charts
+
+**Gráficos a Implementar**:
+- Ventas por mes (línea)
+- Órdenes por estado (pie)
+- Top productos (columna)
+- Ventas por tienda (comparativa)
+- Tendencias temporales
+
+**Tiempo estimado**: 3 horas
+
+### 3.7 Crear JavaScript con Namespaces
+
+**Archivo**: `src/AdministracionFlotillas.Web/Scripts/Orders/Orders.js`
+
+**Estructura de Namespaces** (similar a Employees):
+```javascript
+window.Orders = {
+    Grid: { /* ... */ },
+    Filters: { /* ... */ },
+    Selection: { /* ... */ },
+    Dashboard: { /* ... */ },
+    Calendar: { /* ... */ },
+    Charts: { /* ... */ },
+    Details: { /* ... */ }
+};
+```
+
+**Tiempo estimado**: 4 horas
+
+**Total Fase 3**: ~19 horas
+
+## Fase 4: Funcionalidades Avanzadas
+
+### 4.1 Query Builder para Búsquedas Avanzadas
+
+**Componente**: Syncfusion Query Builder
+
+**Funcionalidades**:
+- Construcción visual de filtros complejos
+- Guardar búsquedas favoritas
+- Exportar resultados
+
+**Tiempo estimado**: 2 horas
+
+### 4.2 Tree Grid para Jerarquías
+
+**Componente**: Syncfusion Tree Grid
+
+**Vista**: Orden → Items → Productos relacionados
+
+**Tiempo estimado**: 2 horas
+
+### 4.3 Kanban para Gestión de Estados
+
+**Componente**: Syncfusion Kanban
+
+**Tablero**: Pendiente | En Proceso | Completada | Cancelada
+
+**Tiempo estimado**: 2 horas
+
+### 4.4 Editor Avanzado de Órdenes
+
+**Componente**: Syncfusion Dialog + Form Controls
+
+**Funcionalidades**:
+- Validación en tiempo real
+- Campos condicionales
+- Preview de cambios
+
+**Tiempo estimado**: 2 horas
+
+**Total Fase 4**: ~8 horas
+
+## Fase 5: Validación y Pruebas
+
+### 5.1 Pruebas Funcionales
+
+**Checklist**:
+- [ ] Dashboard carga métricas correctamente
+- [ ] Grid carga datos de Oracle
+- [ ] Filtros funcionan correctamente
+- [ ] Vista de detalle muestra información completa
+- [ ] Calendario muestra órdenes por fecha
+- [ ] Gráficos muestran datos correctos
+- [ ] Exportación funciona
+- [ ] Responsive funciona en móviles
+
+**Tiempo estimado**: 4 horas
+
+### 5.2 Pruebas de Compatibilidad
 
 **Verificar en**:
 - [ ] Windows con .NET 8.0.300
 - [ ] Mac con .NET 8.0.417
 - [ ] Navegadores: Chrome, Firefox, Safari, Edge
-- [ ] Dispositivos móviles (responsive)
 
 **Tiempo estimado**: 2 horas
 
-### 3.3 Ajustes y Optimizaciones
-
-**Tareas**:
-- Ajustar estilos CSS si es necesario
-- Optimizar rendimiento
-- Corregir bugs encontrados
-- Mejorar templates HTML
-
-**Tiempo estimado**: 4 horas
-
-**Total Fase 3**: ~10 horas
-
-## Fase 4: Documentación y Capacitación
-
-### 4.1 Actualizar Documentación
-
-**Archivos a actualizar**:
-- `ESTRUCTURA_ACTUAL_PROYECTO.md` - Agregar información de Syncfusion
-- `ESTRUCTURA_VISTAS.md` - Actualizar ejemplos con Syncfusion
-- `EJERCICIOS_PRACTICA.md` - Agregar ejercicios con Syncfusion
-
-**Tiempo estimado**: 3 horas
-
-### 4.2 Crear Guía de Uso
-
-**Nuevo archivo**: `GUIA_SYNCFUSION.md`
-- Ejemplos de uso de cada componente
-- Patrones de implementación
-- Mejores prácticas
-- Troubleshooting común
-
-**Tiempo estimado**: 4 horas
-
-### 4.3 Capacitación del Equipo
-
-**Contenido**:
-- Presentación de componentes Syncfusion
-- Demostración de migración realizada
-- Ejercicios prácticos
-- Q&A
-
-**Tiempo estimado**: 2 horas
-
-**Total Fase 4**: ~9 horas
-
-## Fase 5: Migración de Otros Módulos (Futuro)
-
-Una vez validado el módulo Employees, aplicar el mismo patrón a otros módulos:
-
-1. **Departments** (cuando se implemente)
-2. **Flotillas** (cuando se implemente)
-3. **Otros módulos** según planificación
-
-**Tiempo estimado por módulo**: ~8-10 horas
+**Total Fase 5**: ~6 horas
 
 ## Cronograma Estimado
 
 | Fase | Tareas | Tiempo Estimado |
 |------|--------|-----------------|
-| Fase 1 | Preparación y configuración | 1-2 días (incluye espera de licencia) |
-| Fase 2 | Migración módulo Employees | 2 días |
-| Fase 3 | Validación y pruebas | 1.5 días |
-| Fase 4 | Documentación y capacitación | 1 día |
-| **Total Fase 1-4** | **Migración completa del módulo piloto** | **~5-6 días** |
-| Fase 5 | Migración otros módulos | Según planificación |
+| Fase 1 | Configuración de Base de Datos | 2-3 horas |
+| Fase 2 | Desarrollo del Backend | 13 horas |
+| Fase 3 | Desarrollo del Frontend Syncfusion | 19 horas |
+| Fase 4 | Funcionalidades Avanzadas | 8 horas |
+| Fase 5 | Validación y Pruebas | 6 horas |
+| **Total** | **Nuevo Módulo Completo** | **~48-50 horas (~6-7 días)** |
 
-## Estrategia de Implementación
+## Estructura de Archivos Final
 
-### Enfoque Gradual
-
-1. **Mantener DataTables funcionando** durante la migración
-2. **Crear nueva vista** `IndexSyncfusion.cshtml` para pruebas
-3. **Migrar funcionalidad** componente por componente
-4. **Validar** cada componente antes de continuar
-5. **Reemplazar** vista antigua cuando esté completa
-
-### Rollback Plan
-
-Si surgen problemas críticos:
-1. Mantener código DataTables en branch separado
-2. Revertir cambios en `_Layout.cshtml`
-3. Comentar referencias a Syncfusion en `Program.cs`
-4. Restaurar vistas originales
+```
+src/
+├── AdministracionFlotillas.ModelosComunes/
+│   ├── Employee.cs (V1 - sin tocar)
+│   ├── Order.cs (V2 - NUEVO)
+│   ├── OrderItem.cs (V2 - NUEVO)
+│   ├── Customer.cs (V2 - NUEVO)
+│   └── Product.cs (V2 - NUEVO)
+│
+├── AdministracionFlotillas.AccesoDatos/
+│   └── Repositorios/
+│       ├── EmployeesRepository.cs (V1 - sin tocar)
+│       ├── OrdersRepository.cs (V2 - NUEVO - Oracle real)
+│       └── CustomersRepository.cs (V2 - NUEVO)
+│
+├── AdministracionFlotillas.ReglasNegocio/
+│   └── Servicios/
+│       ├── EmployeesServiceOracle.cs (V1 - sin tocar)
+│       └── OrdersServiceOracle.cs (V2 - NUEVO)
+│
+└── AdministracionFlotillas.Web/
+    ├── Controllers/
+    │   ├── EmployeesController.cs (V1 - sin tocar)
+    │   └── OrdersController.cs (V2 - NUEVO)
+    ├── ViewModels/
+    │   ├── EmployeeViewModel.cs (V1 - sin tocar)
+    │   ├── OrderViewModel.cs (V2 - NUEVO)
+    │   └── DashboardViewModel.cs (V2 - NUEVO)
+    ├── Views/
+    │   ├── Employees/ (V1 - sin tocar - DataTables)
+    │   └── Orders/ (V2 - NUEVO - Syncfusion)
+    │       ├── Index.cshtml (Dashboard)
+    │       ├── _OrdersGrid.cshtml (Grid)
+    │       ├── Details.cshtml (Detalle con Tabs)
+    │       ├── Calendar.cshtml (Calendario)
+    │       └── Analytics.cshtml (Gráficos)
+    └── Scripts/
+        ├── Employees/ (V1 - sin tocar)
+        └── Orders/ (V2 - NUEVO)
+            └── Orders.js (Namespace Orders.*)
+```
 
 ## Consideraciones Importantes
 
-### Compatibilidad con Arquitectura Actual
+### Compatibilidad con Módulo Employees (V1)
 
-✅ **Se mantiene**:
-- Arquitectura basada en módulos
-- Namespaces JavaScript (`Employees.Table`, `Employees.Filters`, etc.)
-- Estructura de controladores
-- Parseadores y ViewModels
-- Sistema de bundles
+**Se mantiene intacto**:
+- Todo el código del módulo Employees
+- DataTables, Bootstrap, jQuery UI
+- JavaScript namespaces existentes
+- Bundles actuales
+- Funcionalidad al 100%
 
-✅ **Se mejora**:
-- Binding directo a controladores (menos código JavaScript)
-- Templates HTML condicionales (más flexible)
-- Componentes pre-construidos (menos código manual)
+**No se modifica**:
+- Ningún archivo relacionado con Employees
+- _Layout.cshtml (se agregan referencias Syncfusion sin quitar las actuales)
+- Sistema de bundles (se agregan nuevos bundles para Orders)
 
-### Impacto en Código Existente
+### Coexistencia de Ambas Versiones
 
-**Mínimo impacto**:
-- Los controladores pueden mantenerse igual
-- Los servicios y repositorios no cambian
-- Los ViewModels no cambian
-- Solo cambian las vistas y JavaScript relacionado
+**Ambas versiones funcionan simultáneamente**:
+- Employees (V1) usa DataTables
+- Orders (V2) usa Syncfusion
+- Ambas comparten el mismo _Layout.cshtml
+- Ambas comparten la misma arquitectura de capas
+- Solo difieren en la UI y la fuente de datos
 
-## Checklist de Migración
+### Navegación entre Módulos
 
-### Pre-migración
-- [ ] Licencia Syncfusion obtenida
-- [ ] Paquetes NuGet instalados
-- [ ] Configuración en Program.cs completada
-- [ ] Referencias en _Layout.cshtml agregadas
-
-### Durante migración
-- [ ] Grid migrado y funcionando
-- [ ] Filtros migrados y funcionando
-- [ ] Botones migrados y funcionando
-- [ ] Modal migrado y funcionando
-- [ ] JavaScript adaptado a Syncfusion
-- [ ] Estilos condicionales implementados
-- [ ] Binding a controladores funcionando
-- [ ] Eventos con namespaces funcionando
-
-### Post-migración
-- [ ] Pruebas funcionales completadas
-- [ ] Pruebas de compatibilidad completadas
-- [ ] Documentación actualizada
-- [ ] Equipo capacitado
-- [ ] Código DataTables removido (opcional)
+**Menú de navegación**:
+```html
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Employees" asp-action="Index">
+            Empleados (V1 - DataTables)
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Orders" asp-action="Index">
+            Órdenes (V2 - Syncfusion)
+        </a>
+    </li>
+</ul>
+```
 
 ## Recursos de Referencia
 
 - **Documentación Syncfusion**: https://help.syncfusion.com/aspnet-core
 - **Demos interactivos**: https://ej2.syncfusion.com/aspnetcore/Grid/Overview
-- **API Reference**: https://help.syncfusion.com/cr/aspnetcore
-- **Community Forum**: https://www.syncfusion.com/forums
+- **Oracle Sample Schemas**: https://github.com/oracle-samples/db-sample-schemas
+- **Oracle Cloud Always Free**: https://www.oracle.com/cloud/free/
 
 ---
 
 **Última actualización**: Enero 2026
-**Versión**: 1.0
+**Versión**: 2.0 (Estrategia de Módulos Paralelos)
+**Schema de Base de Datos**: CO (Customer Orders)
+**Base de Datos**: Oracle Cloud Always Free
