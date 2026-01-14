@@ -1,10 +1,27 @@
 # AdministracionFlotillas
 
-Aplicación web multiplataforma para administración de flotillas desarrollada con .NET 8.0 y arquitectura en capas.
+Aplicación web multiplataforma desarrollada con .NET 8.0 y arquitectura en capas, implementando módulos de administración con diferentes tecnologías UI para comparación y aprendizaje.
 
 ## Descripción
 
-Este proyecto implementa una aplicación web para la administración de flotillas utilizando ASP.NET Core MVC con una arquitectura en tres capas: aplicación web, reglas de negocio y acceso a datos.
+Este proyecto implementa una aplicación web utilizando ASP.NET Core MVC con una arquitectura en capas: aplicación web, reglas de negocio y acceso a datos. El proyecto utiliza una estrategia de módulos paralelos:
+
+- **Módulo Employees (V1)**: Implementado con DataTables + Bootstrap, completamente funcional, sirve como referencia
+- **Módulo Orders/Ventas (V2)**: En desarrollo con Syncfusion UI y Oracle Sample Schema CO (Customer Orders) para datos reales de ventas y facturación
+
+La base de datos utilizada es Oracle Cloud Always Free con el Sample Schema CO que contiene datos realistas de órdenes, clientes, productos, inventario y envíos.
+
+## Estado Actual
+
+**Última actualización**: Enero 2026
+
+- ✅ **Módulo Employees**: Completamente implementado y funcionando
+- ✅ **Arquitectura basada en módulos**: Implementada y documentada
+- ✅ **Sistema de bundles**: Configurado y funcionando
+- ✅ **JavaScript organizado en namespaces**: Implementado
+- ⏸️ **Migración a Syncfusion**: En pausa - Esperando aprobación de Community License (Ticket #803702)
+
+Ver [src/AdministracionFlotillas.Web/docs/ESTADO_IMPLEMENTACION_ACTUAL.md](src/AdministracionFlotillas.Web/docs/ESTADO_IMPLEMENTACION_ACTUAL.md) para detalles completos de lo que está implementado y funcionando.
 
 ## Estructura del Proyecto
 
@@ -12,16 +29,38 @@ Este proyecto implementa una aplicación web para la administración de flotilla
 AdministracionFlotillas/
 ├── src/
 │   ├── AdministracionFlotillas.Web/              # Capa de aplicación (MVC)
+│   │   ├── Controllers/                          # Controladores por módulo
+│   │   ├── Views/                                # Vistas por módulo
+│   │   ├── ViewModels/                           # ViewModels por módulo
+│   │   ├── Parseador/                            # Parseadores por módulo
+│   │   ├── Scripts/                              # JavaScript organizado por módulo
+│   │   │   ├── Common/                           # Utilidades comunes
+│   │   │   └── Employees/                        # Módulo Employees
+│   │   ├── docs/                                 # Documentación del proyecto
+│   │   └── scripts/                              # Scripts SQL
 │   ├── AdministracionFlotillas.ReglasNegocio/     # Capa de reglas de negocio
 │   ├── AdministracionFlotillas.AccesoDatos/       # Capa de acceso a datos
 │   └── AdministracionFlotillas.ModelosComunes/   # Modelos compartidos
-├── docs/                                          # Documentación del proyecto
 └── global.json                                    # Configuración del SDK de .NET
 ```
 
+### Arquitectura Basada en Módulos
+
+La aplicación está organizada en módulos funcionales. Cada módulo agrupa funcionalidad relacionada y mantiene una estructura consistente a través de todas las capas. Los archivos de cada módulo comparten el mismo nombre base para facilitar la organización y localización.
+
+**Ejemplo del módulo Employees:**
+- Modelo: `Employee.cs`
+- Repositorio: `IEmployeesRepository.cs`, `EmployeesRepository.cs`
+- Servicio: `IEmployeesService.cs`, `EmployeesServiceOracle.cs`
+- Controlador: `EmployeesController.cs`
+- ViewModel: `EmployeeViewModel.cs`
+- Parseador: `EmployeeParseador.cs`
+- Vistas: `Views/Employees/`
+- JavaScript: `Scripts/Employees/Employees.js`
+
 ## Requisitos
 
-- .NET SDK 8.0.300 o superior
+- .NET SDK 8.0.300 o superior (Windows) / 8.0.417 o superior (Mac)
 - Git
 - IDE: Visual Studio (Windows), Rider (Mac), o VS Code (cualquier plataforma)
 - Base de datos: Oracle Database (local o remota)
@@ -30,8 +69,8 @@ AdministracionFlotillas/
 
 ### Primera vez
 
-1. Instalar herramientas necesarias: [docs/INSTALACION_HERRAMIENTAS.md](docs/INSTALACION_HERRAMIENTAS.md)
-2. Clonar el repositorio: [docs/CLONAR_REPOSITORIO.md](docs/CLONAR_REPOSITORIO.md)
+1. Instalar herramientas necesarias: [src/AdministracionFlotillas.Web/docs/GET_STARTED/INSTALACION_HERRAMIENTAS.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/INSTALACION_HERRAMIENTAS.md)
+2. Clonar el repositorio: [src/AdministracionFlotillas.Web/docs/GET_STARTED/CLONAR_REPOSITORIO.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/CLONAR_REPOSITORIO.md)
 3. Restaurar dependencias y compilar:
    ```bash
    dotnet restore
@@ -45,71 +84,72 @@ AdministracionFlotillas/
 
 ### Windows con Visual Studio
 
-Seguir la guía específica: [docs/INICIO_RAPIDO_WINDOWS.md](docs/INICIO_RAPIDO_WINDOWS.md)
+Seguir la guía específica: [src/AdministracionFlotillas.Web/docs/GET_STARTED/INICIO_RAPIDO_WINDOWS.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/INICIO_RAPIDO_WINDOWS.md)
 
 ## Documentación
 
-Toda la documentación está en la carpeta [docs/](docs/). El archivo [docs/README.md](docs/README.md) contiene un índice completo de todos los documentos disponibles.
+Toda la documentación está en la carpeta [src/AdministracionFlotillas.Web/docs/](src/AdministracionFlotillas.Web/docs/). El archivo [src/AdministracionFlotillas.Web/docs/README.md](src/AdministracionFlotillas.Web/docs/README.md) contiene un índice completo de todos los documentos disponibles.
 
 ### Documentos Principales
 
-- [docs/README.md](docs/README.md) - Índice de documentación
-- [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) - Arquitectura del proyecto, diagramas y flujos
-- [docs/REQUISITOS_PROYECTO.md](docs/REQUISITOS_PROYECTO.md) - Requisitos completos del proyecto
-- [docs/ESTADO_PROYECTO.md](docs/ESTADO_PROYECTO.md) - Estado actual del proyecto
-- [docs/ESTRUCTURA_VISTAS.md](docs/ESTRUCTURA_VISTAS.md) - Estructura y componentes de las vistas
+- [src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md](src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ESTADO_IMPLEMENTACION_ACTUAL.md) - **ESTADO ACTUAL** - Todo lo implementado, funcionando y en uso, con referencias a archivos específicos
+- [src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md](src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md) - Estructura actual del proyecto, arquitectura basada en módulos, sistema de bundles y componentes implementados
+- [src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ARQUITECTURA.md](src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ARQUITECTURA.md) - Arquitectura del proyecto, diagramas y flujos
+- [src/AdministracionFlotillas.Web/docs/UI/PLAN_MIGRACION_UI.md](src/AdministracionFlotillas.Web/docs/UI/PLAN_MIGRACION_UI.md) - Plan de migración a Syncfusion (**EN PAUSA - Esperando aprobación de licencia**)
 
 ### Guías de Inicio
 
-- [docs/CLONAR_REPOSITORIO.md](docs/CLONAR_REPOSITORIO.md) - Guía para clonar y configurar el repositorio
-- [docs/INSTALACION_HERRAMIENTAS.md](docs/INSTALACION_HERRAMIENTAS.md) - Instalación de herramientas necesarias
-- [docs/INICIO_RAPIDO_WINDOWS.md](docs/INICIO_RAPIDO_WINDOWS.md) - Guía específica para Windows con Visual Studio
-- [docs/QUICK_START_CROSS_PLATFORM.md](docs/QUICK_START_CROSS_PLATFORM.md) - Inicio rápido multiplataforma
-- [docs/SETUP.md](docs/SETUP.md) - Configuración inicial del proyecto
+- [src/AdministracionFlotillas.Web/docs/GET_STARTED/CLONAR_REPOSITORIO.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/CLONAR_REPOSITORIO.md) - Guía para clonar y configurar el repositorio
+- [src/AdministracionFlotillas.Web/docs/GET_STARTED/INSTALACION_HERRAMIENTAS.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/INSTALACION_HERRAMIENTAS.md) - Instalación de herramientas necesarias
+- [src/AdministracionFlotillas.Web/docs/GET_STARTED/INICIO_RAPIDO_WINDOWS.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/INICIO_RAPIDO_WINDOWS.md) - Guía específica para Windows con Visual Studio
+- [src/AdministracionFlotillas.Web/docs/GET_STARTED/QUICK_START_CROSS_PLATFORM.md](src/AdministracionFlotillas.Web/docs/GET_STARTED/QUICK_START_CROSS_PLATFORM.md) - Inicio rápido multiplataforma
 
 ### Compatibilidad y Configuración
 
-- [docs/COMPATIBILIDAD_CROSS_PLATFORM.md](docs/COMPATIBILIDAD_CROSS_PLATFORM.md) - Compatibilidad entre Windows y Mac
-- [docs/DIAGNOSTICO_SDK.md](docs/DIAGNOSTICO_SDK.md) - Diagnóstico de problemas con el SDK
-- [docs/SOLUCION_COMPATIBILIDAD_SDK.md](docs/SOLUCION_COMPATIBILIDAD_SDK.md) - Soluciones a problemas de compatibilidad
-- [docs/INSTALAR_RUNTIME_NET8.md](docs/INSTALAR_RUNTIME_NET8.md) - Instalación del runtime de .NET 8
+- [src/AdministracionFlotillas.Web/docs/CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md](src/AdministracionFlotillas.Web/docs/CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md) - Compatibilidad entre Windows y Mac
+- [src/AdministracionFlotillas.Web/docs/CONFIGURACION/DIAGNOSTICO_SDK.md](src/AdministracionFlotillas.Web/docs/CONFIGURACION/DIAGNOSTICO_SDK.md) - Diagnóstico de problemas con el SDK
+- [src/AdministracionFlotillas.Web/docs/CONFIGURACION/SOLUCION_COMPATIBILIDAD_SDK.md](src/AdministracionFlotillas.Web/docs/CONFIGURACION/SOLUCION_COMPATIBILIDAD_SDK.md) - Soluciones a problemas de compatibilidad
+- [src/AdministracionFlotillas.Web/docs/CONFIGURACION/INSTALAR_RUNTIME_NET8.md](src/AdministracionFlotillas.Web/docs/CONFIGURACION/INSTALAR_RUNTIME_NET8.md) - Instalación del runtime de .NET 8
 
 ### Base de Datos
 
-- [docs/GUIA_BASE_DATOS.md](docs/GUIA_BASE_DATOS.md) - Configuración de base de datos Oracle
-- [docs/ORACLE_XE_LOCAL.md](docs/ORACLE_XE_LOCAL.md) - Instalación de Oracle XE local
-- [docs/scripts/](docs/scripts/) - Scripts SQL para la base de datos
+- [src/AdministracionFlotillas.Web/docs/BASE_DATOS/GUIA_BASE_DATOS.md](src/AdministracionFlotillas.Web/docs/BASE_DATOS/GUIA_BASE_DATOS.md) - Configuración de base de datos Oracle
+- [src/AdministracionFlotillas.Web/docs/BASE_DATOS/ORACLE_XE_LOCAL.md](src/AdministracionFlotillas.Web/docs/BASE_DATOS/ORACLE_XE_LOCAL.md) - Instalación de Oracle XE local
+- [src/AdministracionFlotillas.Web/scripts/](src/AdministracionFlotillas.Web/scripts/) - Scripts SQL para la base de datos
 
 ### Desarrollo
 
-- [docs/COMO_CONTINUAR.md](docs/COMO_CONTINUAR.md) - Guía para continuar el desarrollo
-- [docs/EJERCICIOS_PRACTICA.md](docs/EJERCICIOS_PRACTICA.md) - Ejercicios de práctica progresivos
-- [docs/COMANDOS_UTILES.md](docs/COMANDOS_UTILES.md) - Comandos útiles para desarrollo
-
-### Referencia
-
-- [docs/SEGUIMIENTO_PROGRESO.md](docs/SEGUIMIENTO_PROGRESO.md) - Seguimiento del progreso del proyecto
-- [docs/NOTAS.md](docs/NOTAS.md) - Notas y recordatorios
-- [docs/PLAN_ANTES_COMPARTIR_REPO.md](docs/PLAN_ANTES_COMPARTIR_REPO.md) - Plan de implementación del proyecto
+- [src/AdministracionFlotillas.Web/docs/DESARROLLO/COMANDOS_UTILES.md](src/AdministracionFlotillas.Web/docs/DESARROLLO/COMANDOS_UTILES.md) - Comandos útiles para desarrollo
+- [src/AdministracionFlotillas.Web/docs/DESARROLLO/GUIA_GIT.md](src/AdministracionFlotillas.Web/docs/DESARROLLO/GUIA_GIT.md) - Guía de Git con conceptos básicos y buenas prácticas
+- [src/AdministracionFlotillas.Web/docs/DESARROLLO/EJERCICIOS_PRACTICA.md](src/AdministracionFlotillas.Web/docs/DESARROLLO/EJERCICIOS_PRACTICA.md) - Ejercicios de práctica progresivos
 
 ## Tecnologías
 
-- .NET 8.0 - Framework multiplataforma
-- ASP.NET Core MVC - Patrón Model-View-Controller
+### Backend
+- .NET 8.0 SDK - Framework multiplataforma
+- ASP.NET Core MVC 8.0 - Patrón Model-View-Controller
 - C# - Lenguaje de programación
-- Oracle Database - Base de datos
-- DataTables - Framework de tablas JavaScript
-- Bootstrap 5 - Framework CSS
-- Font Awesome 5 - Librería de iconos
-- SweetAlert2 - Alertas personalizadas
-- jQuery UI - Componentes de interfaz
-- Inputmask - Formato de inputs
+- Microsoft.AspNetCore.Mvc.NewtonsoftJson 8.0.11 - Serialización JSON para AJAX
+- BuildBundlerMinifier 3.2.449 - Generación de bundles JavaScript
+
+### Frontend
+- Bootstrap 5 - Framework CSS y componentes JavaScript
+- jQuery 3.7.1 - Biblioteca JavaScript
+- jQuery UI 1.13.2 - Componentes de interfaz (Datepicker)
+- DataTables 1.13.7 - Framework de tablas JavaScript con paginación, ordenamiento y búsqueda
+- DataTables Buttons 2.4.2 - Extensión para exportación (Excel, PDF, Print)
+- DataTables Responsive 2.5.0 - Extensión para diseño responsive
+- Font Awesome 5.15.4 - Librería de iconos
+- SweetAlert2 11 - Alertas personalizadas
+- Inputmask 5.0.8 - Formato de inputs (moneda)
+- jsZip 3.10.1 - Requerido por DataTables Buttons para exportación Excel
+- pdfmake 0.1.53 - Requerido por DataTables Buttons para exportación PDF
 
 ## Compatibilidad Multiplataforma
 
 El proyecto está configurado para funcionar en Windows y Mac simultáneamente. La configuración permite que ambos sistemas trabajen con el mismo código sin problemas de compatibilidad.
 
-Para más información sobre compatibilidad, ver [docs/COMPATIBILIDAD_CROSS_PLATFORM.md](docs/COMPATIBILIDAD_CROSS_PLATFORM.md).
+Para más información sobre compatibilidad, ver [src/AdministracionFlotillas.Web/docs/CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md](src/AdministracionFlotillas.Web/docs/CONFIGURACION/COMPATIBILIDAD_CROSS_PLATFORM.md).
 
 ## Comandos Básicos
 
@@ -127,13 +167,25 @@ dotnet run --project src/AdministracionFlotillas.Web
 dotnet clean
 ```
 
-## Estructura de Capas
+## Estructura de Capas y Módulos
 
-El proyecto sigue una arquitectura en capas:
+El proyecto sigue una arquitectura en capas organizada por módulos funcionales:
 
-1. **Capa de Aplicación (Web)**: Controladores MVC, vistas, ViewModels
-2. **Capa de Reglas de Negocio**: Servicios y lógica de negocio
-3. **Capa de Acceso a Datos**: Repositorios e interfaces de acceso a datos
-4. **Modelos Comunes**: Modelos compartidos entre capas
+1. **Capa de Aplicación (Web)**: Controladores MVC, vistas, ViewModels, parseadores y scripts JavaScript organizados por módulo
+2. **Capa de Reglas de Negocio**: Servicios y lógica de negocio por módulo
+3. **Capa de Acceso a Datos**: Repositorios e interfaces de acceso a datos por módulo
+4. **Modelos Comunes**: Modelos compartidos entre capas (uno por módulo)
 
-Para más detalles sobre la arquitectura, ver [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
+### Sistema de Bundles
+
+El proyecto utiliza bundles JavaScript para optimizar el rendimiento:
+- Los bundles combinan y minifican múltiples archivos JavaScript en uno solo
+- Se generan automáticamente durante la compilación
+- Configuración en `bundleconfig.json`
+- Los bundles se encuentran en `wwwroot/js/bundles/`
+
+Para más detalles sobre la arquitectura, módulos y bundles, ver [src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md](src/AdministracionFlotillas.Web/docs/ARQUITECTURA/ESTRUCTURA_ACTUAL_PROYECTO.md).
+
+---
+
+**Última actualización**: Enero 2026
