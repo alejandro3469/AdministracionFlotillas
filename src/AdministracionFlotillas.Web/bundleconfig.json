@@ -1,0 +1,25 @@
+[
+  {
+    "outputFileName": "wwwroot/js/bundles/common.min.js",
+    "inputFiles": [
+      "Scripts/Common/Utils.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/bundles/employees.min.js",
+    "inputFiles": [
+      "Scripts/Common/Utils.js",
+      "Scripts/Employees/Employees.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+]
