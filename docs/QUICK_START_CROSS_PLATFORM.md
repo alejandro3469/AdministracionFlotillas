@@ -1,24 +1,24 @@
-# Quick Start: Configuración Cross-Platform
+# Inicio Rápido: Configuración Cross-Platform
 
-## ✅ Respuesta Rápida
+## Respuestas Rápidas
 
-**¿Es compatible 8.0.300 con 8.0.417?**
-- **Sí**, ambas son versiones patch de .NET 8.0 y son completamente compatibles.
+¿Es compatible 8.0.300 con 8.0.417?
+- Sí, ambas son versiones patch de .NET 8.0 y son completamente compatibles.
 
-**¿Quién debe migrar?**
-- **Nadie**. La configuración actual funciona para ambos.
+¿Quién debe migrar?
+- Nadie. La configuración actual funciona para ambos sistemas.
 
-**¿Hay una versión compatible con ambos?**
-- **Sí, .NET 8.0**. El proyecto ya está configurado para funcionar en ambos sistemas.
+¿Hay una versión compatible con ambos?
+- Sí, .NET 8.0. El proyecto está configurado para funcionar en ambos sistemas.
 
-## 🚀 Configuración Actual
+## Configuración Actual
 
 El proyecto está configurado para:
-- **Windows**: .NET SDK 8.0.300 o superior
-- **Mac**: .NET SDK 8.0.417 o superior
-- **Ambos**: Funcionan con el mismo código sin problemas
+- Windows: .NET SDK 8.0.300 o superior
+- Mac: .NET SDK 8.0.417 o superior
+- Ambos: Funcionan con el mismo código sin problemas
 
-## 📋 Verificación Rápida
+## Verificación Rápida
 
 ### En Windows:
 ```powershell
@@ -38,31 +38,27 @@ dotnet build
 # Debe compilar sin errores
 ```
 
-## 📚 Documentación Completa
+## Documentación Completa
 
 Para detalles completos, ver: [COMPATIBILIDAD_CROSS_PLATFORM.md](./COMPATIBILIDAD_CROSS_PLATFORM.md)
 
-## 🔧 Si Algo No Funciona
+## Si Algo No Funciona
 
-1. **Verifica tu versión:**
+1. Verificar la versión:
    ```bash
    dotnet --version
    ```
 
-2. **Limpia y recompila:**
+2. Limpiar y recompilar:
    ```bash
    dotnet clean
    dotnet restore
    dotnet build
    ```
 
-3. **Verifica global.json:**
+3. Verificar global.json:
    ```bash
    cat global.json  # Mac
    type global.json # Windows
    ```
    Debe mostrar: `"version": "8.0.300"` y `"rollForward": "latestPatch"`
-
----
-
-**✅ Todo listo para colaborar entre Windows y Mac!**

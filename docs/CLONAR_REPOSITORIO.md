@@ -1,119 +1,106 @@
-# Guía para Clonar el Repositorio - Paso a Paso
+# Guía para Clonar el Repositorio
 
-## Objetivo
-
-Esta guía te ayudará a clonar el repositorio del proyecto y configurarlo en tu máquina (Mac o Windows) para comenzar a trabajar.
+Esta guía explica cómo clonar el repositorio del proyecto y configurarlo en Windows o Mac.
 
 ## Requisitos Previos
 
-**ANTES de clonar el repositorio, necesitas tener instalado:**
+Antes de clonar el repositorio, se requiere tener instalado:
 
-### Para Windows:
-- [ ] .NET SDK 10.0.101 instalado
-- [ ] Git instalado
-- [ ] VS Code instalado (o Visual Studio)
-- [ ] Extensión C# para VS Code instalada
+### Windows
+- .NET SDK 8.0.300 o superior
+- Git
+- Visual Studio o VS Code
+- Extensión C# para VS Code (si se usa VS Code)
 
-### Para Mac:
-- [ ] .NET SDK 10.0.101 instalado
-- [ ] Git instalado
-- [ ] Rider instalado (o VS Code)
-- [ ] DataGrip instalado (opcional, para base de datos)
+### Mac
+- .NET SDK 8.0.417 o superior
+- Git
+- Rider o VS Code
+- DataGrip (opcional, para base de datos)
 
-**Si NO tienes estas herramientas instaladas:**
-- Sigue la guía: [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)
+Si no se tienen estas herramientas instaladas, seguir la guía [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md).
 
----
+## Paso 1: Verificar que Git está Instalado
 
-## PASO 1: Verificar que Git está Instalado
+### Windows
 
-### Para Windows:
+Abrir PowerShell o CMD:
+- Presionar `Win + X` y seleccionar "Windows PowerShell"
+- O presionar `Win + R`, escribir `powershell` y presionar Enter
 
-**1.1. Abre PowerShell o CMD:**
-- Presiona `Win + X` y selecciona "Windows PowerShell"
-- O presiona `Win + R`, escribe `powershell` y presiona Enter
-
-**1.2. Verifica Git:**
+Verificar Git:
 ```powershell
 git --version
 ```
 
-**Si muestra una versión (ej: `git version 2.42.0`):**
-- Git está instalado, continúa al PASO 2
+Si muestra una versión (ejemplo: `git version 2.42.0`):
+- Git está instalado, continuar al Paso 2
 
-**Si muestra error:**
-- Git NO está instalado
-- Descarga desde: https://git-scm.com/download/win
-- Instala Git y reinicia PowerShell
-- Vuelve a verificar con `git --version`
+Si muestra error:
+- Git no está instalado
+- Descargar desde: https://git-scm.com/download/win
+- Instalar Git y reiniciar PowerShell
+- Verificar nuevamente con `git --version`
 
-### Para Mac:
+### Mac
 
-**1.1. Abre la Terminal:**
-- Presiona `Cmd + Espacio` para Spotlight
-- Escribe "Terminal" y presiona Enter
+Abrir la Terminal:
+- Presionar `Cmd + Espacio` para Spotlight
+- Escribir "Terminal" y presionar Enter
 
-**1.2. Verifica Git:**
+Verificar Git:
 ```bash
 git --version
 ```
 
-**Si muestra una versión:**
-- Git está instalado (viene preinstalado en Mac)
-- Continúa al PASO 2
+Si muestra una versión:
+- Git está instalado, continuar al Paso 2
 
-**Si muestra error:**
-- Instala Git desde: https://git-scm.com/download/mac
-- O instala Xcode Command Line Tools: `xcode-select --install`
+Si muestra error:
+- Instalar Git desde: https://git-scm.com/download/mac
+- O instalar Xcode Command Line Tools: `xcode-select --install`
 
----
+## Paso 2: Verificar que .NET SDK está Instalado
 
-## PASO 2: Verificar que .NET SDK está Instalado
+### Windows y Mac
 
-### Para Windows y Mac (mismo comando):
+Abrir PowerShell (Windows) o Terminal (Mac).
 
-**2.1. Abre PowerShell (Windows) o Terminal (Mac)**
-
-**2.2. Verifica .NET:**
+Verificar .NET:
 ```bash
 dotnet --version
 ```
 
-**Si muestra `10.0.101` o superior:**
-- .NET está instalado, continúa al PASO 3
+Si muestra `8.0.300` o superior (Windows) o `8.0.417` o superior (Mac):
+- .NET está instalado, continuar al Paso 3
 
-**Si muestra error o versión diferente:**
-- .NET NO está instalado o es versión incorrecta
-- Sigue la guía: [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)
-- Instala .NET SDK 10.0.101
-- Vuelve a verificar con `dotnet --version`
+Si muestra error o versión diferente:
+- .NET no está instalado o es versión incorrecta
+- Seguir la guía: [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)
+- Instalar .NET SDK 8.0.300 o superior
+- Verificar nuevamente con `dotnet --version`
 
----
-
-## Archivos de Solución (.sln vs .slnx)
+## Archivos de Solución
 
 El repositorio contiene dos archivos de solución:
-- **`AdministracionFlotillas.slnx`** - Formato nuevo de Visual Studio 2022 (solo versión 17.10 Preview 3 o superior)
-- **`AdministracionFlotillas.sln`** - Formato tradicional (compatible con todas las versiones)
+- `AdministracionFlotillas.slnx` - Formato nuevo de Visual Studio 2022 (versión 17.10 Preview 3 o superior)
+- `AdministracionFlotillas.sln` - Formato tradicional (compatible con todas las versiones)
 
-**Compatibilidad:**
-- **VS Code**: Usa `AdministracionFlotillas.sln` (formato tradicional)
-- **Visual Studio 2022 (versión 17.10 Preview 3 o superior)**: Puede usar ambos formatos
-- **Visual Studio 2022 (versiones anteriores a 17.10)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
-- **Visual Studio (versiones anteriores a 2022)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+Compatibilidad:
+- VS Code: Usa `AdministracionFlotillas.sln` (formato tradicional)
+- Visual Studio 2022 (versión 17.10 Preview 3 o superior): Puede usar ambos formatos
+- Visual Studio 2022 (versiones anteriores a 17.10): Usa `AdministracionFlotillas.sln`
+- Visual Studio (versiones anteriores a 2022): Usa `AdministracionFlotillas.sln`
 
-**Recomendación**: Usa `AdministracionFlotillas.sln` para máxima compatibilidad en Windows y Mac.
+Recomendación: Usar `AdministracionFlotillas.sln` para máxima compatibilidad.
 
----
+## Paso 3: Clonar el Repositorio
 
-## PASO 3: Clonar el Repositorio
+### Windows
 
-### Para Windows:
+Abrir PowerShell.
 
-**3.1. Abre PowerShell:**
-- Presiona `Win + X` → "Windows PowerShell"
-
-**3.2. Navega a donde quieres clonar el proyecto:**
+Navegar a donde se quiere clonar el proyecto:
 ```powershell
 # Ejemplo: clonar en Documentos
 cd C:\Users\[TU_USUARIO]\Documents
@@ -122,34 +109,33 @@ cd C:\Users\[TU_USUARIO]\Documents
 cd D:\Proyectos
 ```
 
-**3.3. Clona el repositorio:**
+Clonar el repositorio:
 ```powershell
 git clone https://github.com/alejandro3469/AdministracionFlotillas.git
 ```
 
-**3.4. Navega al proyecto clonado:**
+Navegar al proyecto clonado:
 ```powershell
 cd AdministracionFlotillas
 ```
 
-**3.5. Verifica que se clonó correctamente:**
+Verificar que se clonó correctamente:
 ```powershell
-# Deberías ver los archivos del proyecto
 dir
-
-# Deberías ver:
-# - AdministracionFlotillas.sln
-# - AdministracionFlotillas.slnx
-# - src/
-# - docs/
-# - README.md
 ```
 
-### Para Mac:
+Debe mostrar:
+- AdministracionFlotillas.sln
+- AdministracionFlotillas.slnx
+- src/
+- docs/
+- README.md
 
-**3.1. Abre la Terminal**
+### Mac
 
-**3.2. Navega a donde quieres clonar el proyecto:**
+Abrir la Terminal.
+
+Navegar a donde se quiere clonar el proyecto:
 ```bash
 # Ejemplo: clonar en Documentos
 cd ~/Documents
@@ -158,42 +144,39 @@ cd ~/Documents
 cd ~/Proyectos
 ```
 
-**3.3. Clona el repositorio:**
+Clonar el repositorio:
 ```bash
 # Usando HTTPS
 git clone https://github.com/alejandro3469/AdministracionFlotillas.git
 
-# O usando SSH (si tienes configurado)
+# O usando SSH (si está configurado)
 # git clone git@github.com:alejandro3469/AdministracionFlotillas.git
 ```
 
-**3.4. Navega al proyecto clonado:**
+Navegar al proyecto clonado:
 ```bash
 cd AdministracionFlotillas
 ```
 
-**3.5. Verifica que se clonó correctamente:**
+Verificar que se clonó correctamente:
 ```bash
-# Deberías ver los archivos del proyecto
 ls -la
-
-# Deberías ver:
-# - AdministracionFlotillas.sln
-# - AdministracionFlotillas.slnx
-# - src/
-# - docs/
-# - README.md
 ```
 
----
+Debe mostrar:
+- AdministracionFlotillas.sln
+- AdministracionFlotillas.slnx
+- src/
+- docs/
+- README.md
 
-## PASO 4: Restaurar Dependencias (Paquetes NuGet)
+## Paso 4: Restaurar Dependencias
 
-**IMPORTANTE**: Después de clonar, necesitas restaurar los paquetes NuGet que el proyecto usa.
+Después de clonar, se deben restaurar los paquetes NuGet que el proyecto usa.
 
-### Para Windows y Mac (mismos comandos):
+### Windows y Mac
 
-**4.1. Asegúrate de estar en la raíz del proyecto:**
+Asegurarse de estar en la raíz del proyecto:
 ```bash
 # Windows
 cd [RUTA_DONDE_CLONASTE]\AdministracionFlotillas
@@ -201,101 +184,87 @@ cd [RUTA_DONDE_CLONASTE]\AdministracionFlotillas
 # Mac
 cd ~/Documents/AdministracionFlotillas
 
-# Verifica que estás en el lugar correcto
+# Verificar que se está en el lugar correcto
 pwd
-# Debe mostrar la ruta del proyecto
 ```
 
-**4.2. Restaura las dependencias:**
+Restaurar las dependencias:
 ```bash
-# Mac y Windows (mismo comando)
 dotnet restore
 ```
 
-**4.3. Qué hace este comando:**
+Este comando:
 - Lee los archivos `.csproj` de todos los proyectos
-- Descarga los paquetes NuGet necesarios (Oracle.ManagedDataAccess.Core, etc.)
+- Descarga los paquetes NuGet necesarios
 - Puede tardar 1-3 minutos la primera vez
-- Descarga los paquetes a una carpeta local
 
-**4.4. Verifica que funcionó:**
-- Deberías ver mensajes como:
+Verificar que funcionó:
+- Debe mostrar mensajes como:
 ```
 Restoring packages for /ruta/al/proyecto.csproj...
 Restore succeeded.
 ```
 
-**Si ves errores:**
-- Verifica que .NET SDK 10.0.101 está instalado: `dotnet --version`
-- Verifica tu conexión a internet
-- Intenta nuevamente: `dotnet restore`
+Si hay errores:
+- Verificar que .NET SDK 8.0.300 o superior está instalado: `dotnet --version`
+- Verificar conexión a internet
+- Intentar nuevamente: `dotnet restore`
 
----
+## Paso 5: Compilar el Proyecto
 
-## PASO 5: Compilar el Proyecto
+Después de restaurar, compilar para verificar que todo está correcto.
 
-**IMPORTANTE**: Después de restaurar, compila para verificar que todo está correcto.
+### Windows y Mac
 
-### Para Windows y Mac (mismos comandos):
-
-**5.1. Asegúrate de estar en la raíz del proyecto:**
+Asegurarse de estar en la raíz del proyecto:
 ```bash
-# Verifica que estás en la raíz (donde están los archivos de solución)
 pwd
 ```
 
-**5.2. Compila toda la solución:**
+Compilar toda la solución:
 ```bash
-# Mac y Windows (mismo comando)
 dotnet build
 ```
 
-**5.3. Verifica el resultado:**
-
-**Si todo está bien, verás:**
+Si todo está bien, se verá:
 ```
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 ```
 
-**Si hay errores:**
-- Lee los mensajes de error cuidadosamente
-- Los errores te dirán qué archivo y qué línea tienen el problema
+Si hay errores:
+- Leer los mensajes de error cuidadosamente
+- Los errores indican qué archivo y qué línea tienen el problema
 - Errores comunes:
-  - Paquetes NuGet faltantes → Ejecuta `dotnet restore` nuevamente
-  - Versión de .NET incorrecta → Verifica con `dotnet --version`
-  - Referencias entre proyectos rotas → Verifica que todos los proyectos están en la solución
+  - Paquetes NuGet faltantes: Ejecutar `dotnet restore` nuevamente
+  - Versión de .NET incorrecta: Verificar con `dotnet --version`
+  - Referencias entre proyectos rotas: Verificar que todos los proyectos están en la solución
 
----
+## Paso 6: Configurar Base de Datos (Opcional)
 
-## PASO 6: Configurar Base de Datos (Opcional - Para Desarrollo)
+Si solo se quiere compilar y ejecutar la aplicación sin base de datos, se puede saltar este paso.
 
-**NOTA**: Si solo quieres compilar y ejecutar la aplicación sin base de datos, puedes saltar este paso por ahora.
+Si se necesita configurar la base de datos:
+- Seguir la guía: [GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)
+- Configurar la cadena de conexión en `src/AdministracionFlotillas.Web/appsettings.json`
 
-**Si necesitas configurar la base de datos:**
-- Sigue la guía: [GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)
-- Configura la cadena de conexión en `src/AdministracionFlotillas.Web/appsettings.json`
+## Paso 7: Ejecutar la Aplicación
 
----
+### Windows y Mac
 
-## PASO 7: Ejecutar la Aplicación
-
-### Para Windows y Mac (mismos comandos):
-
-**7.1. Navega al proyecto Web:**
+Navegar al proyecto Web:
 ```bash
-# Mac y Windows (mismo comando)
 cd src/AdministracionFlotillas.Web
 ```
 
-**7.2. Ejecuta la aplicación:**
+Ejecutar la aplicación:
 ```bash
 dotnet run
 ```
 
-**7.3. Verifica que se ejecutó:**
-- Deberías ver mensajes como:
+Verificar que se ejecutó:
+- Debe mostrar mensajes como:
 ```
 Building...
 info: Microsoft.Hosting.Lifetime[14]
@@ -303,133 +272,123 @@ info: Microsoft.Hosting.Lifetime[14]
       Now listening on: http://localhost:5000
 ```
 
-**7.4. Abre el navegador:**
-- Ve a: `https://localhost:5001` o `http://localhost:5000`
-- Deberías ver la página de inicio de ASP.NET Core MVC
+Abrir el navegador:
+- Ir a: `https://localhost:5001` o `http://localhost:5000`
+- Debe mostrar la página de inicio de ASP.NET Core MVC
 
-**7.5. Detén la aplicación:**
-- Presiona `Ctrl + C` en la terminal
+Detener la aplicación:
+- Presionar `Ctrl + C` en la terminal
 - Esto detiene el servidor web
 
----
+## Paso 8: Abrir el Proyecto en el IDE
 
-## PASO 8: Abrir el Proyecto en tu IDE
+### Windows (VS Code)
 
-### Para Windows (VS Code):
+Abrir VS Code:
+- Buscar "Visual Studio Code" en el menú Inicio
+- O presionar `Win + R`, escribir `code` y presionar Enter
 
-**8.1. Abre VS Code:**
-- Busca "Visual Studio Code" en el menú Inicio
-- O presiona `Win + R`, escribe `code` y presiona Enter
+Abrir el proyecto:
+- Opción A: Abrir la carpeta
+  - Ir a: File → Open Folder...
+  - Navegar a la carpeta del proyecto clonado
+  - Seleccionar "Select Folder"
+  - VS Code detectará automáticamente los proyectos .NET
+- Opción B: Abrir el archivo de solución
+  - Ir a: File → Open File...
+  - Navegar a la carpeta del proyecto clonado
+  - Seleccionar `AdministracionFlotillas.sln`
+  - VS Code abrirá la solución con todos los proyectos
 
-**8.2. Abre el proyecto:**
-Tienes dos opciones:
-
-**Opción A: Abrir la carpeta (Recomendado)**
-- Ve a: **File** → **Open Folder...**
-- Navega a la carpeta del proyecto clonado
-- Haz clic en "Select Folder"
-- VS Code detectará automáticamente los proyectos .NET
-
-**Opción B: Abrir el archivo de solución**
-- Ve a: **File** → **Open File...**
-- Navega a la carpeta del proyecto clonado
-- Selecciona `AdministracionFlotillas.sln` (formato tradicional)
-- VS Code abrirá la solución con todos los proyectos
-
-**8.3. Verifica que VS Code detecta .NET:**
-- Abre la Terminal integrada: `Ctrl + `` (backtick)
-- Ejecuta: `dotnet --version`
+Verificar que VS Code detecta .NET:
+- Abrir la Terminal integrada: `Ctrl + ` (backtick)
+- Ejecutar: `dotnet --version`
 - Debe mostrar la versión instalada de .NET SDK
 
-**8.4. Instalar extensiones recomendadas:**
-- VS Code puede sugerirte instalar extensiones
-- Asegúrate de tener la extensión "C#" de Microsoft instalada
-- Si VS Code no detecta los proyectos, instala la extensión "C# Dev Kit" de Microsoft
+Instalar extensiones recomendadas:
+- VS Code puede sugerir instalar extensiones
+- Asegurarse de tener la extensión "C#" de Microsoft instalada
+- Si VS Code no detecta los proyectos, instalar la extensión "C# Dev Kit" de Microsoft
 
-### Para Windows (Visual Studio):
+### Windows (Visual Studio)
 
-**8.1. Abre Visual Studio:**
-- Busca "Visual Studio" en el menú Inicio
+Abrir Visual Studio:
+- Buscar "Visual Studio" en el menú Inicio
 
-**8.2. Abre el proyecto:**
-- Ve a: **File** → **Open** → **Project/Solution...**
-- Navega a la carpeta del proyecto clonado
-- Selecciona `AdministracionFlotillas.sln` (formato tradicional, compatible con todas las versiones)
-- **Nota**: Si tu versión de Visual Studio 2022 es anterior a 17.10 Preview 3, no podrás abrir `.slnx`
-- Haz clic en "Open"
+Abrir el proyecto:
+- Ir a: File → Open → Project/Solution...
+- Navegar a la carpeta del proyecto clonado
+- Seleccionar `AdministracionFlotillas.sln`
+- Hacer clic en "Open"
 
-**8.3. Verifica que Visual Studio detecta .NET:**
-- Visual Studio debería detectar automáticamente .NET SDK 10.0.101
-- Si no, ve a: **Tools** → **Options** → **Projects and Solutions** → **.NET Core**
-- Verifica que .NET SDK 10.0.101 está listado
+Verificar que Visual Studio detecta .NET:
+- Visual Studio debería detectar automáticamente .NET SDK 8.0.300 o superior
+- Si no, ir a: Tools → Options → Projects and Solutions → .NET Core
+- Verificar que .NET SDK 8.0.300 o superior está listado
 
-### Para Mac (Rider):
+### Mac (Rider)
 
-**8.1. Abre Rider:**
-- Ve a Aplicaciones → Rider
-- O busca "Rider" en Spotlight
+Abrir Rider:
+- Ir a Aplicaciones → Rider
+- O buscar "Rider" en Spotlight
 
-**8.2. Abre el proyecto:**
-- Ve a: **File** → **Open**
-- Navega a la carpeta del proyecto clonado
-- Selecciona el archivo `AdministracionFlotillas.slnx` o `AdministracionFlotillas.sln`
-- Haz clic en "Open"
+Abrir el proyecto:
+- Ir a: File → Open
+- Navegar a la carpeta del proyecto clonado
+- Seleccionar el archivo `AdministracionFlotillas.slnx` o `AdministracionFlotillas.sln`
+- Hacer clic en "Open"
 
-**8.3. Verifica que Rider detecta .NET:**
-- Rider debería detectar automáticamente .NET 10.0.101
-- Si no, ve a: **Rider** → **Preferences** → **Toolchains**
-- Verifica que .NET SDK 10.0.101 está listado
-
----
+Verificar que Rider detecta .NET:
+- Rider debería detectar automáticamente .NET 8.0.417 o superior
+- Si no, ir a: Rider → Preferences → Toolchains
+- Verificar que .NET SDK 8.0.417 o superior está listado
 
 ## Checklist de Verificación
 
-Después de clonar y configurar, verifica que todo está bien:
+Después de clonar y configurar, verificar que todo está bien:
 
-- [ ] Git está instalado y funciona
-- [ ] .NET SDK 10.0.101 está instalado
-- [ ] Repositorio clonado correctamente
-- [ ] `dotnet restore` ejecutado sin errores
-- [ ] `dotnet build` ejecutado sin errores
-- [ ] Proyecto abierto en IDE (VS Code, Visual Studio o Rider)
-- [ ] IDE detecta .NET correctamente
-- [ ] (Opcional) Base de datos configurada
-- [ ] (Opcional) Aplicación ejecuta correctamente
-
----
+- Git está instalado y funciona
+- .NET SDK 8.0.300 o superior está instalado
+- Repositorio clonado correctamente
+- `dotnet restore` ejecutado sin errores
+- `dotnet build` ejecutado sin errores
+- Proyecto abierto en IDE (VS Code, Visual Studio o Rider)
+- IDE detecta .NET correctamente
+- (Opcional) Base de datos configurada
+- (Opcional) Aplicación ejecuta correctamente
 
 ## Solución de Problemas Comunes
 
 ### Error: "git: command not found" o "git no se reconoce"
 
-**Solución:**
+Solución:
 - Git no está instalado
-- **Windows**: Descarga e instala desde https://git-scm.com/download/win
-- **Mac**: Ejecuta `xcode-select --install` en Terminal
-- Reinicia tu terminal después de instalar
+- Windows: Descargar e instalar desde https://git-scm.com/download/win
+- Mac: Ejecutar `xcode-select --install` en Terminal
+- Reiniciar la terminal después de instalar
 
 ### Error: "dotnet: command not found" o "dotnet no se reconoce"
 
-**Solución:**
+Solución:
 - .NET SDK no está instalado
-- Sigue: [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)
-- Instala .NET SDK 10.0.101
-- Reinicia tu terminal después de instalar
+- Seguir: [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)
+- Instalar .NET SDK 8.0.300 o superior
+- Reiniciar la terminal después de instalar
 
 ### Error: "Could not find a part of the path" al clonar
 
-**Solución:**
-- La ruta donde intentas clonar no existe
-- Crea la carpeta primero o clona en una ubicación que exista
-- **Windows**: `mkdir C:\Proyectos` y luego clona ahí
-- **Mac**: `mkdir ~/Proyectos` y luego clona ahí
+Solución:
+- La ruta donde se intenta clonar no existe
+- Crear la carpeta primero o clonar en una ubicación que exista
+- Windows: `mkdir C:\Proyectos` y luego clonar ahí
+- Mac: `mkdir ~/Proyectos` y luego clonar ahí
 
 ### Error: "Restore failed" o "Unable to restore packages"
 
-**Solución:**
-1. Verifica tu conexión a internet
-2. Verifica que .NET está instalado: `dotnet --version`
-3. Intenta limpiar y restaurar:
+Solución:
+1. Verificar conexión a internet
+2. Verificar que .NET está instalado: `dotnet --version`
+3. Intentar limpiar y restaurar:
 ```bash
 dotnet clean
 dotnet restore
@@ -437,47 +396,45 @@ dotnet restore
 
 ### Error: "Build failed" después de clonar
 
-**Solución:**
-1. Asegúrate de haber ejecutado `dotnet restore` primero
-2. Verifica que todos los proyectos están en la solución:
+Solución:
+1. Asegurarse de haber ejecutado `dotnet restore` primero
+2. Verificar que todos los proyectos están en la solución:
 ```bash
 dotnet sln list
 ```
-3. Deberías ver 4 proyectos listados
-4. Si faltan proyectos, verifica que clonaste el repositorio completo
+3. Debe mostrar 4 proyectos listados
+4. Si faltan proyectos, verificar que se clonó el repositorio completo
 
 ### Error: "The project file could not be loaded"
 
-**Solución:**
+Solución:
 - El archivo .csproj puede estar corrupto
-- Verifica que clonaste el repositorio completo
-- Intenta clonar nuevamente en una carpeta diferente
+- Verificar que se clonó el repositorio completo
+- Intentar clonar nuevamente en una carpeta diferente
 
 ### Error: "El archivo seleccionado no es un archivo de solución válido"
 
-**Solución:**
+Solución:
 - Este error ocurre cuando se intenta abrir un archivo `.slnx` en un IDE que no lo soporta
-- **VS Code**: Usa `AdministracionFlotillas.sln` (formato tradicional)
-- **Visual Studio 2022 (versiones anteriores a 17.10 Preview 3)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
-- **Visual Studio 2022 (versión 17.10 Preview 3 o superior)**: Puede usar ambos formatos
-- **Visual Studio (versiones anteriores a 2022)**: Usa `AdministracionFlotillas.sln` (no reconoce `.slnx`)
+- VS Code: Usar `AdministracionFlotillas.sln` (formato tradicional)
+- Visual Studio 2022 (versiones anteriores a 17.10 Preview 3): Usar `AdministracionFlotillas.sln`
+- Visual Studio 2022 (versión 17.10 Preview 3 o superior): Puede usar ambos formatos
+- Visual Studio (versiones anteriores a 2022): Usar `AdministracionFlotillas.sln`
 
-**Pasos para corregir:**
-1. Abre el IDE (VS Code o Visual Studio)
-2. Ve a: **File** → **Open File...** (o **Open Project/Solution...**)
-3. Selecciona `AdministracionFlotillas.sln` (NO `.slnx`)
-4. O simplemente abre la carpeta del proyecto:
-   - **VS Code**: **File** → **Open Folder...**
+Pasos para corregir:
+1. Abrir el IDE (VS Code o Visual Studio)
+2. Ir a: File → Open File... (o Open Project/Solution...)
+3. Seleccionar `AdministracionFlotillas.sln` (NO `.slnx`)
+4. O simplemente abrir la carpeta del proyecto:
+   - VS Code: File → Open Folder...
    - El IDE detectará automáticamente los proyectos
 
 ### La aplicación no se ejecuta (error de puerto)
 
-**Solución:**
+Solución:
 - El puerto 5000 o 5001 puede estar en uso
-- Cierra otras aplicaciones que usen esos puertos
-- O cambia el puerto en `Properties/launchSettings.json`
-
----
+- Cerrar otras aplicaciones que usen esos puertos
+- O cambiar el puerto en `Properties/launchSettings.json`
 
 ## Comandos Rápidos de Referencia
 
@@ -505,25 +462,20 @@ dotnet sln list
 dotnet list src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj reference
 ```
 
----
-
 ## Próximos Pasos
 
 Después de clonar y configurar el proyecto:
 
-1. **Lee la documentación:**
+1. Leer la documentación:
    - [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) - Próximos pasos de desarrollo
-   - [ARQUITECTURA.md](./ARQUITECTURA.md) - Entiende la arquitectura del proyecto
+   - [ARQUITECTURA.md](./ARQUITECTURA.md) - Entender la arquitectura del proyecto
    - [REQUISITOS_PROYECTO.md](./REQUISITOS_PROYECTO.md) - Requisitos completos
 
-2. **Configura tu entorno:**
-   - Configura base de datos (si es necesario): [GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)
-   - Configura Kendo UI y Bootstrap (ver SETUP.md)
+2. Configurar el entorno:
+   - Configurar base de datos (si es necesario): [GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)
 
-3. **Comienza a desarrollar:**
-   - Sigue [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) para los siguientes pasos
-
----
+3. Comenzar a desarrollar:
+   - Seguir [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) para los siguientes pasos
 
 ## Documentación Relacionada
 
@@ -531,7 +483,3 @@ Después de clonar y configurar el proyecto:
 - [SETUP.md](./SETUP.md) - Configuración completa del proyecto
 - [COMO_CONTINUAR.md](./COMO_CONTINUAR.md) - Qué hacer después de clonar
 - [COMANDOS_UTILES.md](./COMANDOS_UTILES.md) - Comandos útiles para desarrollo
-
----
-
-

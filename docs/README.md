@@ -1,83 +1,65 @@
-# Documentación del Proyecto AdministracionFlotillas
+# Índice de Documentación
 
-Esta carpeta contiene toda la documentación relacionada con el proyecto.
+Este documento es un índice de toda la documentación disponible del proyecto AdministracionFlotillas.
 
-## Estructura de Documentos
+## Documentos Principales
 
-### Documentos Principales
+- [ARQUITECTURA.md](ARQUITECTURA.md) - Arquitectura del proyecto, diagramas, flujos de datos y estructura en capas
+- [REQUISITOS_PROYECTO.md](REQUISITOS_PROYECTO.md) - Requisitos completos del proyecto, tecnologías y estructura
+- [ESTADO_PROYECTO.md](ESTADO_PROYECTO.md) - Estado actual del proyecto y componentes implementados
+- [ESTRUCTURA_VISTAS.md](ESTRUCTURA_VISTAS.md) - Estructura detallada de las vistas, archivos que las componen y flujos
 
-- **[README.md](./README.md)** - Este archivo (índice de documentación)
-- **[PLAN_ANTES_COMPARTIR_REPO.md](./PLAN_ANTES_COMPARTIR_REPO.md)** - Plan completo de implementación del proyecto desde cero
-- **[CLONAR_REPOSITORIO.md](./CLONAR_REPOSITORIO.md)** - Guía paso a paso para clonar el repo y configurarlo
-- **[QUICK_START.md](./QUICK_START.md)** - Inicio rápido con comandos esenciales
-- **[INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)** - Guía completa de instalación de herramientas (Mac y Windows)
-- **[ARQUITECTURA.md](./ARQUITECTURA.md)** - Diagramas de arquitectura y flujos del proyecto
-- **[REQUISITOS_PROYECTO.md](./REQUISITOS_PROYECTO.md)** - Requisitos completos del proyecto
-- **[COMO_CONTINUAR.md](./COMO_CONTINUAR.md)** - **EMPIEZA AQUÍ** - Guía paso a paso para continuar
-- **[SETUP.md](./SETUP.md)** - Guía de configuración rápida del proyecto
-- **[GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)** - Guía de configuración de base de datos remota
-- **[ESTADO_PROYECTO.md](./ESTADO_PROYECTO.md)** - Estado completo del proyecto, vistas completas/incompletas
-- **[ESTRUCTURA_VISTAS.md](./ESTRUCTURA_VISTAS.md)** - **NUEVO** - Guía detallada de qué archivos componen cada vista
-- **[SEGUIMIENTO_PROGRESO.md](./SEGUIMIENTO_PROGRESO.md)** - Seguimiento detallado del progreso del proyecto
-- **[COMANDOS_UTILES.md](./COMANDOS_UTILES.md)** - Comandos útiles para desarrollo diario
-- **[NOTAS.md](./NOTAS.md)** - Notas personales, recordatorios e ideas
+## Guías de Inicio
 
-## Inicio Rápido
+- [CLONAR_REPOSITORIO.md](CLONAR_REPOSITORIO.md) - Guía paso a paso para clonar el repositorio y configurarlo
+- [INSTALACION_HERRAMIENTAS.md](INSTALACION_HERRAMIENTAS.md) - Guía de instalación de herramientas necesarias
+- [INICIO_RAPIDO_WINDOWS.md](INICIO_RAPIDO_WINDOWS.md) - Guía específica para Windows con Visual Studio
+- [QUICK_START_CROSS_PLATFORM.md](QUICK_START_CROSS_PLATFORM.md) - Inicio rápido multiplataforma
+- [SETUP.md](SETUP.md) - Guía de configuración rápida del proyecto
 
-**¿No sabes por dónde empezar?**
+## Compatibilidad y Configuración
 
-### Si vas a clonar y colaborar en el repositorio existente:
+- [COMPATIBILIDAD_CROSS_PLATFORM.md](COMPATIBILIDAD_CROSS_PLATFORM.md) - Compatibilidad entre Windows y Mac, configuración de versiones
+- [DIAGNOSTICO_SDK.md](DIAGNOSTICO_SDK.md) - Comandos de diagnóstico para problemas con el SDK
+- [SOLUCION_COMPATIBILIDAD_SDK.md](SOLUCION_COMPATIBILIDAD_SDK.md) - Soluciones a problemas de compatibilidad del SDK
+- [INSTALAR_RUNTIME_NET8.md](INSTALAR_RUNTIME_NET8.md) - Instalación del runtime de .NET 8
 
-1. **¿No tienes las herramientas?**: **[INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)** - Instala .NET, Git, Rider/VS Code paso a paso
-2. **Clona el repositorio**: **[CLONAR_REPOSITORIO.md](./CLONAR_REPOSITORIO.md)** - Guía completa para clonar y configurar el proyecto
-3. **Después de clonar**: Ejecuta `dotnet restore` y `dotnet build` (ver CLONAR_REPOSITORIO.md)
-4. **Inicio rápido**: **[QUICK_START.md](./QUICK_START.md)** - Comandos esenciales
+## Base de Datos
 
-### Si vas a crear el proyecto desde cero:
+- [GUIA_BASE_DATOS.md](GUIA_BASE_DATOS.md) - Guía de configuración de base de datos Oracle
+- [ORACLE_XE_LOCAL.md](ORACLE_XE_LOCAL.md) - Guía para instalar Oracle XE localmente
+- [scripts/](scripts/) - Scripts SQL para migración y configuración de base de datos
 
-1. **Plan completo**: **[PLAN_ANTES_COMPARTIR_REPO.md](./PLAN_ANTES_COMPARTIR_REPO.md)** - Plan completo de implementación desde cero
-2. **Ver arquitectura**: **[ARQUITECTURA.md](./ARQUITECTURA.md)** - Diagramas de arquitectura y flujos
-3. **Lee requisitos**: **[REQUISITOS_PROYECTO.md](./REQUISITOS_PROYECTO.md)** - Entiende todos los requisitos del proyecto
-4. **Continúa desarrollo**: **[COMO_CONTINUAR.md](./COMO_CONTINUAR.md)** - Pasos de desarrollo
-5. **Configura BD**: **[GUIA_BASE_DATOS.md](./GUIA_BASE_DATOS.md)** - Guía para configurar base de datos remota
-6. **Revisa progreso**: **[SEGUIMIENTO_PROGRESO.md](./SEGUIMIENTO_PROGRESO.md)** - Estado actual del proyecto
-7. **Comandos útiles**: **[COMANDOS_UTILES.md](./COMANDOS_UTILES.md)** - Comandos para desarrollo diario
+## Desarrollo
 
-## Documentación Externa
+- [COMO_CONTINUAR.md](COMO_CONTINUAR.md) - Guía paso a paso para continuar el desarrollo
+- [EJERCICIOS_PRACTICA.md](EJERCICIOS_PRACTICA.md) - Ejercicios de práctica progresivos con diferentes niveles de dificultad
+- [COMANDOS_UTILES.md](COMANDOS_UTILES.md) - Comandos útiles para desarrollo diario
 
-Para una guía completa y detallada sobre cómo crear y desarrollar este tipo de proyecto, consulta:
+## Referencia
 
-**Guía Completa**: `/Users/wallfacer/proyectos-gitlab/pos-online/GUIA_PROYECTO_NET_CROSS_PLATFORM.md`
+- [SEGUIMIENTO_PROGRESO.md](SEGUIMIENTO_PROGRESO.md) - Seguimiento detallado del progreso del proyecto
+- [NOTAS.md](NOTAS.md) - Notas y recordatorios
+- [PLAN_ANTES_COMPARTIR_REPO.md](PLAN_ANTES_COMPARTIR_REPO.md) - Plan de implementación del proyecto desde cero
 
-Esta guía incluye:
-- Instrucciones paso a paso para Mac y Windows
-- Explicaciones de conceptos (C#, .NET, MVC, IDE)
-- Guías de debugging
-- Mejores prácticas
-- Solución de problemas comunes
+## Flujo Recomendado de Lectura
 
-## Flujo Recomendado para Nuevos Miembros
+### Para nuevos miembros del equipo
 
-1. **Instalar herramientas** → [INSTALACION_HERRAMIENTAS.md](./INSTALACION_HERRAMIENTAS.md)
-2. **Clonar repositorio** → [CLONAR_REPOSITORIO.md](./CLONAR_REPOSITORIO.md)
-3. **Restaurar y compilar** → `dotnet restore` y `dotnet build`
-4. **Entender arquitectura** → [ARQUITECTURA.md](./ARQUITECTURA.md)
-5. **Leer requisitos** → [REQUISITOS_PROYECTO.md](./REQUISITOS_PROYECTO.md)
-6. **Continuar desarrollo** → [COMO_CONTINUAR.md](./COMO_CONTINUAR.md)
+1. [INSTALACION_HERRAMIENTAS.md](INSTALACION_HERRAMIENTAS.md) - Instalar herramientas necesarias
+2. [CLONAR_REPOSITORIO.md](CLONAR_REPOSITORIO.md) - Clonar y configurar el repositorio
+3. [ARQUITECTURA.md](ARQUITECTURA.md) - Entender la arquitectura del proyecto
+4. [ESTRUCTURA_VISTAS.md](ESTRUCTURA_VISTAS.md) - Entender cómo están estructuradas las vistas
+5. [EJERCICIOS_PRACTICA.md](EJERCICIOS_PRACTICA.md) - Practicar con ejercicios progresivos
 
-## Actualización de Documentos
+### Para desarrollo continuo
 
-- **SEGUIMIENTO_PROGRESO.md**: Actualizar diariamente con el progreso
-- **NOTAS.md**: Agregar notas, ideas y recordatorios según sea necesario
-- **SETUP.md**: Actualizar cuando se agreguen nuevos pasos de configuración
+1. [COMO_CONTINUAR.md](COMO_CONTINUAR.md) - Guía para continuar el desarrollo
+2. [ESTADO_PROYECTO.md](ESTADO_PROYECTO.md) - Revisar el estado actual
+3. [COMANDOS_UTILES.md](COMANDOS_UTILES.md) - Comandos de referencia rápida
 
-## Convenciones
+### Para configuración de entorno
 
-- Todos los documentos están en Markdown (.md)
-- Usar español para documentación de seguimiento y notas
-- Usar inglés para nombres de archivos y código
-- Mantener los documentos actualizados con el progreso del proyecto
-
----
-
-**Última actualización**: Enero 2026
+1. [INSTALACION_HERRAMIENTAS.md](INSTALACION_HERRAMIENTAS.md) - Instalar herramientas
+2. [GUIA_BASE_DATOS.md](GUIA_BASE_DATOS.md) - Configurar base de datos
+3. [COMPATIBILIDAD_CROSS_PLATFORM.md](COMPATIBILIDAD_CROSS_PLATFORM.md) - Verificar compatibilidad
