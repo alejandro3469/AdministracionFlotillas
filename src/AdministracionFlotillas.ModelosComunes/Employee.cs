@@ -1,3 +1,5 @@
+using System;
+
 namespace AdministracionFlotillas.ModelosComunes;
 
 /// <summary>
@@ -20,6 +22,6 @@ public class Employee
     
     public int? Antiguedad { get; set; }
     
-    public string NombreDepartamento { get; set; }
+    public string? NombreDepartamento { get; set; }
 }
 

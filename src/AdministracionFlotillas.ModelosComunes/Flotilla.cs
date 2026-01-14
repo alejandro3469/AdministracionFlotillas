@@ -1,3 +1,5 @@
+using System;
+
 namespace AdministracionFlotillas.ModelosComunes;
 
 public class Flotilla
