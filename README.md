@@ -1,200 +1,139 @@
 # AdministracionFlotillas
 
-Proyecto .NET multiplataforma para administración de flotillas con arquitectura en capas.
+Aplicación web multiplataforma para administración de flotillas desarrollada con .NET 8.0 y arquitectura en capas.
 
-## 📋 Descripción
+## Descripción
 
-Este proyecto implementa una aplicación web para la administración de flotillas utilizando:
-- **.NET 10.0** (Multiplataforma - Mac y Windows)
-- **ASP.NET Core MVC** (Patrón Model-View-Controller)
-- **Arquitectura en 3 capas**:
-  - Capa de Aplicación (Web/MVC)
-  - Capa de Reglas de Negocio
-  - Capa de Acceso a Datos
+Este proyecto implementa una aplicación web para la administración de flotillas utilizando ASP.NET Core MVC con una arquitectura en tres capas: aplicación web, reglas de negocio y acceso a datos.
 
 ## Estructura del Proyecto
 
 ```
 AdministracionFlotillas/
 ├── src/
-│   ├── AdministracionFlotillas.Web/              # Capa de Aplicación (MVC)
-│   ├── AdministracionFlotillas.ReglasNegocio/   # Capa de Reglas de Negocio
-│   ├── AdministracionFlotillas.AccesoDatos/      # Capa de Acceso a Datos
+│   ├── AdministracionFlotillas.Web/              # Capa de aplicación (MVC)
+│   ├── AdministracionFlotillas.ReglasNegocio/     # Capa de reglas de negocio
+│   ├── AdministracionFlotillas.AccesoDatos/       # Capa de acceso a datos
 │   └── AdministracionFlotillas.ModelosComunes/   # Modelos compartidos
 ├── docs/                                          # Documentación del proyecto
-│   ├── README.md                                  # Índice de documentación
-│   ├── CLONAR_REPOSITORIO.md                     # Guía para clonar el repo
-│   ├── QUICK_START.md                             # Inicio rápido
-│   ├── INSTALACION_HERRAMIENTAS.md               # Instalación de herramientas
-│   ├── ARQUITECTURA.md                            # Diagramas de arquitectura
-│   ├── REQUISITOS_PROYECTO.md                    # Requisitos completos
-│   ├── COMO_CONTINUAR.md                         # Guía paso a paso
-│   ├── SETUP.md                                   # Guía de configuración
-│   ├── GUIA_BASE_DATOS.md                        # Configuración de BD
-│   ├── COMANDOS_UTILES.md                        # Comandos útiles
-│   ├── NOTAS.md                                   # Notas personales
-│   └── SEGUIMIENTO_PROGRESO.md                    # Seguimiento de progreso
-└── README.md                                      # Este archivo
+└── global.json                                    # Configuración del SDK de .NET
 ```
+
+## Requisitos
+
+- .NET SDK 8.0.300 o superior
+- Git
+- IDE: Visual Studio (Windows), Rider (Mac), o VS Code (cualquier plataforma)
+- Base de datos: Oracle Database (local o remota)
 
 ## Inicio Rápido
 
-### Si estás clonando el repositorio por primera vez:
+### Primera vez
 
-1. **Instala las herramientas necesarias:**
-   - Sigue: [docs/INSTALACION_HERRAMIENTAS.md](./docs/INSTALACION_HERRAMIENTAS.md)
-   - Necesitas: .NET SDK 10.0.101, Git, VS Code (Windows) o Rider (Mac)
-
-2. **Clona el repositorio:**
-   - Sigue: [docs/CLONAR_REPOSITORIO.md](./docs/CLONAR_REPOSITORIO.md)
-   - Guía completa paso a paso para Windows y Mac
-
-3. **Después de clonar, ejecuta:**
-   ```bash
-   # Restaurar dependencias (descarga paquetes NuGet)
-   dotnet restore
-   
-   # Compilar para verificar que todo está bien
-   dotnet build
-   
-   # Ejecutar la aplicación
-   cd src/AdministracionFlotillas.Web
-   dotnet run
-   ```
-
-### Si ya tienes el proyecto localmente:
-
-1. **Abre el proyecto en tu IDE:**
-   ```bash
-   # Windows
-   cd C:\Users\TU_USUARIO\Documents\AdministracionFlotillas
-   
-   # Mac
-   cd ~/Documents/AdministracionFlotillas
-   ```
-
-2. **Restaura las dependencias (si es necesario):**
+1. Instalar herramientas necesarias: [docs/INSTALACION_HERRAMIENTAS.md](docs/INSTALACION_HERRAMIENTAS.md)
+2. Clonar el repositorio: [docs/CLONAR_REPOSITORIO.md](docs/CLONAR_REPOSITORIO.md)
+3. Restaurar dependencias y compilar:
    ```bash
    dotnet restore
-   ```
-
-3. **Compila el proyecto:**
-   ```bash
    dotnet build
    ```
-
-4. **Ejecuta la aplicación:**
+4. Ejecutar la aplicación:
    ```bash
    cd src/AdministracionFlotillas.Web
    dotnet run
    ```
 
-## 📚 Documentación
+### Windows con Visual Studio
 
-Toda la documentación está en la carpeta **[docs/](./docs/)**:
+Seguir la guía específica: [docs/INICIO_RAPIDO_WINDOWS.md](docs/INICIO_RAPIDO_WINDOWS.md)
 
-- **[docs/README.md](./docs/README.md)** - Índice de toda la documentación
-- **[docs/CLONAR_REPOSITORIO.md](./docs/CLONAR_REPOSITORIO.md)** - **NUEVO** - Guía para clonar el repo y configurarlo
-- **[docs/INSTALACION_HERRAMIENTAS.md](./docs/INSTALACION_HERRAMIENTAS.md)** - Guía completa de instalación (Mac y Windows)
-- **[docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)** - Diagramas de arquitectura y flujos
-- **[docs/REQUISITOS_PROYECTO.md](./docs/REQUISITOS_PROYECTO.md)** - Requisitos completos del proyecto
-- **[docs/COMO_CONTINUAR.md](./docs/COMO_CONTINUAR.md)** - Guía paso a paso para continuar
-- **[docs/SETUP.md](./docs/SETUP.md)** - Guía de configuración rápida
-- **[docs/GUIA_BASE_DATOS.md](./docs/GUIA_BASE_DATOS.md)** - Guía de configuración de base de datos
-- **[docs/COMANDOS_UTILES.md](./docs/COMANDOS_UTILES.md)** - Comandos útiles para desarrollo
-- **[docs/NOTAS.md](./docs/NOTAS.md)** - Notas personales y recordatorios
-- **[docs/ESTADO_PROYECTO.md](./docs/ESTADO_PROYECTO.md)** - **NUEVO** - Estado completo del proyecto, vistas completas/incompletas
-- **[docs/SEGUIMIENTO_PROGRESO.md](./docs/SEGUIMIENTO_PROGRESO.md)** - Seguimiento detallado del progreso
+## Documentación
 
-### Documentación Externa
+Toda la documentación está en la carpeta [docs/](docs/). El archivo [docs/README.md](docs/README.md) contiene un índice completo de todos los documentos disponibles.
 
-- **Guía Completa**: Ver `GUIA_PROYECTO_NET_CROSS_PLATFORM.md` en el proyecto pos-online
-  - Guía detallada paso a paso para crear el proyecto
-  - Explicaciones de conceptos (C#, .NET, MVC, IDE)
-  - Instrucciones para Mac y Windows
+### Documentos Principales
+
+- [docs/README.md](docs/README.md) - Índice de documentación
+- [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) - Arquitectura del proyecto, diagramas y flujos
+- [docs/REQUISITOS_PROYECTO.md](docs/REQUISITOS_PROYECTO.md) - Requisitos completos del proyecto
+- [docs/ESTADO_PROYECTO.md](docs/ESTADO_PROYECTO.md) - Estado actual del proyecto
+- [docs/ESTRUCTURA_VISTAS.md](docs/ESTRUCTURA_VISTAS.md) - Estructura y componentes de las vistas
+
+### Guías de Inicio
+
+- [docs/CLONAR_REPOSITORIO.md](docs/CLONAR_REPOSITORIO.md) - Guía para clonar y configurar el repositorio
+- [docs/INSTALACION_HERRAMIENTAS.md](docs/INSTALACION_HERRAMIENTAS.md) - Instalación de herramientas necesarias
+- [docs/INICIO_RAPIDO_WINDOWS.md](docs/INICIO_RAPIDO_WINDOWS.md) - Guía específica para Windows con Visual Studio
+- [docs/QUICK_START_CROSS_PLATFORM.md](docs/QUICK_START_CROSS_PLATFORM.md) - Inicio rápido multiplataforma
+- [docs/SETUP.md](docs/SETUP.md) - Configuración inicial del proyecto
+
+### Compatibilidad y Configuración
+
+- [docs/COMPATIBILIDAD_CROSS_PLATFORM.md](docs/COMPATIBILIDAD_CROSS_PLATFORM.md) - Compatibilidad entre Windows y Mac
+- [docs/DIAGNOSTICO_SDK.md](docs/DIAGNOSTICO_SDK.md) - Diagnóstico de problemas con el SDK
+- [docs/SOLUCION_COMPATIBILIDAD_SDK.md](docs/SOLUCION_COMPATIBILIDAD_SDK.md) - Soluciones a problemas de compatibilidad
+- [docs/INSTALAR_RUNTIME_NET8.md](docs/INSTALAR_RUNTIME_NET8.md) - Instalación del runtime de .NET 8
+
+### Base de Datos
+
+- [docs/GUIA_BASE_DATOS.md](docs/GUIA_BASE_DATOS.md) - Configuración de base de datos Oracle
+- [docs/ORACLE_XE_LOCAL.md](docs/ORACLE_XE_LOCAL.md) - Instalación de Oracle XE local
+- [docs/scripts/](docs/scripts/) - Scripts SQL para la base de datos
+
+### Desarrollo
+
+- [docs/COMO_CONTINUAR.md](docs/COMO_CONTINUAR.md) - Guía para continuar el desarrollo
+- [docs/EJERCICIOS_PRACTICA.md](docs/EJERCICIOS_PRACTICA.md) - Ejercicios de práctica progresivos
+- [docs/COMANDOS_UTILES.md](docs/COMANDOS_UTILES.md) - Comandos útiles para desarrollo
+
+### Referencia
+
+- [docs/SEGUIMIENTO_PROGRESO.md](docs/SEGUIMIENTO_PROGRESO.md) - Seguimiento del progreso del proyecto
+- [docs/NOTAS.md](docs/NOTAS.md) - Notas y recordatorios
+- [docs/PLAN_ANTES_COMPARTIR_REPO.md](docs/PLAN_ANTES_COMPARTIR_REPO.md) - Plan de implementación del proyecto
 
 ## Tecnologías
 
-- **.NET 10.0.101** - Framework multiplataforma
-  - Compatible con Mac (Rider, DataGrip)
-  - Compatible con Windows (VS Code, Visual Studio)
-  - Compatible con Linux (VS Code)
-  - **Mismo código funciona en todos los sistemas operativos**
-- **ASP.NET Core MVC** - Patrón Model-View-Controller
-- **C#** - Lenguaje de programación
-- **Oracle Database HR** - Base de datos de ejemplo estándar (Oracle HR schema)
-- **DataTables** - Framework de tablas JavaScript (gratis, con exportación Excel/PDF)
-- **Bootstrap 5** - Framework CSS (última versión)
-- **AutoMapper** - Parser ViewModel ↔ BusinessModel
-- **DataGrip** (Mac) / **DataGrip o SQL Developer** (Windows) - Herramientas de visualización de base de datos
+- .NET 8.0 - Framework multiplataforma
+- ASP.NET Core MVC - Patrón Model-View-Controller
+- C# - Lenguaje de programación
+- Oracle Database - Base de datos
+- DataTables - Framework de tablas JavaScript
+- Bootstrap 5 - Framework CSS
+- Font Awesome 5 - Librería de iconos
+- SweetAlert2 - Alertas personalizadas
+- jQuery UI - Componentes de interfaz
+- Inputmask - Formato de inputs
 
 ## Compatibilidad Multiplataforma
 
-**Este proyecto es 100% compatible con:**
-- Windows (VS Code, Visual Studio)
-- Mac (Rider, VS Code)
-- Linux (VS Code)
+El proyecto está configurado para funcionar en Windows y Mac simultáneamente. La configuración permite que ambos sistemas trabajen con el mismo código sin problemas de compatibilidad.
 
-**Los usuarios de Windows pueden:**
-- Clonar el repositorio sin problemas
-- Ejecutar los mismos comandos `dotnet`
-- Compilar y ejecutar la aplicación
-- Trabajar con el mismo código que los usuarios de Mac
+Para más información sobre compatibilidad, ver [docs/COMPATIBILIDAD_CROSS_PLATFORM.md](docs/COMPATIBILIDAD_CROSS_PLATFORM.md).
 
-**Comandos después de clonar (Windows y Mac):**
+## Comandos Básicos
+
 ```bash
-dotnet restore  # Restaurar dependencias
-dotnet build    # Compilar
-dotnet run      # Ejecutar
+# Restaurar dependencias
+dotnet restore
+
+# Compilar el proyecto
+dotnet build
+
+# Ejecutar la aplicación
+dotnet run --project src/AdministracionFlotillas.Web
+
+# Limpiar compilaciones anteriores
+dotnet clean
 ```
 
-## Estado del Proyecto
+## Estructura de Capas
 
-Ver el estado detallado en **[docs/ESTADO_PROYECTO.md](./docs/ESTADO_PROYECTO.md)** y **[docs/SEGUIMIENTO_PROGRESO.md](./docs/SEGUIMIENTO_PROGRESO.md)**
+El proyecto sigue una arquitectura en capas:
 
-**Resumen rápido:**
-- [x] Crear solución con 4 proyectos
-- [x] Configurar todas las referencias entre proyectos
-- [x] Instalar paquetes NuGet (AutoMapper, NewtonsoftJson)
-- [x] **Vista Employees COMPLETA y FUNCIONAL**
-  - [x] Modelo Employee
-  - [x] Repository con datos mock
-  - [x] Service con reglas de negocio
-  - [x] Controller con endpoints AJAX
-  - [x] Views con DataTables
-  - [x] JavaScript para manejo de UI
-- [x] DataTables configurado (gratis, con exportación)
-- [x] Bootstrap 5 y Bootstrap Icons
-- [x] AutoMapper configurado
-- [x] Dependency Injection configurado
-- [ ] Conectar a base de datos Oracle real
-- [ ] Agregar funcionalidades CRUD completas (Crear/Editar/Eliminar)
-- [ ] Crear nuevas vistas (Departments, Jobs, etc.)
+1. **Capa de Aplicación (Web)**: Controladores MVC, vistas, ViewModels
+2. **Capa de Reglas de Negocio**: Servicios y lógica de negocio
+3. **Capa de Acceso a Datos**: Repositorios e interfaces de acceso a datos
+4. **Modelos Comunes**: Modelos compartidos entre capas
 
-## Para Nuevos Miembros del Equipo
-
-**Si vas a clonar y colaborar en el repositorio existente:**
-
-1. **Instala las herramientas**: [docs/INSTALACION_HERRAMIENTAS.md](./docs/INSTALACION_HERRAMIENTAS.md)
-2. **Clona el repositorio**: [docs/CLONAR_REPOSITORIO.md](./docs/CLONAR_REPOSITORIO.md)
-3. **Después de clonar, ejecuta:**
-   ```bash
-   dotnet restore  # Restaurar dependencias
-   dotnet build    # Compilar proyecto
-   ```
-4. **Inicio rápido**: [docs/QUICK_START.md](./docs/QUICK_START.md)
-
-## Para Crear el Proyecto Desde Cero
-
-**Si vas a crear el proyecto desde cero:**
-
-1. **Plan completo**: [docs/PLAN_ANTES_COMPARTIR_REPO.md](./docs/PLAN_ANTES_COMPARTIR_REPO.md) - Plan completo de implementación
-2. **Ver arquitectura**: [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md) - Diagramas y estructura
-3. **Continúa desarrollo**: [docs/COMO_CONTINUAR.md](./docs/COMO_CONTINUAR.md) - Pasos de desarrollo
-4. **Revisa progreso**: [docs/SEGUIMIENTO_PROGRESO.md](./docs/SEGUIMIENTO_PROGRESO.md) - Estado actual
-
-## 🔗 Enlaces Útiles
-
-- [Documentación oficial de .NET](https://learn.microsoft.com/dotnet/)
-- [Documentación de ASP.NET Core](https://learn.microsoft.com/aspnet/core/)
-- [AdventureWorks Sample Database](https://learn.microsoft.com/en-us/sql/samples/adventureworks-install-configure)
+Para más detalles sobre la arquitectura, ver [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).

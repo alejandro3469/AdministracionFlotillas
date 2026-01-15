@@ -488,3 +488,284 @@ dotnet list src/AdministracionFlotillas.Web/AdministracionFlotillas.Web.csproj r
 ---
 
 **Última actualización**: Enero 2026
+
+---
+
+## 🎯 Ejercicio Avanzado: Crear una Pantalla Completa
+
+Este ejercicio guía la creación de una pantalla completa siguiendo el patrón del módulo Employees. Se implementará un módulo nuevo desde cero.
+
+### Objetivo
+
+Crear un módulo completo para gestionar Departamentos (Departments) con las siguientes funcionalidades:
+- Listar departamentos en una tabla DataTables
+- Filtrar por nombre de departamento
+- Filtrar por ubicación
+- Ver detalles de un departamento
+- Exportar datos a Excel y PDF
+
+### Requisitos Técnicos
+
+La pantalla debe incluir:
+1. **Tabla DataTables** con paginación, ordenamiento y búsqueda
+2. **Filtros** por nombre y ubicación
+3. **Botón de exportación** a Excel y PDF
+4. **Botón ver detalles** que muestre información completa
+5. **Diseño responsive** que funcione en móviles
+6. **Mensajes de error** usando Bootstrap Toasts
+7. **Carga de datos mediante AJAX** sin recargar la página
+
+### Estructura de Archivos a Crear
+
+Seguir la arquitectura basada en módulos:
+
+```
+src/
+├── AdministracionFlotillas.ModelosComunes/
+│   └── Department.cs
+├── AdministracionFlotillas.AccesoDatos/
+│   └── Repositorios/
+│       ├── IDepartmentsRepository.cs
+│       └── DepartmentsRepository.cs
+├── AdministracionFlotillas.ReglasNegocio/
+│   └── Servicios/
+│       ├── Interfaces/
+│       │   └── IDepartmentsService.cs
+│       └── Escenarios/
+│           └── Oracle/
+│               └── DepartmentsServiceOracle.cs
+└── AdministracionFlotillas.Web/
+    ├── Controllers/
+    │   └── DepartmentsController.cs
+    ├── ViewModels/
+    │   └── DepartmentViewModel.cs
+    ├── Parseador/
+    │   └── DepartmentParseador.cs
+    ├── Views/
+    │   └── Departments/
+    │       ├── Index.cshtml
+    │       └── _DepartmentsGrid.cshtml
+    └── Scripts/
+        └── Departments/
+            └── Departments.js
+```
+
+### Paso 1: Crear el Modelo Común
+
+**Archivo**: `src/AdministracionFlotillas.ModelosComunes/Department.cs`
+
+**Propiedades requeridas**:
+- `DepartmentId` (int) - ID del departamento
+- `DepartmentName` (string) - Nombre del departamento
+- `Location` (string) - Ubicación del departamento
+- `ManagerId` (int?) - ID del gerente (opcional)
+
+**Referencia**: Ver `Employee.cs` como ejemplo.
+
+### Paso 2: Crear el Repositorio
+
+**Archivos**:
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/IDepartmentsRepository.cs`
+- `src/AdministracionFlotillas.AccesoDatos/Repositorios/DepartmentsRepository.cs`
+
+**Métodos requeridos**:
+- `Task<List<Department>> ObtenerDepartmentsAsync()` - Retorna lista de departamentos
+- `Task<Department?> ObtenerDepartmentPorIdAsync(int id)` - Retorna un departamento por ID
+
+**Datos mock**: Crear al menos 10 departamentos de ejemplo con datos realistas.
+
+**Referencia**: Ver `IEmployeesRepository.cs` y `EmployeesRepository.cs` como ejemplo.
+
+### Paso 3: Crear el Servicio de Negocio
+
+**Archivos**:
+- `src/AdministracionFlotillas.ReglasNegocio/Servicios/Interfaces/IDepartmentsService.cs`
+- `src/AdministracionFlotillas.ReglasNegocio/Servicios/Escenarios/Oracle/DepartmentsServiceOracle.cs`
+
+**Reglas de negocio a implementar**:
+- Ordenar departamentos alfabéticamente por nombre
+- Validar que el departamento existe antes de retornarlo
+- Filtrar departamentos activos (si se agrega propiedad IsActive)
+
+**Referencia**: Ver `IEmployeesService.cs` y `EmployeesServiceOracle.cs` como ejemplo.
+
+### Paso 4: Crear el ViewModel
+
+**Archivo**: `src/AdministracionFlotillas.Web/ViewModels/DepartmentViewModel.cs`
+
+**Propiedades requeridas** (todas en español):
+- `IdDepartamento` (int)
+- `NombreDepartamento` (string)
+- `Ubicacion` (string)
+- `IdGerente` (int?)
+
+**Referencia**: Ver `EmployeeViewModel.cs` como ejemplo.
+
+### Paso 5: Crear el Parseador
+
+**Archivo**: `src/AdministracionFlotillas.Web/Parseador/DepartmentParseador.cs`
+
+**Métodos requeridos**:
+- `ConvertirAVista(Department department)` - Convierte Department a DepartmentViewModel
+- `ConvertirListaAVista(List<Department> departments)` - Convierte lista de Department a lista de DepartmentViewModel
+- `ConvertirAModelo(DepartmentViewModel viewModel)` - Convierte DepartmentViewModel a Department
+
+**Referencia**: Ver `EmployeeParseador.cs` como ejemplo.
+
+### Paso 6: Crear el Controlador
+
+**Archivo**: `src/AdministracionFlotillas.Web/Controllers/DepartmentsController.cs`
+
+**Acciones requeridas**:
+- `Index()` - Retorna la vista principal
+- `ObtenerDepartments()` - Endpoint AJAX POST que retorna todos los departamentos
+- `ObtenerDepartmentPorId(int id)` - Endpoint AJAX POST que retorna un departamento por ID
+
+**Formato de respuesta JSON**:
+```json
+{
+  "exito": true,
+  "datos": [...]
+}
+```
+
+**Referencia**: Ver `EmployeesController.cs` como ejemplo.
+
+### Paso 7: Registrar en Program.cs
+
+**Archivo**: `src/AdministracionFlotillas.Web/Program.cs`
+
+Agregar registros de Dependency Injection:
+```csharp
+builder.Services.AddScoped<IDepartmentsRepository, DepartmentsRepository>();
+builder.Services.AddScoped<IDepartmentsService, DepartmentsServiceOracle>();
+```
+
+**Referencia**: Ver cómo están registrados `IEmployeesRepository` e `IEmployeesService`.
+
+### Paso 8: Crear las Vistas
+
+**Archivos**:
+- `src/AdministracionFlotillas.Web/Views/Departments/Index.cshtml` - Vista principal
+- `src/AdministracionFlotillas.Web/Views/Departments/_DepartmentsGrid.cshtml` - Vista parcial con tabla y filtros
+
+**Requisitos de la vista**:
+- Breadcrumb navigation
+- Título y descripción
+- Filtros: nombre y ubicación
+- Tabla DataTables con columnas: ID, Nombre, Ubicación, Gerente
+- Botón de exportación a Excel y PDF
+- Botón ver detalles en cada fila
+- Modal o alert para mostrar detalles
+
+**Referencia**: Ver `Views/Employees/Index.cshtml` y `Views/Employees/_EmployeesGrid.cshtml` como ejemplo.
+
+### Paso 9: Crear el JavaScript
+
+**Archivo**: `src/AdministracionFlotillas.Web/Scripts/Departments/Departments.js`
+
+**Estructura de namespace requerida**:
+```javascript
+window.Departments = {
+    Table: {
+        Initialize: function() { ... },
+        Reload: function() { ... }
+    },
+    Filters: {
+        Initialize: function() { ... },
+        Apply: function() { ... }
+    },
+    Details: {
+        View: function(id) { ... }
+    },
+    Events: {
+        Initialize: function() { ... }
+    }
+};
+```
+
+**Funcionalidades requeridas**:
+- Inicialización de DataTables con AJAX
+- Aplicación de filtros personalizados
+- Manejo de eventos (click en botón ver detalles)
+- Mostrar mensajes con `Common.Utils.ShowMessage()`
+
+**Referencia**: Ver `Scripts/Employees/Employees.js` como ejemplo.
+
+### Paso 10: Configurar Bundle
+
+**Archivo**: `src/AdministracionFlotillas.Web/bundleconfig.json`
+
+Agregar nuevo bundle para departments:
+```json
+{
+  "outputFileName": "wwwroot/js/bundles/departments.min.js",
+  "inputFiles": [
+    "Scripts/Common/Utils.js",
+    "Scripts/Departments/Departments.js"
+  ],
+  "minify": {
+    "enabled": true,
+    "renameLocals": true
+  },
+  "sourceMap": false
+}
+```
+
+**Referencia**: Ver cómo está configurado `employees.min.js`.
+
+### Paso 11: Referenciar Bundle en la Vista
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Departments/Index.cshtml`
+
+Agregar en la sección `@section Scripts`:
+```html
+<script src="~/js/bundles/departments.min.js" asp-append-version="true"></script>
+```
+
+### Paso 12: Agregar Enlace de Navegación
+
+**Archivo**: `src/AdministracionFlotillas.Web/Views/Shared/_Layout.cshtml`
+
+Agregar enlace en el menú de navegación:
+```html
+<li class="nav-item">
+    <a class="nav-link" asp-controller="Departments" asp-action="Index">Departments</a>
+</li>
+```
+
+### Checklist de Verificación
+
+Antes de considerar el ejercicio completo, verificar:
+
+- [ ] El proyecto compila sin errores (`dotnet build`)
+- [ ] La página carga correctamente en el navegador
+- [ ] La tabla muestra datos correctamente
+- [ ] Los filtros funcionan y actualizan la tabla
+- [ ] El botón ver detalles muestra información
+- [ ] La exportación a Excel funciona
+- [ ] La exportación a PDF funciona
+- [ ] El diseño es responsive (probar en móvil)
+- [ ] Los mensajes de error se muestran correctamente
+- [ ] El código sigue las convenciones del módulo Employees
+
+### Recursos de Referencia
+
+- **Estructura Actual**: [ESTRUCTURA_ACTUAL_PROYECTO.md](./ESTRUCTURA_ACTUAL_PROYECTO.md)
+- **Estructura de Vistas**: [ESTRUCTURA_VISTAS.md](./ESTRUCTURA_VISTAS.md)
+- **Arquitectura**: [ARQUITECTURA.md](./ARQUITECTURA.md)
+- **Guía de Git**: [GUIA_GIT.md](./GUIA_GIT.md) - Para hacer commits durante el desarrollo
+
+### Notas Importantes
+
+- Seguir el patrón exacto del módulo Employees
+- Usar nombres en español para propiedades de ViewModel
+- Usar nombres en inglés para propiedades del modelo de negocio
+- Crear commits frecuentes con mensajes descriptivos (menos de 10 palabras)
+- Probar cada paso antes de continuar al siguiente
+- Revisar la consola del navegador para errores JavaScript
+- Revisar la consola de la aplicación para errores C#
+
+---
+
+**Última actualización**: Enero 2026
