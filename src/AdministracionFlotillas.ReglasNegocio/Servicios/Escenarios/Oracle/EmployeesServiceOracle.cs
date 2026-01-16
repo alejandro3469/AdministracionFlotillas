@@ -158,7 +158,19 @@ public class EmployeesServiceOracle : IEmployeesService
         // Regla de negocio: El salario debe ser mayor al mínimo establecido
         return empleado.Salary.HasValue && empleado.Salary.Value > 10000;
     }
-    
+
+    private bool ValidarSalarioAltoNivel(Employee empleado)
+    {
+        if (empleado == null)
+        {
+            return false;
+        }
+
+        const decimal SalarioMinimoAltoNivel = 10000m;
+
+        return empleado.Salary.HasValue && empleado.Salary.Value > SalarioMinimoAltoNivel;
+    }
+
     /// <summary>
     /// Valida que el ID del empleado es válido según reglas de negocio
     /// </summary>
@@ -166,6 +178,33 @@ public class EmployeesServiceOracle : IEmployeesService
     {
         if (id <= 0)
             throw new ArgumentException("El ID del empleado debe ser mayor que cero", nameof(id));
+    }
+
+    /// <summary>
+    /// Valida que un email tenga el formato básico válido.
+    /// Verifica que no sea nulo o este vacío,
+    /// que contenga el símbolo del arroba @ y que tenga al menos un punto después del simbolo "@"__.__
+    /// </summary>
+    private bool ValidarEmailValido(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return false;
+        }
+
+        int simboloArroba = email.IndexOf('@');
+
+        if(simboloArroba < 0)
+        {
+            return false;
+        }
+
+        if (!email.Substring(simboloArroba).Contains('.'))
+        {
+            return false;
+        }
+
+        return true;
     }
 }
 
