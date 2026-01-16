@@ -27,6 +27,7 @@ public class EmployeesRepository : IEmployeesRepository
                 FirstName = "Steven",
                 LastName = "King",
                 Email = "SKING",
+                EmailPersonal = "Steven@gmail.com",
                 PhoneNumber = "515.123.4567",
                 HireDate = new DateTime(2003, 6, 17),
                 JobId = 1,
