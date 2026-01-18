@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AdministracionFlotillas.ModelosComunes;
+using AdministracionFlotillas.ReglasNegocio.Servicios.Escenarios.Oracle;
+using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
 using AdministracionFlotillas.Web.ViewModels;
 
 namespace AdministracionFlotillas.Web.Parseador;
@@ -17,12 +19,18 @@ public static class EmployeeParseador
     /// </summary>
     /// <param name="empleado">Empleado del modelo de negocio</param>
     /// <returns>ViewModel formateado para la UI</returns>
-    public static EmployeeViewModel ConvertirAVista(Employee empleado)
+    public static EmployeeViewModel ConvertirAVista(Employee empleado, IEmployeesService employeeService)
     {
         if (empleado == null)
             throw new ArgumentNullException(nameof(empleado));
 
-        return new EmployeeViewModel
+        if (employeeService == null)
+            throw new ArgumentNullException(nameof(employeeService));
+        
+            var salarioAnual = employeeService.CalcularSalarioAnualEstimado(empleado);
+        
+
+            return new EmployeeViewModel
         {
             IdEmpleado = empleado.EmployeeId,
             PrimerNombre = empleado.FirstName,
@@ -33,6 +41,7 @@ public static class EmployeeParseador
             FechaContratacion = empleado.HireDate.ToString("dd/MM/yyyy"),
             IdPuesto = empleado.JobId,
             Salario = empleado.Salary.HasValue ? empleado.Salary.Value.ToString("C") : null,
+            SalarioAnual = salarioAnual.ToString("C"),
             PorcentajeComision = empleado.CommissionPct.HasValue 
                 ? (empleado.CommissionPct.Value * 100).ToString("F2") + "%" 
                 : null,
@@ -49,12 +58,15 @@ public static class EmployeeParseador
     /// </summary>
     /// <param name="empleados">Lista de empleados del modelo de negocio</param>
     /// <returns>Lista de ViewModels formateados para la UI</returns>
-    public static List<EmployeeViewModel> ConvertirListaAVista(List<Employee> empleados)
+    public static List<EmployeeViewModel> ConvertirListaAVista(List<Employee> empleados, IEmployeesService employeeService)
     {
         if (empleados == null)
             return new List<EmployeeViewModel>();
 
-        return empleados.Select(ConvertirAVista).ToList();
+        if(employeeService == null)
+            throw new ArgumentNullException(nameof(employeeService));
+
+        return empleados.Select(e => ConvertirAVista(e, employeeService)).ToList();
     }
 
     /// <summary>

@@ -16,6 +16,7 @@ public class EmployeeViewModel
     public string FechaContratacion { get; set; } = string.Empty; // String formateado para UI
     public int IdPuesto { get; set; }
     public string? Salario { get; set; } // String formateado para UI (ej: "$24,000.00")
+    public string? SalarioAnual { get; set; }
     public string? PorcentajeComision { get; set; } // String formateado para UI (ej: "15.50%")
     public int? IdGerente { get; set; }
     public int? IdDepartamento { get; set; }
