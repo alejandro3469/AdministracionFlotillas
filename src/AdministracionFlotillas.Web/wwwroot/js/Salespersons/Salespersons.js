@@ -194,8 +194,11 @@ window.Salespersons = window.Salespersons || {};
                                 var datos = respuesta.datos;
                                 document.getElementById('totalVendedores').textContent = datos.totalVendedores || 0;
                                 document.getElementById('vendedoresActivos').textContent = datos.vendedoresActivos || 0;
-                                document.getElementById('totalVentas').textContent = '$' + parseFloat(datos.totalVentas || 0).toFixed(2);
-                                document.getElementById('totalComisiones').textContent = '$' + parseFloat(datos.totalComisiones || 0).toFixed(2);
+                                // Formatear con separadores de miles
+                                var totalVentas = parseFloat(datos.totalVentas || 0);
+                                document.getElementById('totalVentas').textContent = '$' + totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                var totalComisiones = parseFloat(datos.totalComisiones || 0);
+                                document.getElementById('totalComisiones').textContent = '$' + totalComisiones.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                 
                                 var breadcrumbContador = document.querySelector('[id^="breadcrumb-contador-"]');
                                 if (breadcrumbContador) {
@@ -282,15 +285,35 @@ window.Salespersons = window.Salespersons || {};
             document.getElementById('modalComisionVariable').textContent = (vendedor.ComisionVariable || 0).toFixed(2) + '%';
             
             if (vendedor.FechaContratacion) {
-                document.getElementById('modalFechaContratacion').textContent = new Date(vendedor.FechaContratacion).toLocaleDateString('es-MX');
+                try {
+                    // Manejar tanto objetos Date como strings ISO
+                    var fecha = vendedor.FechaContratacion instanceof Date 
+                        ? vendedor.FechaContratacion 
+                        : new Date(vendedor.FechaContratacion);
+                    if (!isNaN(fecha.getTime())) {
+                        document.getElementById('modalFechaContratacion').textContent = fecha.toLocaleDateString('es-MX', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit' 
+                        });
+                    } else {
+                        document.getElementById('modalFechaContratacion').textContent = '-';
+                    }
+                } catch (e) {
+                    console.warn('Error al formatear fecha de contratación:', e);
+                    document.getElementById('modalFechaContratacion').textContent = '-';
+                }
             } else {
                 document.getElementById('modalFechaContratacion').textContent = '-';
             }
             
-            document.getElementById('modalTotalOrdenes').textContent = vendedor.TotalOrdenes || 0;
-            document.getElementById('modalTotalVentas').textContent = '$' + (vendedor.TotalVentas || 0).toFixed(2);
-            document.getElementById('modalTotalComisiones').textContent = '$' + (vendedor.TotalComisiones || 0).toFixed(2);
-            document.getElementById('modalCadenasAsignadas').textContent = vendedor.CadenasAsignadas || 0;
+            document.getElementById('modalTotalOrdenes').textContent = (vendedor.TotalOrdenes || 0).toLocaleString('es-MX');
+            // Formatear con separadores de miles
+            var totalVentas = parseFloat(vendedor.TotalVentas || 0);
+            document.getElementById('modalTotalVentas').textContent = '$' + totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var totalComisiones = parseFloat(vendedor.TotalComisiones || 0);
+            document.getElementById('modalTotalComisiones').textContent = '$' + totalComisiones.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('modalCadenasAsignadas').textContent = (vendedor.CadenasAsignadas || 0).toLocaleString('es-MX');
         },
         
         AbrirDialog: function() {
