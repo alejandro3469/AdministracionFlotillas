@@ -34,13 +34,6 @@ public class OrdersController : Controller
         return View();
     }
     
-    [Obsolete("Este método está obsoleto. Use el modal _ModalOrden.cshtml en su lugar. Se mantiene por compatibilidad temporal.")]
-    public IActionResult Details(int? id)
-    {
-        // Redirigir a Index - el modal se maneja desde JavaScript
-        return RedirectToAction(nameof(Index));
-    }
-    
     [HttpPost]
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> ObtenerOrders()

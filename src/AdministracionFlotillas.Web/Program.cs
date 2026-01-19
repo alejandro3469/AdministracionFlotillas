@@ -24,7 +24,6 @@ builder.Services.AddControllersWithViews()
     }); // Para soporte de JSON en AJAX
 
 // Repositorios
-builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
 builder.Services.AddScoped<IChainsRepository, ChainsRepository>();
 builder.Services.AddScoped<ISalespersonsRepository, SalespersonsRepository>();
@@ -34,7 +33,6 @@ builder.Services.AddScoped<IOrderChannelsRepository, OrderChannelsRepository>();
 builder.Services.AddScoped<IInvoicingRepository, InvoicingRepository>();
 
 // Servicios (por ahora usamos directamente Oracle, luego se puede usar Factory)
-builder.Services.AddScoped<IEmployeesService, EmployeesServiceOracle>();
 builder.Services.AddScoped<IOrdersService, OrdersServiceOracle>();
 builder.Services.AddScoped<IChainsService, ChainsService>();
 builder.Services.AddScoped<ISalespersonsService, SalespersonsService>();
