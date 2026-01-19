@@ -23,6 +23,16 @@ public class EmployeesController : Controller
     /// </summary>
     public IActionResult Index()
     {
+        var breadcrumb = new BreadcrumbViewModel
+        {
+            Items = new List<BreadcrumbItem>
+            {
+                new BreadcrumbItem { Text = "Dashboard", Url = Url.Action("Index", "Home") },
+                new BreadcrumbItem { Text = "Catálogos", Url = "#" },
+                new BreadcrumbItem { Text = "Empleados", Url = null }
+            }
+        };
+        ViewBag.Breadcrumb = breadcrumb;
         return View();
     }
     

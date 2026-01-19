@@ -20,6 +20,9 @@
     <!-- Font Awesome 5 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
+    <!-- Syncfusion ASP.NET Core controls styles -->
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/32.1.23/fluent.css" />
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AdministracionFlotillas.Web.styles.css" asp-append-version="true" />
@@ -36,7 +39,37 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a>
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")" asp-area="" asp-controller="Orders" asp-action="Index">
+                                <i class="fas fa-shopping-cart"></i> Órdenes
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Customers" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Employees" ? "active" : "")" href="#" id="catalogosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-book"></i> Catálogos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="catalogosDropdown">
+                                <li>
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">
+                                        <i class="fas fa-box"></i> Productos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Customers" ? "active" : "")" asp-controller="Customers" asp-action="Index">
+                                        <i class="fas fa-users"></i> Clientes
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Employees" ? "active" : "")" asp-controller="Employees" asp-action="Index">
+                                        <i class="fas fa-user-tie"></i> Empleados
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -87,10 +120,16 @@
     <!-- 9. SweetAlert2 (no depende de jQuery, pero se carga después para evitar conflictos) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
-    <!-- 10. Custom scripts -->
+    <!-- 10. Syncfusion ASP.NET Core controls scripts -->
+    <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script>
+    
+    <!-- 11. Custom scripts (antes de Script Manager para que funciones de eventos estén disponibles) -->
     <script src="~/js/site.js" asp-append-version="true"></script>
     
-    <!-- 11. Page-specific scripts (se renderizan aquí) -->
+    <!-- 12. Page-specific scripts (se renderizan aquí ANTES de Script Manager) -->
     @await RenderSectionAsync("Scripts", required: false)
+    
+    <!-- 13. Syncfusion ASP.NET Core Script Manager (OBLIGATORIO - debe ir al final) -->
+    <ejs-scripts></ejs-scripts>
 </body>
 </html>

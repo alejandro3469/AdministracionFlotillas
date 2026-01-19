@@ -1,0 +1,85 @@
+@using AdministracionFlotillas.Web.ViewModels
+@{
+    ViewData["Title"] = "Gestión de Clientes";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb Navigation Mejorado -->
+    @if (ViewBag.Breadcrumb != null)
+    {
+        @await Html.PartialAsync("_BreadcrumbConIndicadores", ViewBag.Breadcrumb as BreadcrumbViewModel)
+    }
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="mb-0">Gestión de Clientes</h2>
+            <p class="text-muted">Administración de clientes y relaciones comerciales</p>
+        </div>
+    </div>
+
+    <!-- Indicadores Compactos -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-users text-primary"></i>
+                            <span class="text-muted small">Total:</span>
+                            <strong class="text-primary" id="totalClientes">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="text-muted small">Activos:</span>
+                            <strong class="text-success" id="clientesActivos">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-times-circle text-warning"></i>
+                            <span class="text-muted small">Inactivos:</span>
+                            <strong class="text-warning" id="clientesInactivos">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-user-plus text-info"></i>
+                            <span class="text-muted small">Nuevos (30 días):</span>
+                            <strong class="text-info" id="clientesNuevos">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de Clientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                    <h5 class="card-title mb-0">Lista de Clientes</h5>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="Customers.Grid.Recargar()">
+                        <i class="fas fa-sync-alt"></i> <span class="d-none d-sm-inline">Actualizar</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @await Html.PartialAsync("_CustomersGrid")
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Ver/Editar Cliente -->
+    @await Html.PartialAsync("_ModalCliente")
+</div>
+
+@section Scripts {
+    <script src="~/js/Customers/Customers.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function() {
+            if (window.Customers && window.Customers.Dashboard) {
+                window.Customers.Dashboard.ActualizarMetricas();
+            }
+        });
+    </script>
+}

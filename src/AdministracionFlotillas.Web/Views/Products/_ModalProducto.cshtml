@@ -1,0 +1,198 @@
+@* Modal unificado Ver/Editar Producto usando Syncfusion Dialog *@
+<ejs-tooltip id="tooltipModalProducto" 
+             target=".info-tooltip-producto" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalProductoBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentProducto"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalProducto" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="70%" 
+            height="80%" 
+            visible="false"
+            header="Producto #<span id='modalProductoTitulo'>0</span>"
+            open="modalProductoOpen"
+            close="modalProductoClose"
+            beforeClose="modalProductoBeforeClose">
+    <e-content-template>
+        <div id="modalProductoContenido">
+            <!-- Tabs para organizar el contenido -->
+            <ejs-tab id="tabsModalProducto" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalProducto" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información del Producto</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Producto:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdProducto" class="info-tooltip-producto" data-field="IdProducto" data-tooltip="Identificador único del producto en el sistema">-</strong>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Nombre:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreProducto" class="info-tooltip-producto" data-field="NombreProducto" data-tooltip="Nombre comercial del producto">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Categoría:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCategoria" class="info-tooltip-producto" data-field="Categoria" data-tooltip="Categoría a la que pertenece el producto">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoProducto">
+                                                        <span class="info-tooltip-producto" data-field="Estado" data-tooltip="Estado del producto: ACTIVE (activo, disponible para venta), INACTIVE (inactivo, no disponible)">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Código de Barras:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCodigoBarras" class="info-tooltip-producto" data-field="CodigoBarras" data-tooltip="Código de barras único del producto para identificación">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Precios y Stock</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Precio Unitario:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalPrecioUnitario" class="info-tooltip-producto" data-field="PrecioUnitario" data-tooltip="Precio de venta al público por unidad del producto">$0.00</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Precio de Costo:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalPrecioCosto" class="info-tooltip-producto" data-field="PrecioCosto" data-tooltip="Costo de adquisición del producto para la empresa">$0.00</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Margen de Ganancia:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalMargenGanancia" class="info-tooltip-producto" data-field="MargenGanancia" data-tooltip="Diferencia entre precio de venta y costo (Precio Unitario - Precio de Costo)">$0.00</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Cantidad en Stock:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCantidadStock" class="info-tooltip-producto" data-field="CantidadStock" data-tooltip="Cantidad disponible en inventario. Stock bajo: menos de 20 unidades, Stock medio: 20-50 unidades, Stock alto: más de 50 unidades">0</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Descripción</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p id="modalDescripcion" class="mb-0">-</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalProductoEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalProductoCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    // Variables globales para el modal de producto
+    var modalProductoModo = 'ver';
+    var modalProductoId = null;
+    var tooltipModalProductoObj = null;
+
+    // Inicializar tooltip cuando el DOM esté listo
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalProducto');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalProductoObj = tooltipElement.ej2_instances[0];
+        }
+    });
+
+    // Evento beforeRender del tooltip
+    window.tooltipModalProductoBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalProductoObj) {
+                tooltipModalProductoObj.content = contentDiv;
+            }
+        }
+    };
+
+    // Eventos del modal
+    window.modalProductoOpen = function(args) {
+        console.log('Modal de producto abierto');
+    };
+
+    window.modalProductoClose = function(args) {
+        console.log('Modal de producto cerrado');
+        modalProductoId = null;
+        modalProductoModo = 'ver';
+    };
+
+    window.modalProductoBeforeClose = function(args) {
+        return true;
+    };
+
+    // Botones del modal
+    window.modalProductoEditar = function() {
+        if (modalProductoId) {
+            modalProductoModo = 'editar';
+            if (window.Products && window.Products.Modal) {
+                window.Products.Modal.CambiarAModoEdicion(modalProductoId);
+            }
+        }
+    };
+
+    window.modalProductoCerrar = function() {
+        var dialogElement = document.getElementById('modalProducto');
+        if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+            dialogElement.ej2_instances[0].hide();
+        }
+    };
+</script>

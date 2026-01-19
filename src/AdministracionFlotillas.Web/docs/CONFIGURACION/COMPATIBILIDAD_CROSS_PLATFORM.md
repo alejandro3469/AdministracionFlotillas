@@ -54,4 +54,5 @@ Las versiones 8.0.300 y 8.0.417 son **compatibles entre sí** porque:
 
 Para ver la documentación completa, consulta el archivo en el repositorio.
 
-**Última actualización**: Configurado para .NET 8.0.300+ (Windows) y 8.0.417+ (Mac)
+**Última actualización**: Enero 2026
+**Configuración**: .NET 8.0.300+ (Windows) y 8.0.417+ (Mac)

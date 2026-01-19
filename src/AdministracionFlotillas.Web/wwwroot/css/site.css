@@ -75,3 +75,197 @@ footer {
   color: #666 !important;
   opacity: 0.6;
 }
+
+/* Spinner de carga para Orders */
+#loadingSpinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+#loadingSpinner .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Estilos para botones de filtro de estado */
+.btn-link[id^="btnFiltro"] {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-link[id^="btnFiltro"]:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.btn-link[id^="btnFiltro"].active {
+    font-weight: bold !important;
+    text-decoration: underline !important;
+    opacity: 1;
+}
+
+.btn-link[id^="btnFiltro"].active strong {
+    font-weight: bold;
+}
+
+/* Estilos para navegación activa */
+.nav-link.active {
+    font-weight: 600;
+    color: #0d6efd !important;
+}
+
+.dropdown-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Breadcrumb styles */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+}
+
+/* Responsive Design para Orders */
+@media (max-width: 768px) {
+  /* Filtros en móvil */
+  .row.g-3 > div {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Grid responsive */
+  #ordersGrid {
+    overflow-x: auto;
+  }
+  
+  /* Cards de métricas más compactas en móvil */
+  .card-body h2 {
+    font-size: 1.5rem;
+  }
+  
+  /* Botones más pequeños en móvil */
+  .btn-sm {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  /* Toolbar del grid más compacto */
+  .e-grid .e-gridheader,
+  .e-grid .e-gridcontent {
+    font-size: 0.875rem;
+  }
+  
+  /* Columnas del grid más estrechas en móvil */
+  .e-grid .e-gridcontent .e-rowcell {
+    padding: 0.5rem;
+  }
+}
+
+/* Mejoras para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .card-body h2 {
+    font-size: 1.75rem;
+  }
+}
+
+/* Scroll horizontal para grid en pantallas pequeñas */
+.e-grid {
+  overflow-x: auto;
+}
+
+/* Asegurar que el grid sea responsive */
+.e-grid .e-gridcontent {
+  overflow-x: auto;
+}
+
+/* Mejorar visibilidad de botones en móvil */
+@media (max-width: 576px) {
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .card-header .btn {
+    width: auto;
+  }
+}
+
+/* Formato Condicional para Grid de Órdenes */
+/* Estilos para celdas según estado */
+.e-grid .estado-complete {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  font-weight: 600;
+}
+
+.e-grid .estado-cancelled {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  font-weight: 600;
+}
+
+.e-grid .estado-refunded {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  font-weight: 600;
+}
+
+.e-grid .estado-pending {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+  font-weight: 600;
+}
+
+/* Estilos para filas completas según estado */
+.e-grid .fila-estado-complete {
+  background-color: rgba(40, 167, 69, 0.05) !important;
+}
+
+.e-grid .fila-estado-complete:hover {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+.e-grid .fila-estado-cancelled {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.e-grid .fila-estado-cancelled:hover {
+  background-color: rgba(255, 193, 7, 0.2) !important;
+}
+
+.e-grid .fila-estado-refunded {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.e-grid .fila-estado-refunded:hover {
+  background-color: rgba(220, 53, 69, 0.2) !important;
+}
+
+.e-grid .fila-estado-pending {
+  background-color: rgba(23, 162, 184, 0.05) !important;
+}
+
+.e-grid .fila-estado-pending:hover {
+  background-color: rgba(23, 162, 184, 0.1) !important;
+}
+
+/* Estilos para filas completas con estado crítico (legacy - mantener para compatibilidad) */
+.e-grid .fila-estado-critico {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.e-grid .fila-estado-critico:hover {
+  background-color: rgba(255, 193, 7, 0.2) !important;
+}

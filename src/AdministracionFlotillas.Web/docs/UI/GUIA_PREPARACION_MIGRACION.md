@@ -2,13 +2,13 @@
 
 Este documento detalla todas las tareas que se pueden adelantar mientras se espera la aprobación de la Community License de Syncfusion. Estas tareas preparatorias permitirán que el desarrollo del nuevo módulo sea más rápido y eficiente una vez que se apruebe la licencia.
 
-**Estado**: Preparación en curso - Esperando aprobación de licencia (Ticket #803702)
+**Estado**: Licencia aprobada - Ver [INSTALACION_POST_APROBACION.md](INSTALACION_POST_APROBACION.md) para instalación (Ticket #803702)
 
 **Estrategia**: Crear nuevo módulo basado en Oracle Sample Schema CO (Customer Orders) con Syncfusion, manteniendo el módulo Employees intacto como referencia.
 
 ## Objetivo
 
-Preparar el proyecto para el desarrollo del nuevo módulo de Órdenes/Ventas con Syncfusion sin necesidad de tener la licencia activa, de manera que cuando se apruebe, la implementación sea inmediata.
+Preparar el proyecto para el desarrollo del nuevo módulo de Órdenes/Ventas con Syncfusion. La licencia ya está aprobada, ver [INSTALACION_POST_APROBACION.md](INSTALACION_POST_APROBACION.md) para instalación.
 
 ## Tareas Preparatorias (Sin Licencia)
 

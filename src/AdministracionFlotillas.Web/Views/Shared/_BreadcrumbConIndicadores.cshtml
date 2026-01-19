@@ -1,0 +1,31 @@
+@* Breadcrumb mejorado con indicadores de progreso y contadores *@
+@model AdministracionFlotillas.Web.ViewModels.BreadcrumbViewModel
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb mb-0">
+        @if (Model.Items != null && Model.Items.Count > 0)
+        {
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                var item = Model.Items[i];
+                var isLast = i == Model.Items.Count - 1;
+                var contadorId = !string.IsNullOrEmpty(item.Contador) ? $"breadcrumb-contador-{i}" : "";
+                
+                <li class="breadcrumb-item @(isLast ? "active" : "")" @(isLast ? "aria-current=\"page\"" : "")>
+                    @if (!isLast && !string.IsNullOrEmpty(item.Url))
+                    {
+                        <a href="@item.Url">@item.Text</a>
+                    }
+                    else
+                    {
+                        <span>@item.Text</span>
+                    }
+                    @if (!string.IsNullOrEmpty(item.Contador) || !string.IsNullOrEmpty(contadorId))
+                    {
+                        <span class="badge bg-primary ms-2" id="@contadorId" data-inicial="@item.Contador">@item.Contador</span>
+                    }
+                </li>
+            }
+        }
+    </ol>
+</nav>

@@ -1,8 +1,94 @@
-﻿@{
-    ViewData["Title"] = "Home";
+﻿@using AdministracionFlotillas.Web.ViewModels
+@{
+    ViewData["Title"] = "Dashboard Principal";
 }
 
-<div>
-    <h1>Bienvenido</h1>
-    <p>Administración de Flotillas</p>
+<div class="container-fluid">
+    <!-- Breadcrumb Navigation Mejorado -->
+    @if (ViewBag.Breadcrumb != null)
+    {
+        @await Html.PartialAsync("_BreadcrumbConIndicadores", ViewBag.Breadcrumb as BreadcrumbViewModel)
+    }
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="mb-0">Dashboard Principal</h2>
+            <p class="text-muted">Vista general del sistema de administración</p>
+        </div>
+    </div>
+
+    <!-- Métricas del Dashboard -->
+    @await Html.PartialAsync("_DashboardMetricas")
+
+    <!-- Filtros -->
+    <div class="row mb-3 g-2">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <label class="form-label small">ID Cliente</label>
+            <ejs-numerictextbox id="filtroClienteId" 
+                                 placeholder="Todos"
+                                 change="filtroClienteIdChange">
+            </ejs-numerictextbox>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <label class="form-label small">Estado</label>
+            <ejs-dropdownlist id="filtroEstado" 
+                              placeholder="Todos"
+                              dataSource="@(new string[] { "COMPLETE", "CANCELLED", "REFUNDED" })"
+                              change="filtroEstadoChange">
+            </ejs-dropdownlist>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <label class="form-label small">ID Tienda</label>
+            <ejs-numerictextbox id="filtroTiendaId" 
+                                 placeholder="Todas"
+                                 change="filtroTiendaIdChange">
+            </ejs-numerictextbox>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <label class="form-label small">Fecha Inicio</label>
+            <ejs-datepicker id="filtroFechaInicio" 
+                            placeholder="Desde"
+                            change="filtroFechaInicioChange">
+            </ejs-datepicker>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <label class="form-label small">Fecha Fin</label>
+            <ejs-datepicker id="filtroFechaFin" 
+                            placeholder="Hasta"
+                            change="filtroFechaFinChange">
+            </ejs-datepicker>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-end">
+            <button type="button" class="btn btn-secondary btn-sm w-100" onclick="Dashboard.Filtros.Limpiar()">
+                <i class="fas fa-times"></i> Limpiar
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid de Órdenes -->
+    @await Html.PartialAsync("_DashboardOrdenes")
 </div>
+
+@section Scripts {
+    <script src="~/js/Dashboard/Dashboard.js" asp-append-version="true"></script>
+    <script>
+        // Función helper para obtener clase de badge según estado
+        window.getEstadoBadgeClass = function(estado) {
+            if (estado === 'COMPLETE') {
+                return 'bg-success';
+            } else if (estado === 'CANCELLED') {
+                return 'bg-warning';
+            } else if (estado === 'REFUNDED') {
+                return 'bg-danger';
+            } else {
+                return 'bg-secondary';
+            }
+        };
+        
+        $(document).ready(function() {
+            if (window.Dashboard) {
+                window.Dashboard.CargarMetricas();
+            }
+        });
+    </script>
+}

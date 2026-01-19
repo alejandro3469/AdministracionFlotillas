@@ -237,5 +237,5 @@ Para el proyecto AdministracionFlotillas, si la organización cumple los requisi
 
 ---
 
-**Última actualización**: Enero 2026  
+**Última actualización**: Enero 2026
 **Fuentes**: Documentación oficial de Syncfusion, NuGet, y términos de licencia

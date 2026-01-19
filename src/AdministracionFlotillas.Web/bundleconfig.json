@@ -1,24 +1,45 @@
 [
   {
-    "outputFileName": "wwwroot/js/bundles/common.min.js",
+    "outputFileName": "wwwroot/js/bundles/orders.min.js",
     "inputFiles": [
-      "Scripts/Common/Utils.js"
+      "wwwroot/js/Orders/Orders.js"
     ],
     "minify": {
-      "enabled": true,
-      "renameLocals": true
+      "enabled": false,
+      "renameLocals": false
     },
     "sourceMap": false
   },
   {
-    "outputFileName": "wwwroot/js/bundles/employees.min.js",
+    "outputFileName": "wwwroot/js/bundles/products.min.js",
     "inputFiles": [
-      "Scripts/Common/Utils.js",
-      "Scripts/Employees/Employees.js"
+      "wwwroot/js/Products/Products.js"
     ],
     "minify": {
-      "enabled": true,
-      "renameLocals": true
+      "enabled": false,
+      "renameLocals": false
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/bundles/customers.min.js",
+    "inputFiles": [
+      "wwwroot/js/Customers/Customers.js"
+    ],
+    "minify": {
+      "enabled": false,
+      "renameLocals": false
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/bundles/dashboard.min.js",
+    "inputFiles": [
+      "wwwroot/js/Dashboard/Dashboard.js"
+    ],
+    "minify": {
+      "enabled": false,
+      "renameLocals": false
     },
     "sourceMap": false
   }

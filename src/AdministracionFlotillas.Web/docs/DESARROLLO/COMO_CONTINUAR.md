@@ -352,5 +352,5 @@ dotnet new classlib -n AdministracionFlotillas.ReglasNegocio -o src/Administraci
 
 ---
 
-**�ltima actualización**: 12 de Enero, 2026
+**�ltima actualización**: Enero 2026
 

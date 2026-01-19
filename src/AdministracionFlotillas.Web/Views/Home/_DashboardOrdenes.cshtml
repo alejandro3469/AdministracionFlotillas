@@ -1,0 +1,84 @@
+@* Vista parcial para grid de órdenes en el dashboard *@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 py-2">
+                <h5 class="card-title mb-0">Órdenes</h5>
+                <button type="button" class="btn btn-primary btn-sm" onclick="Dashboard.Grid.Recargar()">
+                    <i class="fas fa-sync-alt"></i> <span class="d-none d-sm-inline">Actualizar</span>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <ejs-grid id="dashboardOrdersGrid" 
+                          allowPaging="true"
+                          allowFiltering="true"
+                          allowSorting="true"
+                          allowSelection="true"
+                          allowExcelExport="true"
+                          allowPdfExport="true"
+                          allowResizing="true"
+                          is-responsive="true"
+                          enable-responsive-row="true"
+                          toolbarClick="dashboardOrdersGridToolbarClick"
+                          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
+                          rowSelected="dashboardOrdersGridRowSelected"
+                          actionComplete="dashboardOrdersGridActionComplete"
+                          created="dashboardOrdersGridCreated">
+                    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+                    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+                    <e-grid-columns>
+                        <e-grid-column field="IdOrden" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right"></e-grid-column>
+                        <e-grid-column field="IdCliente" headerText="Cliente ID" width="100" type="number" textAlign="Right"></e-grid-column>
+                        <e-grid-column field="IdTienda" headerText="Tienda ID" width="100" type="number" textAlign="Right"></e-grid-column>
+                        <e-grid-column field="FechaOrden" headerText="Fecha" width="150" type="date" format="dd/MM/yyyy HH:mm"></e-grid-column>
+                        <e-grid-column field="EstadoOrden" headerText="Estado" width="120" template="#estadoTemplate"></e-grid-column>
+                        <e-grid-column field="Total" headerText="Total" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+                        <e-grid-column headerText="Acciones" width="120" template="#accionesTemplate"></e-grid-column>
+                    </e-grid-columns>
+                </ejs-grid>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para estado -->
+<script id="estadoTemplate" type="text/x-template">
+    ${if(EstadoOrden === 'COMPLETE')}
+        <span class="badge bg-success">${EstadoOrden}</span>
+    ${else if(EstadoOrden === 'CANCELLED')}
+        <span class="badge bg-warning text-dark">${EstadoOrden}</span>
+    ${else if(EstadoOrden === 'REFUNDED')}
+        <span class="badge bg-danger">${EstadoOrden}</span>
+    ${else if(EstadoOrden === 'PENDING')}
+        <span class="badge bg-info text-dark">${EstadoOrden}</span>
+    ${else}
+        <span class="badge bg-secondary">${EstadoOrden || 'PENDING'}</span>
+    ${/if}
+</script>
+
+<!-- Template para acciones -->
+<script id="accionesTemplate" type="text/x-template">
+    <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-info btn-ver-detalle-dashboard" data-id-orden="${IdOrden}" title="Ver detalles">
+            <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+        </button>
+    </div>
+</script>
+
+<script>
+    // Event delegation para botones del dashboard
+    $(document).ready(function() {
+        var gridElement = document.getElementById('dashboardOrdersGrid');
+        if (gridElement) {
+            gridElement.addEventListener('click', function(event) {
+                var target = event.target.closest('.btn-ver-detalle-dashboard');
+                if (target) {
+                    var idOrden = target.getAttribute('data-id-orden');
+                    if (idOrden && window.Dashboard && window.Dashboard.Detalles) {
+                        window.Dashboard.Detalles.Ver(idOrden);
+                    }
+                }
+            });
+        }
+    });
+</script>

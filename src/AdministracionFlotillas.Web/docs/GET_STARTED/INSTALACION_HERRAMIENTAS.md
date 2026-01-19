@@ -528,5 +528,5 @@ Test-Path "C:\Program Files\dotnet\dotnet.exe"
 
 ---
 
-**�ltima actualización**: Enero 2025
+**�ltima actualización**: Enero 2026
 

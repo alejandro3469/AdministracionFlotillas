@@ -86,14 +86,47 @@ Este documento presenta los componentes principales de Syncfusion ASP.NET Core M
 
 **Binding a Controlador (Tag Helper - Recomendado)**:
 ```html
-<ejs-grid id="employeesGrid" 
-          dataSource="@Url.Action("ObtenerEmployees", "Employees")">
+<!-- Opción 1: Binding directo con datos del modelo -->
+<ejs-grid id="employeesGrid" dataSource="@Model">
+    <e-grid-columns>
+        <e-grid-column field="idEmpleado" headerText="ID"></e-grid-column>
+        <e-grid-column field="nombreCompleto" headerText="Nombre"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<!-- Opción 2: Binding remoto con DataManager (recomendado para datos dinámicos) -->
+<ejs-grid id="employeesGrid">
+    <e-data-manager url="/Employees/ObtenerEmployees" adaptor="UrlAdaptor"></e-data-manager>
+    <e-grid-columns>
+        <e-grid-column field="idEmpleado" headerText="ID"></e-grid-column>
+        <e-grid-column field="nombreCompleto" headerText="Nombre"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<!-- Opción 3: Cargar datos con JavaScript después de crear el grid -->
+<script>
+    function onGridCreated() {
+        var grid = document.getElementById('employeesGrid').ej2_instances[0];
+        $.ajax({
+            url: '/Employees/ObtenerEmployees',
+            method: 'POST',
+            success: function(response) {
+                if (response.exito) {
+                    grid.dataSource = response.datos;
+                }
+            }
+        });
+    }
+</script>
+<ejs-grid id="employeesGrid" created="onGridCreated">
     <e-grid-columns>
         <e-grid-column field="idEmpleado" headerText="ID"></e-grid-column>
         <e-grid-column field="nombreCompleto" headerText="Nombre"></e-grid-column>
     </e-grid-columns>
 </ejs-grid>
 ```
+
+**Referencia oficial**: [Remote Data Binding](https://ej2.syncfusion.com/aspnetcore/documentation/grid/data-binding/remote-data)
 
 **Alternativa con HTML Helper**:
 ```html
@@ -129,8 +162,8 @@ window.Employees = {
 
 // En la vista
 @Html.EJS().Grid("employeesGrid")
-    .RowSelected("Employees.Grid.OnRowSelected")
-    .ActionComplete("Employees.Grid.OnActionComplete")
+    .RowSelected("Employees.Grid.AlSeleccionarFila")
+    .ActionComplete("Employees.Grid.AlCompletarAccion")
     .Render()
 ```
 

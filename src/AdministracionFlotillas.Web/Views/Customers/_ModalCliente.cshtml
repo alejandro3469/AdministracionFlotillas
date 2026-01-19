@@ -1,0 +1,229 @@
+@* Modal unificado Ver/Editar Cliente usando Syncfusion Dialog *@
+<ejs-tooltip id="tooltipModalCliente" 
+             target=".info-tooltip-cliente" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalClienteBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentCliente"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalCliente" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="80%" 
+            height="85%" 
+            visible="false"
+            header="Cliente #<span id='modalClienteTitulo'>0</span>"
+            open="modalClienteOpen"
+            close="modalClienteClose"
+            beforeClose="modalClienteBeforeClose">
+    <e-content-template>
+        <div id="modalClienteContenido">
+            <!-- Tabs para organizar el contenido -->
+            <ejs-tab id="tabsModalCliente" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalCliente" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información del Cliente</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Cliente:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdCliente" class="info-tooltip-cliente" data-field="IdCliente" data-tooltip="Identificador único del cliente en el sistema">-</strong>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Nombre:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreCliente" class="info-tooltip-cliente" data-field="NombreCliente" data-tooltip="Nombre completo o razón social del cliente">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Email:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalEmailCliente" class="info-tooltip-cliente" data-field="Email" data-tooltip="Correo electrónico de contacto del cliente">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Teléfono:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTelefonoCliente" class="info-tooltip-cliente" data-field="Telefono" data-tooltip="Número de teléfono de contacto">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoCliente">
+                                                        <span class="info-tooltip-cliente" data-field="EstadoCliente" data-tooltip="Estado del cliente: ACTIVE (activo, puede realizar compras), INACTIVE (inactivo, bloqueado)">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Dirección</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Dirección:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalDireccionCliente" class="info-tooltip-cliente" data-field="Direccion" data-tooltip="Dirección completa del cliente">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Ciudad:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCiudadCliente" class="info-tooltip-cliente" data-field="Ciudad" data-tooltip="Ciudad donde se encuentra el cliente">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalEstadoDireccionCliente" class="info-tooltip-cliente" data-field="Estado" data-tooltip="Estado o provincia del cliente">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Código Postal:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCodigoPostalCliente" class="info-tooltip-cliente" data-field="CodigoPostal" data-tooltip="Código postal de la dirección">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">País:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalPaisCliente" class="info-tooltip-cliente" data-field="Pais" data-tooltip="País del cliente">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información Comercial" })">
+                        <e-content-template>
+                            <div id="tabComercialModalCliente" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Resumen Comercial</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-6">Límite de Crédito:</dt>
+                                                    <dd class="col-sm-6">
+                                                        <span id="modalLimiteCredito" class="info-tooltip-cliente" data-field="LimiteCredito" data-tooltip="Monto máximo de crédito autorizado para el cliente">$0.00</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-6">Total de Órdenes:</dt>
+                                                    <dd class="col-sm-6">
+                                                        <span id="modalTotalOrdenes" class="info-tooltip-cliente" data-field="TotalOrdenes" data-tooltip="Número total de órdenes realizadas por el cliente">0</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-6">Total de Compras:</dt>
+                                                    <dd class="col-sm-6">
+                                                        <span id="modalTotalCompras" class="info-tooltip-cliente" data-field="TotalCompras" data-tooltip="Monto total acumulado de todas las compras realizadas">$0.00</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-6">Fecha de Registro:</dt>
+                                                    <dd class="col-sm-6">
+                                                        <span id="modalFechaRegistro" class="info-tooltip-cliente" data-field="FechaRegistro" data-tooltip="Fecha en que el cliente fue registrado en el sistema">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalClienteEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalClienteCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    // Variables globales para el modal de cliente
+    var modalClienteModo = 'ver';
+    var modalClienteId = null;
+    var tooltipModalClienteObj = null;
+
+    // Inicializar tooltip cuando el DOM esté listo
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalCliente');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalClienteObj = tooltipElement.ej2_instances[0];
+        }
+    });
+
+    // Evento beforeRender del tooltip
+    window.tooltipModalClienteBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalClienteObj) {
+                tooltipModalClienteObj.content = contentDiv;
+            }
+        }
+    };
+
+    // Eventos del modal
+    window.modalClienteOpen = function(args) {
+        console.log('Modal de cliente abierto');
+    };
+
+    window.modalClienteClose = function(args) {
+        console.log('Modal de cliente cerrado');
+        modalClienteId = null;
+        modalClienteModo = 'ver';
+    };
+
+    window.modalClienteBeforeClose = function(args) {
+        return true;
+    };
+
+    // Botones del modal
+    window.modalClienteEditar = function() {
+        if (modalClienteId) {
+            modalClienteModo = 'editar';
+            if (window.Customers && window.Customers.Modal) {
+                window.Customers.Modal.CambiarAModoEdicion(modalClienteId);
+            }
+        }
+    };
+
+    window.modalClienteCerrar = function() {
+        var dialogElement = document.getElementById('modalCliente');
+        if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+            dialogElement.ej2_instances[0].hide();
+        }
+    };
+</script>

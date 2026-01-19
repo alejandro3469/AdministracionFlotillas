@@ -158,4 +158,4 @@ dotnet publish -c Release -r osx-x64
 
 ---
 
-**Última actualización**: Enero 2025
+**Última actualización**: Enero 2026

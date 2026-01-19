@@ -1,3 +1,67 @@
+# Documentación del Proyecto AdministracionFlotillas
+
+## 📚 Índice de Documentación
+
+Para navegar fácilmente por toda la documentación, consulta el **[Índice de Documentación Completo](INDICE_DOCUMENTACION.md)**.
+
+## 🚀 Inicio Rápido
+
+Si eres nuevo en el proyecto, comienza aquí:
+
+1. **[GET_STARTED/QUICK_START.md](GET_STARTED/QUICK_START.md)** - Inicio rápido
+2. **[BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)** - Configurar base de datos
+3. **[UI/GUIA_CREACION_MODULO_SYNCFUSION.md](UI/GUIA_CREACION_MODULO_SYNCFUSION.md)** - Crear primer módulo
+
+## 📖 Guías Principales
+
+### Para Desarrollo Avanzado ⭐
+- **[UI/GUIA_FUNCIONALIDADES_AVANZADAS_SYNCFUSION.md](UI/GUIA_FUNCIONALIDADES_AVANZADAS_SYNCFUSION.md)** - Funcionalidades avanzadas completas
+- **[BASE_DATOS/REGLAS_NEGOCIO_SCHEMA_CO.md](BASE_DATOS/REGLAS_NEGOCIO_SCHEMA_CO.md)** - Reglas de negocio
+- **[UI/GUIA_NUEVAS_FUNCIONALIDADES_VISTAS.md](UI/GUIA_NUEVAS_FUNCIONALIDADES_VISTAS.md)** - Nuevas vistas y funcionalidades
+
+### Para Referencia
+- **[PLAN_EXPANSION_SYNCFUSION.md](../../../PLAN_EXPANSION_SYNCFUSION.md)** - Plan completo de expansión
+- **[PRÓXIMOS_PASOS.md](../../../PRÓXIMOS_PASOS.md)** - Próximos pasos recomendados
+- **[ARQUITECTURA/ARQUITECTURA.md](ARQUITECTURA/ARQUITECTURA.md)** - Arquitectura del proyecto
+
+## 🎯 Próximos Pasos
+
+Consulta **[PRÓXIMOS_PASOS.md](../../../PRÓXIMOS_PASOS.md)** para ver los próximos pasos recomendados de implementación.
+
+---
+
+# Documentación del Proyecto AdministracionFlotillas
+
+## 📚 Índice de Documentación Completo
+
+Para navegar fácilmente por toda la documentación, consulta el **[Índice de Documentación Completo](INDICE_DOCUMENTACION.md)**.
+
+## 🚀 Inicio Rápido
+
+Si eres nuevo en el proyecto, comienza aquí:
+
+1. **[GET_STARTED/QUICK_START.md](GET_STARTED/QUICK_START.md)** - Inicio rápido
+2. **[BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md)** - Configurar base de datos
+3. **[UI/GUIA_CREACION_MODULO_SYNCFUSION.md](UI/GUIA_CREACION_MODULO_SYNCFUSION.md)** - Crear primer módulo
+
+## 📖 Guías Principales ⭐
+
+### Para Desarrollo Avanzado
+- **[UI/GUIA_FUNCIONALIDADES_AVANZADAS_SYNCFUSION.md](UI/GUIA_FUNCIONALIDADES_AVANZADAS_SYNCFUSION.md)** - Funcionalidades avanzadas completas
+- **[BASE_DATOS/REGLAS_NEGOCIO_SCHEMA_CO.md](BASE_DATOS/REGLAS_NEGOCIO_SCHEMA_CO.md)** - Reglas de negocio
+- **[UI/GUIA_NUEVAS_FUNCIONALIDADES_VISTAS.md](UI/GUIA_NUEVAS_FUNCIONALIDADES_VISTAS.md)** - Nuevas vistas y funcionalidades
+
+### Para Referencia
+- **[PLAN_EXPANSION_SYNCFUSION.md](../../../PLAN_EXPANSION_SYNCFUSION.md)** - Plan completo de expansión
+- **[PRÓXIMOS_PASOS.md](../../../PRÓXIMOS_PASOS.md)** - Próximos pasos recomendados
+- **[ARQUITECTURA/ARQUITECTURA.md](ARQUITECTURA/ARQUITECTURA.md)** - Arquitectura del proyecto
+
+## 🎯 Próximos Pasos
+
+Consulta **[PRÓXIMOS_PASOS.md](../../../PRÓXIMOS_PASOS.md)** para ver los próximos pasos recomendados de implementación.
+
+---
+
 # Índice de Documentación
 
 Este documento es un índice de toda la documentación disponible del proyecto AdministracionFlotillas. Toda la documentación está en español y está organizada por categorías.
@@ -45,6 +109,7 @@ Documentación sobre la migración a Syncfusion ASP.NET Core MVC:
 
 ### Instalación y Configuración
 
+- [UI/INSTALACION_POST_APROBACION.md](UI/INSTALACION_POST_APROBACION.md) - **POST-APROBACIÓN** - Guía completa para instalar y configurar Syncfusion después de recibir la aprobación de la Community License permanente (NuGet y Mac Installer)
 - [UI/INSTALACION_SYNCFUSION_MAC.md](UI/INSTALACION_SYNCFUSION_MAC.md) - **PARA MAC** - Guía paso a paso para instalar Syncfusion Essential Studio en macOS
 - [UI/INSTALACION_SYNCFUSION_WINDOWS.md](UI/INSTALACION_SYNCFUSION_WINDOWS.md) - **PARA WINDOWS** - Guía paso a paso para instalar Syncfusion Essential Studio en Windows
 - [UI/REGISTRO_LICENCIA_SYNCFUSION.md](UI/REGISTRO_LICENCIA_SYNCFUSION.md) - **IMPORTANTE** - Cómo registrar la licencia temporal y permanente en el proyecto (Mac y Windows)
@@ -60,10 +125,13 @@ Documentación sobre la migración a Syncfusion ASP.NET Core MVC:
 - [UI/COMPONENTES_SYNCFUSION.md](UI/COMPONENTES_SYNCFUSION.md) - Componentes Syncfusion: guía visual, capacidades y ejemplos de uso
 - [UI/RECOMENDACIONES_UI_LIBRARIES.md](UI/RECOMENDACIONES_UI_LIBRARIES.md) - Comparación inicial de bibliotecas UI consideradas
 
-### Migración
+### Migración y Desarrollo
 
-- [UI/PLAN_MIGRACION_UI.md](UI/PLAN_MIGRACION_UI.md) - **ESTRATEGIA ACTUALIZADA** - Plan de creación de nuevo módulo con Syncfusion basado en Oracle Sample Schema CO, manteniendo módulo Employees intacto como referencia (V1) (**EN PAUSA - Esperando aprobación de licencia**)
-- [UI/GUIA_PREPARACION_MIGRACION.md](UI/GUIA_PREPARACION_MIGRACION.md) - **PREPARACIÓN ACTIVA** - Guía de tareas que se pueden adelantar mientras se espera la aprobación de la licencia (configuración de BD, análisis, diseño)
+- [UI/PLAN_MIGRACION_UI.md](UI/PLAN_MIGRACION_UI.md) - **ESTRATEGIA ACTUALIZADA** - Plan de creación de nuevo módulo con Syncfusion basado en Oracle Sample Schema CO, manteniendo módulo Employees intacto como referencia (V1) (**LICENCIA APROBADA - Listo para implementar**)
+- [UI/GUIA_PREPARACION_MIGRACION.md](UI/GUIA_PREPARACION_MIGRACION.md) - **PREPARACIÓN** - Guía de tareas de preparación (configuración de BD, análisis, diseño). Ver [INSTALACION_POST_APROBACION.md](UI/INSTALACION_POST_APROBACION.md) para instalación de Syncfusion.
+- [UI/GUIA_CREACION_MODULO_SYNCFUSION.md](UI/GUIA_CREACION_MODULO_SYNCFUSION.md) - **GUÍA PASO A PASO ATEMPORAL** - Guía completa para crear un nuevo módulo basado en Employees, usando Syncfusion y stored procedures de Oracle. Incluye todas las fases: backend, frontend, componentes avanzados y pruebas
+- [UI/GUIA_FUNCIONALIDADES_AVANZADAS_SYNCFUSION.md](UI/GUIA_FUNCIONALIDADES_AVANZADAS_SYNCFUSION.md) ⭐ **NUEVO - COMPLETO** - Guía completa de funcionalidades avanzadas de Syncfusion con ejemplos de código en todas las capas
+- [UI/GUIA_NUEVAS_FUNCIONALIDADES_VISTAS.md](UI/GUIA_NUEVAS_FUNCIONALIDADES_VISTAS.md) ⭐ **NUEVO** - Guía de nuevas funcionalidades y vistas adaptadas a nuestros datos del schema CO
 - [UI/VERIFICACION_DOCUMENTACION.md](UI/VERIFICACION_DOCUMENTACION.md) - Verificación de que toda la documentación está actualizada, correctamente referenciada y alineada con la documentación oficial
 
 **Nota sobre Estrategia**: El proyecto mantiene el módulo Employees (V1) completamente intacto con DataTables + Bootstrap. El nuevo módulo de Órdenes/Ventas (V2) se desarrollará desde cero con Syncfusion y Oracle Sample Schema CO, permitiendo comparación directa y aprendizaje gradual sin interrumpir el trabajo actual.
@@ -87,6 +155,7 @@ Guías para configurar y trabajar con Oracle Database:
 
 - [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md) - **RECOMENDADO** - Configuración de Oracle Cloud Always Free con Sample Schema CO (Customer Orders) para datos reales de ventas y facturación
 - [BASE_DATOS/ORACLE_XE_LOCAL.md](BASE_DATOS/ORACLE_XE_LOCAL.md) - Guía para instalar Oracle XE localmente (alternativa)
+- [BASE_DATOS/REGLAS_NEGOCIO_SCHEMA_CO.md](BASE_DATOS/REGLAS_NEGOCIO_SCHEMA_CO.md) ⭐ **NUEVO** - Reglas de negocio completas basadas en schema CO
 - [../scripts/](../scripts/) - Scripts SQL para migración y configuración de base de datos
 
 **Nota**: El proyecto utiliza Oracle Cloud Always Free con el Sample Schema CO (Customer Orders) que contiene datos realistas de ventas, órdenes, clientes, productos e inventario. Ver [BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md](BASE_DATOS/ORACLE_CLOUD_SAMPLE_SCHEMAS.md) para configuración completa.
@@ -172,7 +241,7 @@ Git permite rastrear cambios en el proyecto. Los mensajes de commit deben ser br
 - El módulo Employees es el único completamente implementado y sirve como referencia
 - Los bundles se generan automáticamente durante `dotnet build`
 - Los archivos JavaScript están organizados por módulo en `Scripts/[Modulo]/`
-- La migración a Syncfusion está en pausa esperando aprobación de licencia (Ticket #803702)
+- La Community License de Syncfusion ha sido aprobada (Ticket #803702) - Ver [INSTALACION_POST_APROBACION.md](UI/INSTALACION_POST_APROBACION.md)
 
 ---
 
