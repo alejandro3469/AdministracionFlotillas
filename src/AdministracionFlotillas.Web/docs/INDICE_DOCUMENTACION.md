@@ -320,6 +320,6 @@ Al agregar nueva documentación:
 
 ---
 
-**Última actualización**: 2026-01-18  
-**Versión**: 1.0  
+**Última actualización**: Enero 2026  
+**Versión**: 2.0  
 **Propósito**: Enseñanza y desarrollo
