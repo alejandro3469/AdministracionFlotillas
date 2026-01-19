@@ -216,18 +216,24 @@ docs/
 
 **Ubicación**: `/` (raíz del proyecto)
 
-- **[PLAN_EXPANSION_SYNCFUSION.md](../../../PLAN_EXPANSION_SYNCFUSION.md)** ⭐ **ACTUALIZADO**
-  - Plan completo de expansión
-  - Componentes a implementar
-  - Orden de implementación
-  - Reglas de negocio integradas
-  - Adaptado completamente a schema CO
+- **[DOCUMENTACION_MAESTRA.md](../../../DOCUMENTACION_MAESTRA.md)** ⭐ **LEER PRIMERO**
+  - Estado completo del proyecto
+  - Módulos implementados
+  - Tecnologías utilizadas
+  - Mejoras recientes
+  - Guías de inicio rápido
 
-- **[IMPLEMENTACION_FUNCIONALIDADES_AVANZADAS.md](../../../IMPLEMENTACION_FUNCIONALIDADES_AVANZADAS.md)** ⭐ **ACTUALIZADO**
-  - Estado de implementación
-  - Funcionalidades completadas
-  - Funcionalidades pendientes
-  - Referencias a guías completas
+- **[MEJORAS_NAVEGACION_UI_UX.md](../../../MEJORAS_NAVEGACION_UI_UX.md)** ⭐ **NUEVO**
+  - Mejoras de navegación implementadas
+  - Navbar mejorado
+  - Breadcrumbs con indicadores
+  - CSS y JavaScript de navegación
+  - Responsive y accesibilidad
+
+- **[IMPLEMENTACION_COMPLETA.md](../../../IMPLEMENTACION_COMPLETA.md)**
+  - Resumen de implementación completa
+  - Módulos creados
+  - Estadísticas del proyecto
 
 ## Guías Principales Recomendadas
 
