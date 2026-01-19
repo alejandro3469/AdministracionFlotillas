@@ -1,5 +1,6 @@
 using AdministracionFlotillas.ModelosComunes;
 using AdministracionFlotillas.Web.ViewModels;
+using Route = AdministracionFlotillas.ModelosComunes.Route;
 
 namespace AdministracionFlotillas.Web.Parseador;
 
