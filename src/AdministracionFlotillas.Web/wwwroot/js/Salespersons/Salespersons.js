@@ -294,24 +294,57 @@ window.Salespersons = window.Salespersons || {};
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalVendedor');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
-                
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalVendedor');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalVendedorObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
-            } else if (window.modalVendedorInstance) {
-                window.modalVendedorInstance.show();
-            } else {
-                console.warn('Modal de vendedor no disponible aún');
-                setTimeout(function() {
-                    window.Salespersons.Modal.AbrirDialog();
-                }, 200);
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50;
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                if (typeof window.modalVendedorInstance !== 'undefined' && window.modalVendedorInstance !== null) {
+                    return window.modalVendedorInstance;
+                }
+                var dialogElement = document.getElementById('modalVendedor');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal de vendedor abierto correctamente después de ' + intentos + ' intentos');
+                        window.modalVendedorInstance = dialogInstance;
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalVendedor');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                tooltipModalVendedorObj = tooltipElement.ej2_instances[0];
+                            }
+                        }, 100);
+                        return;
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal de vendedor:', error);
+                        window.Salespersons.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return;
+                    }
+                }
+                
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal de vendedor... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal de vendedor no inicializado después de ' + maxIntentos + ' intentos');
+                    window.Salespersons.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idVendedor) {

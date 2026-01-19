@@ -292,24 +292,57 @@ window.Addendums = window.Addendums || {};
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalAdenda');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
-                
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalAdenda');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
-            } else if (window.modalAdendaInstance) {
-                window.modalAdendaInstance.show();
-            } else {
-                console.warn('Modal de adenda no disponible aún');
-                setTimeout(function() {
-                    window.Addendums.Modal.AbrirDialog();
-                }, 200);
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50;
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                if (typeof window.modalAdendaInstance !== 'undefined' && window.modalAdendaInstance !== null) {
+                    return window.modalAdendaInstance;
+                }
+                var dialogElement = document.getElementById('modalAdenda');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal de adenda abierto correctamente después de ' + intentos + ' intentos');
+                        window.modalAdendaInstance = dialogInstance;
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalAdenda');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
+                            }
+                        }, 100);
+                        return;
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal de adenda:', error);
+                        window.Addendums.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return;
+                    }
+                }
+                
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal de adenda... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal de adenda no inicializado después de ' + maxIntentos + ' intentos');
+                    window.Addendums.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idAdenda) {

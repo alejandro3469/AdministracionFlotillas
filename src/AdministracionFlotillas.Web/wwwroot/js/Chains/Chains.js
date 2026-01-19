@@ -288,24 +288,60 @@ window.Chains = window.Chains || {};
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalCadena');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50;
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                if (typeof window.modalCadenaInstance !== 'undefined' && window.modalCadenaInstance !== null) {
+                    return window.modalCadenaInstance;
+                }
                 
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalCadena');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalCadenaObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
-            } else if (window.modalCadenaInstance) {
-                window.modalCadenaInstance.show();
-            } else {
-                console.warn('Modal de cadena no disponible aún');
-                setTimeout(function() {
-                    window.Chains.Modal.AbrirDialog();
-                }, 200);
+                var dialogElement = document.getElementById('modalCadena');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal de cadena abierto correctamente después de ' + intentos + ' intentos');
+                        window.modalCadenaInstance = dialogInstance;
+                        
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalCadena');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                tooltipModalCadenaObj = tooltipElement.ej2_instances[0];
+                            }
+                        }, 100);
+                        return;
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal de cadena:', error);
+                        window.Chains.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return;
+                    }
+                }
+                
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal de cadena... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal de cadena no inicializado después de ' + maxIntentos + ' intentos');
+                    window.Chains.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idCadena) {

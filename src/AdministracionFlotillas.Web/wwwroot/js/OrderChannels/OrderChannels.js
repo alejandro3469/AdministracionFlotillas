@@ -292,24 +292,57 @@ window.OrderChannels = window.OrderChannels || {};
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalCanal');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
-                
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalCanal');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalCanalObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
-            } else if (window.modalCanalInstance) {
-                window.modalCanalInstance.show();
-            } else {
-                console.warn('Modal de canal no disponible aún');
-                setTimeout(function() {
-                    window.OrderChannels.Modal.AbrirDialog();
-                }, 200);
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50;
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                if (typeof window.modalCanalInstance !== 'undefined' && window.modalCanalInstance !== null) {
+                    return window.modalCanalInstance;
+                }
+                var dialogElement = document.getElementById('modalCanal');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal de canal abierto correctamente después de ' + intentos + ' intentos');
+                        window.modalCanalInstance = dialogInstance;
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalCanal');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                tooltipModalCanalObj = tooltipElement.ej2_instances[0];
+                            }
+                        }, 100);
+                        return;
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal de canal:', error);
+                        window.OrderChannels.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return;
+                    }
+                }
+                
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal de canal... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal de canal no inicializado después de ' + maxIntentos + ' intentos');
+                    window.OrderChannels.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idCanal) {

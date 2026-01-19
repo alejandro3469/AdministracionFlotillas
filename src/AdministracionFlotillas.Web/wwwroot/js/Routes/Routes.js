@@ -286,24 +286,57 @@ window.Routes = window.Routes || {};
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalRuta');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
-                
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalRuta');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalRutaObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
-            } else if (window.modalRutaInstance) {
-                window.modalRutaInstance.show();
-            } else {
-                console.warn('Modal de ruta no disponible aún');
-                setTimeout(function() {
-                    window.Routes.Modal.AbrirDialog();
-                }, 200);
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50;
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                if (typeof window.modalRutaInstance !== 'undefined' && window.modalRutaInstance !== null) {
+                    return window.modalRutaInstance;
+                }
+                var dialogElement = document.getElementById('modalRuta');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal de ruta abierto correctamente después de ' + intentos + ' intentos');
+                        window.modalRutaInstance = dialogInstance;
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalRuta');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                tooltipModalRutaObj = tooltipElement.ej2_instances[0];
+                            }
+                        }, 100);
+                        return;
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal de ruta:', error);
+                        window.Routes.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return;
+                    }
+                }
+                
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal de ruta... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal de ruta no inicializado después de ' + maxIntentos + ' intentos');
+                    window.Routes.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idRuta) {
