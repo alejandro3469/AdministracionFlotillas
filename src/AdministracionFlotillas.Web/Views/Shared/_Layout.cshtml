@@ -25,85 +25,112 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navigation.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AdministracionFlotillas.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom">
+        <!-- Skip to main content (Accesibilidad) -->
+        <a href="#main-content" class="skip-to-main">Saltar al contenido principal</a>
+        
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AdministracionFlotillas</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span>AdministracionFlotillas</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Dashboard
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" 
+                               asp-area="" asp-controller="Home" asp-action="Index" title="Dashboard Principal">
+                                <i class="fas fa-home"></i>
+                                <span class="d-none d-md-inline">Dashboard</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")" asp-area="" asp-controller="Orders" asp-action="Index">
-                                <i class="fas fa-shopping-cart"></i> Órdenes
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")" 
+                               asp-area="" asp-controller="Orders" asp-action="Index" title="Gestión de Órdenes">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="d-none d-md-inline">Órdenes</span>
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Customers" ? "active" : "")" href="#" id="catalogosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-book"></i> Catálogos
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Customers" ? "active" : "")" 
+                               href="#" id="catalogosDropdown" role="button" data-bs-toggle="dropdown" 
+                               aria-expanded="false" title="Catálogos del Sistema">
+                                <i class="fas fa-book"></i>
+                                <span class="d-none d-md-inline">Catálogos</span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="catalogosDropdown">
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")" asp-controller="Products" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")" 
+                                       asp-controller="Products" asp-action="Index">
                                         <i class="fas fa-box"></i> Productos
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Customers" ? "active" : "")" asp-controller="Customers" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Customers" ? "active" : "")" 
+                                       asp-controller="Customers" asp-action="Index">
                                         <i class="fas fa-users"></i> Clientes
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chains" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Salespersons" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" ? "active" : "")" href="#" id="ventasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-store"></i> Ventas
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chains" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Salespersons" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" ? "active" : "")" 
+                               href="#" id="ventasDropdown" role="button" data-bs-toggle="dropdown" 
+                               aria-expanded="false" title="Módulos de Ventas">
+                                <i class="fas fa-store"></i>
+                                <span class="d-none d-md-inline">Ventas</span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="ventasDropdown">
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chains" ? "active" : "")" asp-controller="Chains" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chains" ? "active" : "")" 
+                                       asp-controller="Chains" asp-action="Index">
                                         <i class="fas fa-building"></i> Cadenas
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Salespersons" ? "active" : "")" asp-controller="Salespersons" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Salespersons" ? "active" : "")" 
+                                       asp-controller="Salespersons" asp-action="Index">
                                         <i class="fas fa-user-tie"></i> Vendedores
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" ? "active" : "")" asp-controller="Routes" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Routes" ? "active" : "")" 
+                                       asp-controller="Routes" asp-action="Index">
                                         <i class="fas fa-route"></i> Rutas
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Addendums" || ViewContext.RouteData.Values["Controller"]?.ToString() == "OrderChannels" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoicing" ? "active" : "")" href="#" id="administracionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-cog"></i> Administración
+                            <a class="nav-link dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Addendums" || ViewContext.RouteData.Values["Controller"]?.ToString() == "OrderChannels" || ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoicing" ? "active" : "")" 
+                               href="#" id="administracionDropdown" role="button" data-bs-toggle="dropdown" 
+                               aria-expanded="false" title="Módulos de Administración">
+                                <i class="fas fa-cog"></i>
+                                <span class="d-none d-md-inline">Administración</span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="administracionDropdown">
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Addendums" ? "active" : "")" asp-controller="Addendums" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Addendums" ? "active" : "")" 
+                                       asp-controller="Addendums" asp-action="Index">
                                         <i class="fas fa-file-contract"></i> Adendas
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "OrderChannels" ? "active" : "")" asp-controller="OrderChannels" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "OrderChannels" ? "active" : "")" 
+                                       asp-controller="OrderChannels" asp-action="Index">
                                         <i class="fas fa-mobile-alt"></i> Canales de Pedidos
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoicing" ? "active" : "")" asp-controller="Invoicing" asp-action="Index">
+                                    <a class="dropdown-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Invoicing" ? "active" : "")" 
+                                       asp-controller="Invoicing" asp-action="Index">
                                         <i class="fas fa-file-invoice"></i> Facturación
                                     </a>
                                 </li>
@@ -115,7 +142,7 @@
         </nav>
     </header>
     <div class="container-fluid">
-        <main role="main">
+        <main role="main" id="main-content">
             @RenderBody()
         </main>
     </div>
@@ -162,6 +189,7 @@
     <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script>
     
     <!-- 11. Custom scripts (antes de Script Manager para que funciones de eventos estén disponibles) -->
+    <script src="~/js/navigation.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     
     <!-- 12. Page-specific scripts (se renderizan aquí ANTES de Script Manager) -->

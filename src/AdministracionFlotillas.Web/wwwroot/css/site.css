@@ -115,28 +115,9 @@ footer {
     font-weight: bold;
 }
 
-/* Estilos para navegación activa */
-.nav-link.active {
-    font-weight: 600;
-    color: #0d6efd !important;
-}
+/* Estilos para navegación activa - Mejorados en navigation.css */
 
-.dropdown-item.active {
-    background-color: #0d6efd;
-    color: white;
-}
-
-/* Breadcrumb styles */
-.breadcrumb {
-    background-color: transparent;
-    padding: 0;
-    margin-bottom: 0;
-}
-
-.breadcrumb-item + .breadcrumb-item::before {
-    content: "›";
-    color: #6c757d;
-}
+/* Breadcrumb styles - Mejorados en navigation.css */
 
 /* Responsive Design para Orders */
 @media (max-width: 768px) {

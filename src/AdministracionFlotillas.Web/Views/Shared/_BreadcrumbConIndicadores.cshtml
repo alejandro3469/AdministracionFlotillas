@@ -14,15 +14,24 @@
                 <li class="breadcrumb-item @(isLast ? "active" : "")" @(isLast ? "aria-current=\"page\"" : "")>
                     @if (!isLast && !string.IsNullOrEmpty(item.Url))
                     {
-                        <a href="@item.Url">@item.Text</a>
+                        <a href="@item.Url" title="Ir a @item.Text">
+                            <i class="fas fa-chevron-right me-1" style="font-size: 0.7rem; opacity: 0.5;"></i>
+                            @item.Text
+                        </a>
                     }
                     else
                     {
-                        <span>@item.Text</span>
+                        <span>
+                            @if (i > 0)
+                            {
+                                <i class="fas fa-chevron-right me-1" style="font-size: 0.7rem; opacity: 0.5;"></i>
+                            }
+                            @item.Text
+                        </span>
                     }
                     @if (!string.IsNullOrEmpty(item.Contador) || !string.IsNullOrEmpty(contadorId))
                     {
-                        <span class="badge bg-primary ms-2" id="@contadorId" data-inicial="@item.Contador">@item.Contador</span>
+                        <span class="badge bg-primary ms-2" id="@contadorId" data-inicial="@item.Contador" title="Total de registros">@item.Contador</span>
                     }
                 </li>
             }
