@@ -10,6 +10,10 @@
     </e-content-template>
 </ejs-tooltip>
 
+@* IMPORTANTE: El tag helper <ejs-dialog> renderiza un div con el id especificado cuando el Script Manager se ejecuta *@
+@* Pero necesitamos asegurarnos de que el elemento exista en el DOM antes de que Syncfusion lo inicialice *@
+<div id="modalProducto" style="display: none;"></div>
+
 <ejs-dialog id="modalProducto" 
             isModal="true" 
             showCloseIcon="true" 
@@ -17,6 +21,7 @@
             height="80%" 
             visible="false"
             header="Producto #<span id='modalProductoTitulo'>0</span>"
+            created="modalProductoCreated"
             open="modalProductoOpen"
             close="modalProductoClose"
             beforeClose="modalProductoBeforeClose">
@@ -122,16 +127,93 @@
 
 <script>
     // Variables globales para el modal de producto
-    var modalProductoModo = 'ver';
+    var modalProductoModo = 'ver'; // 'ver' o 'editar'
     var modalProductoId = null;
     var tooltipModalProductoObj = null;
+    // IMPORTANTE: Variable global para la instancia del Dialog - debe ser accesible desde Products.js
+    window.modalProductoInstance = null; // Instancia del Dialog de Syncfusion - se guarda en el evento 'created'
+    
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    // Uso: window.mostrarModalProducto() o window.ocultarModalProducto()
+    window.mostrarModalProducto = function() {
+        var elemento = document.getElementById('modalProducto');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        console.warn('⚠️ Modal no disponible aún, intentando obtener instancia...');
+        // Si no está disponible, intentar obtenerla
+        if (window.modalProductoInstance) {
+            window.modalProductoInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalProducto = function() {
+        var elemento = document.getElementById('modalProducto');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalProductoInstance) {
+            window.modalProductoInstance.hide();
+            return true;
+        }
+        return false;
+    };
 
-    // Inicializar tooltip cuando el DOM esté listo
+    // Evento created del Dialog - SOLUCIÓN DE RAÍZ según documentación oficial
+    // Este evento se ejecuta cuando Syncfusion inicializa el componente después de <ejs-scripts>
+    // Es el momento correcto para guardar la referencia a la instancia
+    window.modalProductoCreated = function(args) {
+        console.log('✅ Modal de producto creado e inicializado por Syncfusion');
+        console.log('Args recibidos:', args);
+        // IMPORTANTE: args.component es la instancia del Dialog, no args directamente
+        if (args && args.component) {
+            window.modalProductoInstance = args.component;
+            console.log('✅ Instancia del Dialog guardada correctamente');
+        } else {
+            // Fallback: intentar obtener del DOM directamente
+            var dialogElement = document.getElementById('modalProducto');
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                window.modalProductoInstance = dialogElement.ej2_instances[0];
+                console.log('⚠️ Instancia obtenida del DOM (fallback en created)');
+            } else {
+                console.error('❌ No se pudo obtener la instancia del Dialog en el evento created');
+            }
+        }
+        
+        // Inicializar tooltip después de que el modal esté creado
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalProducto');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalProductoObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+
+    // Inicializar tooltip cuando el DOM esté listo (fallback)
+    // También verificar si el modal ya está inicializado después de que Syncfusion procese los componentes
     document.addEventListener("DOMContentLoaded", function() {
         var tooltipElement = document.getElementById('tooltipModalProducto');
         if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
             tooltipModalProductoObj = tooltipElement.ej2_instances[0];
         }
+        
+        // Verificar si el modal ya está inicializado después de que <ejs-scripts> procese los componentes
+        // Esperar más tiempo para que Syncfusion termine de procesar
+        setTimeout(function() {
+            if (!window.modalProductoInstance) {
+                var dialogElement = document.getElementById('modalProducto');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalProductoInstance = dialogElement.ej2_instances[0];
+                    console.log('✅ Instancia del modal obtenida del DOM después de DOMContentLoaded (fallback)');
+                } else {
+                    console.warn('⚠️ Modal aún no inicializado después de DOMContentLoaded + 1 segundo');
+                }
+            }
+        }, 1000); // Aumentado a 1 segundo para dar tiempo a Syncfusion
     });
 
     // Evento beforeRender del tooltip

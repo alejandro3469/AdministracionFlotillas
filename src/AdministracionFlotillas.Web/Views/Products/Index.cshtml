@@ -76,10 +76,27 @@
 @section Scripts {
     <script src="~/js/Products/Products.js" asp-append-version="true"></script>
     <script>
-        $(document).ready(function() {
+        // Inicializar métricas al cargar la página
+        // Usar addEventListener en lugar de jQuery para evitar dependencia
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                inicializarMetricasProductos();
+            });
+        } else {
+            inicializarMetricasProductos();
+        }
+        
+        function inicializarMetricasProductos() {
+            // Esperar a que el namespace esté disponible
             if (window.Products && window.Products.Dashboard) {
                 window.Products.Dashboard.ActualizarMetricas();
+            } else {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Dashboard) {
+                        window.Products.Dashboard.ActualizarMetricas();
+                    }
+                }, 500);
             }
-        });
+        }
     </script>
 }

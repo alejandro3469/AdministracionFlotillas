@@ -10,6 +10,10 @@
     </e-content-template>
 </ejs-tooltip>
 
+@* IMPORTANTE: El tag helper <ejs-dialog> renderiza un div con el id especificado cuando el Script Manager se ejecuta *@
+@* Pero necesitamos asegurarnos de que el elemento exista en el DOM antes de que Syncfusion lo inicialice *@
+<div id="modalCliente" style="display: none;"></div>
+
 <ejs-dialog id="modalCliente" 
             isModal="true" 
             showCloseIcon="true" 
@@ -17,6 +21,7 @@
             height="85%" 
             visible="false"
             header="Cliente #<span id='modalClienteTitulo'>0</span>"
+            created="modalClienteCreated"
             open="modalClienteOpen"
             close="modalClienteClose"
             beforeClose="modalClienteBeforeClose">
@@ -153,16 +158,93 @@
 
 <script>
     // Variables globales para el modal de cliente
-    var modalClienteModo = 'ver';
+    var modalClienteModo = 'ver'; // 'ver' o 'editar'
     var modalClienteId = null;
     var tooltipModalClienteObj = null;
+    // IMPORTANTE: Variable global para la instancia del Dialog - debe ser accesible desde Customers.js
+    window.modalClienteInstance = null; // Instancia del Dialog de Syncfusion - se guarda en el evento 'created'
+    
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    // Uso: window.mostrarModalCliente() o window.ocultarModalCliente()
+    window.mostrarModalCliente = function() {
+        var elemento = document.getElementById('modalCliente');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        console.warn('⚠️ Modal no disponible aún, intentando obtener instancia...');
+        // Si no está disponible, intentar obtenerla
+        if (window.modalClienteInstance) {
+            window.modalClienteInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalCliente = function() {
+        var elemento = document.getElementById('modalCliente');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalClienteInstance) {
+            window.modalClienteInstance.hide();
+            return true;
+        }
+        return false;
+    };
 
-    // Inicializar tooltip cuando el DOM esté listo
+    // Evento created del Dialog - SOLUCIÓN DE RAÍZ según documentación oficial
+    // Este evento se ejecuta cuando Syncfusion inicializa el componente después de <ejs-scripts>
+    // Es el momento correcto para guardar la referencia a la instancia
+    window.modalClienteCreated = function(args) {
+        console.log('✅ Modal de cliente creado e inicializado por Syncfusion');
+        console.log('Args recibidos:', args);
+        // IMPORTANTE: args.component es la instancia del Dialog, no args directamente
+        if (args && args.component) {
+            window.modalClienteInstance = args.component;
+            console.log('✅ Instancia del Dialog guardada correctamente');
+        } else {
+            // Fallback: intentar obtener del DOM directamente
+            var dialogElement = document.getElementById('modalCliente');
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                window.modalClienteInstance = dialogElement.ej2_instances[0];
+                console.log('⚠️ Instancia obtenida del DOM (fallback en created)');
+            } else {
+                console.error('❌ No se pudo obtener la instancia del Dialog en el evento created');
+            }
+        }
+        
+        // Inicializar tooltip después de que el modal esté creado
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalCliente');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalClienteObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+
+    // Inicializar tooltip cuando el DOM esté listo (fallback)
+    // También verificar si el modal ya está inicializado después de que Syncfusion procese los componentes
     document.addEventListener("DOMContentLoaded", function() {
         var tooltipElement = document.getElementById('tooltipModalCliente');
         if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
             tooltipModalClienteObj = tooltipElement.ej2_instances[0];
         }
+        
+        // Verificar si el modal ya está inicializado después de que <ejs-scripts> procese los componentes
+        // Esperar más tiempo para que Syncfusion termine de procesar
+        setTimeout(function() {
+            if (!window.modalClienteInstance) {
+                var dialogElement = document.getElementById('modalCliente');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalClienteInstance = dialogElement.ej2_instances[0];
+                    console.log('✅ Instancia del modal obtenida del DOM después de DOMContentLoaded (fallback)');
+                } else {
+                    console.warn('⚠️ Modal aún no inicializado después de DOMContentLoaded + 1 segundo');
+                }
+            }
+        }, 1000); // Aumentado a 1 segundo para dar tiempo a Syncfusion
     });
 
     // Evento beforeRender del tooltip
@@ -221,9 +303,15 @@
     };
 
     window.modalClienteCerrar = function() {
-        var dialogElement = document.getElementById('modalCliente');
-        if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-            dialogElement.ej2_instances[0].hide();
+        if (typeof window.ocultarModalCliente === 'function') {
+            window.ocultarModalCliente();
+        } else {
+            var dialogElement = document.getElementById('modalCliente');
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                dialogElement.ej2_instances[0].hide();
+            } else if (window.modalClienteInstance) {
+                window.modalClienteInstance.hide();
+            }
         }
     };
 </script>

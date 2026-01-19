@@ -76,10 +76,27 @@
 @section Scripts {
     <script src="~/js/Customers/Customers.js" asp-append-version="true"></script>
     <script>
-        $(document).ready(function() {
+        // Inicializar métricas al cargar la página
+        // Usar addEventListener en lugar de jQuery para evitar dependencia
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                inicializarMetricasClientes();
+            });
+        } else {
+            inicializarMetricasClientes();
+        }
+        
+        function inicializarMetricasClientes() {
+            // Esperar a que el namespace esté disponible
             if (window.Customers && window.Customers.Dashboard) {
                 window.Customers.Dashboard.ActualizarMetricas();
+            } else {
+                setTimeout(function() {
+                    if (window.Customers && window.Customers.Dashboard) {
+                        window.Customers.Dashboard.ActualizarMetricas();
+                    }
+                }, 500);
             }
-        });
+        }
     </script>
 }
