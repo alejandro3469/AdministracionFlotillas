@@ -1,0 +1,169 @@
+<!-- Filtros -->
+<div class="row mb-3 g-3">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <label class="form-label">ID Cliente</label>
+        <ejs-numerictextbox id="filtroClienteId" 
+                             placeholder="Todos los clientes"
+                             change="filtroClienteIdChange">
+        </ejs-numerictextbox>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <label class="form-label">Estado</label>
+        <ejs-dropdownlist id="filtroEstado" 
+                          placeholder="Todos los estados"
+                          dataSource="@(new string[] { "COMPLETE", "CANCELLED", "REFUNDED" })"
+                          change="filtroEstadoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <label class="form-label">ID Tienda</label>
+        <ejs-numerictextbox id="filtroTiendaId" 
+                             placeholder="Todas las tiendas"
+                             change="filtroTiendaIdChange">
+        </ejs-numerictextbox>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <label class="form-label">Fecha Inicio</label>
+        <ejs-datepicker id="filtroFechaInicio" 
+                        placeholder="Desde"
+                        change="filtroFechaInicioChange">
+        </ejs-datepicker>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <label class="form-label">Fecha Fin</label>
+        <ejs-datepicker id="filtroFechaFin" 
+                        placeholder="Hasta"
+                        change="filtroFechaFinChange">
+        </ejs-datepicker>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-end">
+        <button type="button" class="btn btn-secondary w-100" onclick="Orders.Filtros.Limpiar()">
+            <i class="fas fa-times"></i> Limpiar Filtros
+        </button>
+    </div>
+</div>
+
+<!-- Botones de Acciones Batch (solo visible cuando hay selección múltiple) -->
+<div id="accionesBatch" class="row mb-3" style="display: none;">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body py-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted" id="contadorSeleccionados">0 órdenes seleccionadas</span>
+                    <div class="vr"></div>
+                    <button type="button" class="btn btn-sm btn-success" onclick="Orders.Batch.CambiarEstado('COMPLETE')">
+                        <i class="fas fa-check"></i> Completar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning" onclick="Orders.Batch.CambiarEstado('CANCELLED')">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="Orders.Batch.CambiarEstado('REFUNDED')">
+                        <i class="fas fa-undo"></i> Reembolsar
+                    </button>
+                    <div class="vr"></div>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="Orders.Batch.ExportarSeleccionadas()">
+                        <i class="fas fa-file-excel"></i> Exportar Seleccionadas
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="Orders.Batch.DeseleccionarTodas()">
+                        <i class="fas fa-times-circle"></i> Deseleccionar Todas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grid Syncfusion -->
+<ejs-grid id="ordersGrid" 
+          allowPaging="true"
+          allowFiltering="true"
+          allowSorting="true"
+          allowSelection="true"
+          allowGrouping="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          allowCsvExport="true"
+          allowResizing="true"
+          allowReordering="true"
+          is-responsive="true"
+          enable-responsive-row="true"
+          enableStickyHeader="true"
+          toolbarClick="ordersGridToolbarClick"
+          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport", "CsvExport", "Print", "ColumnChooser" })"
+          rowSelected="ordersGridRowSelected"
+          rowDeselected="ordersGridRowDeselected"
+          actionComplete="ordersGridActionComplete"
+          actionBegin="ordersGridActionBegin"
+          dataBound="ordersGridDataBound"
+          created="ordersGridCreated"
+          queryCellInfo="ordersGridQueryCellInfo"
+          rowDataBound="ordersGridRowDataBound"
+          aggregateCellInfo="ordersGridAggregateCellInfo">
+    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+    <e-grid-filtersettings type="Menu" showFilterBarStatus="true" immediateModeDelay="0"></e-grid-filtersettings>
+    <e-grid-selectionsettings type="Multiple" mode="Row" checkboxOnly="true"></e-grid-selectionsettings>
+    <e-grid-groupsettings showDropArea="true" showGroupedColumn="true"></e-grid-groupsettings>
+    <e-grid-editsettings allowEditing="true" allowAdding="false" allowDeleting="false" mode="Normal" showConfirmDialog="true"></e-grid-editsettings>
+    <e-grid-columns>
+        <e-grid-column field="IdOrden" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right" freeze="Left"></e-grid-column>
+        <e-grid-column field="EstadoOrden" headerText="Estado" width="120" template="#estadoTemplate" type="string" allowEditing="true" editType="dropdownedit" edit="@(new { @params = new Syncfusion.EJ2.DropDowns.DropDownList() { DataSource = new string[] { "COMPLETE", "CANCELLED", "REFUNDED", "PENDING" } } })"></e-grid-column>
+        <e-grid-column field="IdCliente" headerText="Cliente ID" width="100" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="IdTienda" headerText="Tienda ID" width="100" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="FechaOrden" headerText="Fecha" width="150" type="date" format="dd/MM/yyyy HH:mm"></e-grid-column>
+        <e-grid-column headerText="Acciones" width="150" template="#accionesTemplate" freeze="Right"></e-grid-column>
+    </e-grid-columns>
+    <e-grid-aggregates>
+        <e-grid-aggregate>
+            <e-aggregate-columns>
+                <e-aggregate-column field="IdOrden" type="Count" format="N0">
+                    <e-content-template>
+                        <span>Total Órdenes: <strong id="totalCount">0</strong></span>
+                    </e-content-template>
+                </e-aggregate-column>
+            </e-aggregate-columns>
+        </e-grid-aggregate>
+        <e-grid-aggregate>
+            <e-aggregate-columns>
+                <e-aggregate-column field="EstadoOrden" type="Count" format="N0">
+                    <e-content-template>
+                        <span>Órdenes en <strong id="groupKey">-</strong>: <strong id="groupCount">0</strong></span>
+                    </e-content-template>
+                </e-aggregate-column>
+            </e-aggregate-columns>
+        </e-grid-aggregate>
+    </e-grid-aggregates>
+</ejs-grid>
+
+<!-- Template para estado con badge -->
+<script id="estadoTemplate" type="text/x-template">
+    ${if(EstadoOrden && EstadoOrden !== 'undefined' && EstadoOrden !== 'null' && EstadoOrden === 'COMPLETE')}
+        <span class="badge bg-success">${EstadoOrden}</span>
+    ${else if(EstadoOrden && EstadoOrden !== 'undefined' && EstadoOrden !== 'null' && EstadoOrden === 'CANCELLED')}
+        <span class="badge bg-warning text-dark">${EstadoOrden}</span>
+    ${else if(EstadoOrden && EstadoOrden !== 'undefined' && EstadoOrden !== 'null' && EstadoOrden === 'REFUNDED')}
+        <span class="badge bg-danger">${EstadoOrden}</span>
+    ${else if(EstadoOrden && EstadoOrden !== 'undefined' && EstadoOrden !== 'null' && EstadoOrden === 'PENDING')}
+        <span class="badge bg-info text-dark">${EstadoOrden}</span>
+    ${else}
+        <span class="badge bg-secondary">PENDING</span>
+    ${/if}
+</script>
+
+<!-- Template para acciones -->
+<script id="accionesTemplate" type="text/x-template">
+    ${if(IdOrden && IdOrden > 0)}
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-info btn-ver-detalle" data-id-orden="${IdOrden}" title="Ver detalles">
+                <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+            </button>
+            <button class="btn btn-sm btn-primary btn-editar-orden" data-id-orden="${IdOrden}" title="Editar orden">
+                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+            </button>
+        </div>
+    ${else}
+        <div class="d-flex gap-1">
+            <span class="text-muted small">-</span>
+        </div>
+    ${/if}
+</script>
