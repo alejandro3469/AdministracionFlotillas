@@ -25,7 +25,7 @@
 
 .navbar-brand:hover {
     color: #0a58ca !important;
-    transform: translateY(-1px);
+    /* Sin transformación - solo cambio de color para feedback visual */
 }
 
 .navbar-brand::before {
@@ -42,7 +42,8 @@
 .nav-link {
     padding: 0.5rem 1rem !important;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
+    /* Transición solo para propiedades funcionales (background, color) */
+    transition: background-color 0.2s ease, color 0.2s ease;
     position: relative;
     display: flex;
     align-items: center;
@@ -52,7 +53,7 @@
 
 .nav-link:hover {
     background-color: rgba(13, 110, 253, 0.1);
-    transform: translateY(-1px);
+    /* Sin transformación - solo cambio de background para feedback visual */
 }
 
 .nav-link.active {
@@ -95,11 +96,13 @@
 .dropdown-item {
     padding: 0.625rem 1rem;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
+    /* Transición solo para propiedades funcionales */
+    transition: background-color 0.2s ease, color 0.2s ease, border-left 0.2s ease, padding-left 0.2s ease;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 0.25rem;
+    border-left: 3px solid transparent;
 }
 
 .dropdown-item:last-child {
@@ -108,7 +111,9 @@
 
 .dropdown-item:hover {
     background-color: rgba(13, 110, 253, 0.1);
-    transform: translateX(4px);
+    /* Sin transformación - solo cambio de background para feedback visual */
+    border-left: 3px solid #0d6efd;
+    padding-left: calc(1rem - 3px);
 }
 
 .dropdown-item.active {
@@ -168,7 +173,8 @@
 .breadcrumb-item a {
     color: #6c757d;
     text-decoration: none;
-    transition: all 0.2s ease;
+    /* Transición solo para propiedades funcionales */
+    transition: color 0.2s ease, background-color 0.2s ease, text-decoration 0.2s ease;
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
 }
@@ -176,7 +182,8 @@
 .breadcrumb-item a:hover {
     color: #0d6efd;
     background-color: rgba(13, 110, 253, 0.1);
-    transform: translateX(2px);
+    /* Sin transformación - solo cambio de color y background para feedback visual */
+    text-decoration: underline;
 }
 
 .breadcrumb-item.active {
@@ -230,14 +237,16 @@
 }
 
 .card-indicadores .btn-link {
-    transition: all 0.2s ease;
+    /* Transición solo para propiedades funcionales */
+    transition: background-color 0.2s ease, font-weight 0.2s ease;
     border-radius: 0.375rem;
     padding: 0.25rem 0.5rem;
 }
 
 .card-indicadores .btn-link:hover {
     background-color: rgba(13, 110, 253, 0.1);
-    transform: translateY(-2px);
+    /* Sin transformación - solo cambio de background para feedback visual */
+    font-weight: 600;
 }
 
 .card-indicadores .btn-link.active {
@@ -269,15 +278,16 @@ main {
     }
 }
 
-/* Hover effects en cards */
+/* Hover effects en cards - Mejorado basado en reglas de negocio */
 .card {
-    transition: all 0.3s ease;
     border: 1px solid #dee2e6;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    border-color: #0d6efd;
+    /* Sin transformación - solo cambios visuales para feedback */
 }
 
 /* ============================================================================
@@ -387,16 +397,20 @@ main {
     gap: 0.5rem;
     color: #6c757d;
     text-decoration: none;
-    transition: all 0.2s ease;
+    /* Transición solo para propiedades funcionales */
+    transition: color 0.2s ease, background-color 0.2s ease, border-left 0.2s ease, padding-left 0.2s ease;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
     margin-bottom: 1rem;
+    border-left: 3px solid transparent;
 }
 
 .btn-back:hover {
     color: #0d6efd;
     background-color: rgba(13, 110, 253, 0.1);
-    transform: translateX(-4px);
+    /* Sin transformación - solo cambio de color y background para feedback visual */
+    border-left: 3px solid #0d6efd;
+    padding-left: calc(1rem - 3px);
 }
 
 /* Indicador de página actual */
