@@ -142,29 +142,89 @@
     // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
     // Uso: window.mostrarModalVendedor() o window.ocultarModalVendedor()
     window.mostrarModalVendedor = function() {
-        var elemento = document.getElementById('modalVendedor');
-        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
-            elemento.ej2_instances[0].show();
-            return true;
-        }
-        console.warn('⚠️ Modal no disponible aún, intentando obtener instancia...');
+        // Intentar obtener la instancia de varias formas
         if (window.modalVendedorInstance) {
-            window.modalVendedorInstance.show();
-            return true;
+            try {
+                window.modalVendedorInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('⚠️ Error al mostrar modal usando instancia guardada:', e);
+            }
         }
+        
+        // Buscar en el DOM
+        var elemento = document.getElementById('modalVendedor');
+        if (elemento) {
+            // Buscar en ej2_instances
+            if (elemento.ej2_instances && elemento.ej2_instances[0]) {
+                try {
+                    elemento.ej2_instances[0].show();
+                    window.modalVendedorInstance = elemento.ej2_instances[0];
+                    return true;
+                } catch (e) {
+                    console.warn('⚠️ Error al mostrar modal desde ej2_instances:', e);
+                }
+            }
+            
+            // Buscar en el contenedor de diálogo de Syncfusion
+            var dialogContainer = elemento.closest('.e-dlg-container');
+            if (dialogContainer) {
+                var dialogElement = dialogContainer.querySelector('#modalVendedor');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    try {
+                        dialogElement.ej2_instances[0].show();
+                        window.modalVendedorInstance = dialogElement.ej2_instances[0];
+                        return true;
+                    } catch (e) {
+                        console.warn('⚠️ Error al mostrar modal desde contenedor:', e);
+                    }
+                }
+            }
+        }
+        
+        console.warn('⚠️ No se pudo encontrar la instancia del modal de vendedor');
         return false;
     };
     
     window.ocultarModalVendedor = function() {
-        var elemento = document.getElementById('modalVendedor');
-        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
-            elemento.ej2_instances[0].hide();
-            return true;
-        }
+        // Intentar obtener la instancia de varias formas
         if (window.modalVendedorInstance) {
-            window.modalVendedorInstance.hide();
-            return true;
+            try {
+                window.modalVendedorInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('⚠️ Error al ocultar modal usando instancia guardada:', e);
+            }
         }
+        
+        // Buscar en el DOM
+        var elemento = document.getElementById('modalVendedor');
+        if (elemento) {
+            // Buscar en ej2_instances
+            if (elemento.ej2_instances && elemento.ej2_instances[0]) {
+                try {
+                    elemento.ej2_instances[0].hide();
+                    return true;
+                } catch (e) {
+                    console.warn('⚠️ Error al ocultar modal desde ej2_instances:', e);
+                }
+            }
+            
+            // Buscar en el contenedor de diálogo de Syncfusion
+            var dialogContainer = elemento.closest('.e-dlg-container');
+            if (dialogContainer) {
+                var dialogElement = dialogContainer.querySelector('#modalVendedor');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    try {
+                        dialogElement.ej2_instances[0].hide();
+                        return true;
+                    } catch (e) {
+                        console.warn('⚠️ Error al ocultar modal desde contenedor:', e);
+                    }
+                }
+            }
+        }
+        
         return false;
     };
 
@@ -173,16 +233,33 @@
         console.log('✅ Modal de vendedor creado e inicializado por Syncfusion');
         if (args && args.component) {
             window.modalVendedorInstance = args.component;
-            console.log('✅ Instancia del Dialog guardada correctamente');
-        } else {
-            // Fallback: intentar obtener del DOM directamente
-            var dialogElement = document.getElementById('modalVendedor');
+            console.log('✅ Instancia del Dialog guardada correctamente:', window.modalVendedorInstance);
+        } else if (args && args.element) {
+            // Fallback: obtener del elemento
+            var dialogElement = args.element;
             if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
                 window.modalVendedorInstance = dialogElement.ej2_instances[0];
-                console.log('⚠️ Instancia obtenida del DOM (fallback en created)');
-            } else {
-                console.error('❌ No se pudo obtener la instancia del Dialog en el evento created');
+                console.log('⚠️ Instancia obtenida del elemento (fallback en created)');
             }
+        } else {
+            // Fallback: intentar obtener del DOM directamente
+            setTimeout(function() {
+                var dialogElement = document.getElementById('modalVendedor');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalVendedorInstance = dialogElement.ej2_instances[0];
+                    console.log('⚠️ Instancia obtenida del DOM después de created (fallback)');
+                } else {
+                    // Buscar en el contenedor de diálogo
+                    var dialogContainer = document.querySelector('.e-dlg-container');
+                    if (dialogContainer) {
+                        var dialogElement = dialogContainer.querySelector('#modalVendedor');
+                        if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                            window.modalVendedorInstance = dialogElement.ej2_instances[0];
+                            console.log('⚠️ Instancia obtenida del contenedor de diálogo (fallback)');
+                        }
+                    }
+                }
+            }, 100);
         }
         
         // Inicializar tooltip después de que el modal esté creado
