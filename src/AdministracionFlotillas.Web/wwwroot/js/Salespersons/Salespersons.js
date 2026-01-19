@@ -263,57 +263,195 @@ window.Salespersons = window.Salespersons || {};
         
         MostrarDatos: function(vendedor) {
             document.getElementById('modalVendedorTitulo').textContent = vendedor.IdVendedor;
-            document.getElementById('modalIdVendedor').textContent = vendedor.IdVendedor;
-            document.getElementById('modalNombreCompleto').textContent = vendedor.NombreCompleto || '-';
-            document.getElementById('modalEmail').textContent = vendedor.Email || '-';
-            document.getElementById('modalTelefono').textContent = vendedor.Telefono || '-';
-            document.getElementById('modalZonaCobertura').textContent = vendedor.ZonaCobertura || '-';
             
+            // ID Vendedor con tooltip
+            var idElement = document.getElementById('modalIdVendedor');
+            idElement.textContent = vendedor.IdVendedor;
+            idElement.setAttribute('data-tooltip', 'Identificador único del vendedor en el sistema. Usado para referencias internas y reportes.');
+            
+            // Nombre Completo
+            var nombreElement = document.getElementById('modalNombreCompleto');
+            nombreElement.textContent = vendedor.NombreCompleto || '-';
+            nombreElement.setAttribute('data-tooltip', 'Nombre completo del vendedor registrado en el sistema.');
+            
+            // Email
+            var emailElement = document.getElementById('modalEmail');
+            emailElement.textContent = vendedor.Email || '-';
+            emailElement.setAttribute('data-tooltip', 'Correo electrónico de contacto oficial del vendedor. Usado para comunicaciones y notificaciones.');
+            
+            // Teléfono
+            var telefonoElement = document.getElementById('modalTelefono');
+            telefonoElement.textContent = vendedor.Telefono || '-';
+            telefonoElement.setAttribute('data-tooltip', 'Número de teléfono de contacto directo del vendedor.');
+            
+            // Zona de Cobertura
+            var zonaElement = document.getElementById('modalZonaCobertura');
+            zonaElement.textContent = vendedor.ZonaCobertura || '-';
+            var zonaTooltip = 'Zona geográfica asignada al vendedor: ' + (vendedor.ZonaCobertura || 'No asignada') + '. Define el área de operación y clientes asignados.';
+            zonaElement.setAttribute('data-tooltip', zonaTooltip);
+            
+            // Estado con tooltip contextual
             var estadoHtml = '';
+            var estadoTooltip = '';
             if (vendedor.Estado === 'ACTIVE') {
-                estadoHtml = '<span class="badge bg-success info-tooltip-vendedor" data-field="Estado" data-tooltip="Vendedor activo y operativo">' + vendedor.Estado + '</span>';
+                estadoHtml = '<span class="badge bg-success info-tooltip-vendedor" data-field="Estado" data-tooltip="✅ Vendedor activo y operativo. Puede recibir órdenes, generar comisiones y está disponible para asignación de clientes.">' + vendedor.Estado + '</span>';
             } else if (vendedor.Estado === 'INACTIVE') {
-                estadoHtml = '<span class="badge bg-secondary info-tooltip-vendedor" data-field="Estado" data-tooltip="Vendedor inactivo">' + vendedor.Estado + '</span>';
+                estadoHtml = '<span class="badge bg-secondary info-tooltip-vendedor" data-field="Estado" data-tooltip="❌ Vendedor inactivo. No puede recibir órdenes nuevas ni generar comisiones. Contactar con recursos humanos para reactivación.">' + vendedor.Estado + '</span>';
             } else if (vendedor.Estado === 'ON_LEAVE') {
-                estadoHtml = '<span class="badge bg-warning text-dark info-tooltip-vendedor" data-field="Estado" data-tooltip="Vendedor en licencia">' + vendedor.Estado + '</span>';
+                estadoHtml = '<span class="badge bg-warning text-dark info-tooltip-vendedor" data-field="Estado" data-tooltip="⏸️ Vendedor en licencia. Temporalmente no disponible. Las órdenes existentes se mantienen, pero no se asignan nuevas.">' + vendedor.Estado + '</span>';
             } else {
-                estadoHtml = '<span class="badge bg-secondary info-tooltip-vendedor" data-field="Estado" data-tooltip="Estado desconocido">' + (vendedor.Estado || 'ACTIVE') + '</span>';
+                estadoHtml = '<span class="badge bg-secondary info-tooltip-vendedor" data-field="Estado" data-tooltip="Estado desconocido. Verificar con administración.">' + (vendedor.Estado || 'ACTIVE') + '</span>';
             }
             document.getElementById('modalEstadoVendedor').innerHTML = estadoHtml;
             
-            document.getElementById('modalComisionBase').textContent = (vendedor.ComisionBase || 0).toFixed(2) + '%';
-            document.getElementById('modalComisionVariable').textContent = (vendedor.ComisionVariable || 0).toFixed(2) + '%';
+            // Comisión Base con tooltip contextual
+            var comisionBase = parseFloat(vendedor.ComisionBase || 0);
+            var comisionBaseElement = document.getElementById('modalComisionBase');
+            comisionBaseElement.textContent = comisionBase.toFixed(2) + '%';
+            var comisionBaseTooltip = 'Comisión base fija: ' + comisionBase.toFixed(2) + '%. ';
+            if (comisionBase < 4.0) {
+                comisionBaseTooltip += '⚠️ Comisión baja - Considerar revisar estructura de comisiones para mejorar incentivos.';
+            } else if (comisionBase > 6.0) {
+                comisionBaseTooltip += '✅ Comisión alta - Vendedor con estructura de comisiones preferencial, generalmente por alto rendimiento.';
+            } else {
+                comisionBaseTooltip += 'Comisión estándar del mercado. Aplicada a todas las ventas del vendedor.';
+            }
+            comisionBaseElement.setAttribute('data-tooltip', comisionBaseTooltip);
             
+            // Comisión Variable con tooltip contextual
+            var comisionVar = parseFloat(vendedor.ComisionVariable || 0);
+            var comisionVarElement = document.getElementById('modalComisionVariable');
+            comisionVarElement.textContent = comisionVar.toFixed(2) + '%';
+            var comisionVarTooltip = 'Comisión variable adicional: ' + comisionVar.toFixed(2) + '%. ';
+            if (comisionVar < 2.0) {
+                comisionVarTooltip += '⚠️ Variable baja - Incentivo limitado por volumen. Considerar aumentar para motivar mayores ventas.';
+            } else if (comisionVar > 3.5) {
+                comisionVarTooltip += '✅ Variable alta - Fuerte incentivo por volumen de ventas. Diseñado para premiar alto rendimiento.';
+            } else {
+                comisionVarTooltip += 'Variable estándar. Se aplica sobre ventas que exceden metas establecidas.';
+            }
+            comisionVarElement.setAttribute('data-tooltip', comisionVarTooltip);
+            
+            // Fecha de Contratación
+            var fechaElement = document.getElementById('modalFechaContratacion');
             if (vendedor.FechaContratacion) {
                 try {
-                    // Manejar tanto objetos Date como strings ISO
                     var fecha = vendedor.FechaContratacion instanceof Date 
                         ? vendedor.FechaContratacion 
                         : new Date(vendedor.FechaContratacion);
                     if (!isNaN(fecha.getTime())) {
-                        document.getElementById('modalFechaContratacion').textContent = fecha.toLocaleDateString('es-MX', { 
+                        var fechaFormateada = fecha.toLocaleDateString('es-MX', { 
                             year: 'numeric', 
                             month: '2-digit', 
                             day: '2-digit' 
                         });
+                        fechaElement.textContent = fechaFormateada;
+                        var diasContratado = Math.floor((new Date() - fecha) / (1000 * 60 * 60 * 24));
+                        var fechaTooltip = 'Fecha de contratación: ' + fechaFormateada + '. ';
+                        if (diasContratado < 30) {
+                            fechaTooltip += '🆕 Vendedor nuevo (menos de 30 días). En período de capacitación.';
+                        } else if (diasContratado < 180) {
+                            fechaTooltip += '📅 Vendedor reciente (' + Math.floor(diasContratado / 30) + ' meses). En desarrollo.';
+                        } else if (diasContratado < 365) {
+                            fechaTooltip += '✅ Vendedor con experiencia (' + Math.floor(diasContratado / 30) + ' meses).';
+                        } else {
+                            fechaTooltip += '🏆 Vendedor senior (' + Math.floor(diasContratado / 365) + ' años). Alta experiencia.';
+                        }
+                        fechaElement.setAttribute('data-tooltip', fechaTooltip);
                     } else {
-                        document.getElementById('modalFechaContratacion').textContent = '-';
+                        fechaElement.textContent = '-';
+                        fechaElement.setAttribute('data-tooltip', 'Fecha de contratación no disponible.');
                     }
                 } catch (e) {
                     console.warn('Error al formatear fecha de contratación:', e);
-                    document.getElementById('modalFechaContratacion').textContent = '-';
+                    fechaElement.textContent = '-';
+                    fechaElement.setAttribute('data-tooltip', 'Error al procesar fecha de contratación.');
                 }
             } else {
-                document.getElementById('modalFechaContratacion').textContent = '-';
+                fechaElement.textContent = '-';
+                fechaElement.setAttribute('data-tooltip', 'Fecha de contratación no registrada.');
             }
             
-            document.getElementById('modalTotalOrdenes').textContent = (vendedor.TotalOrdenes || 0).toLocaleString('es-MX');
-            // Formatear con separadores de miles
+            // Total Órdenes con tooltip contextual
+            var totalOrdenes = vendedor.TotalOrdenes || 0;
+            var totalOrdenesElement = document.getElementById('modalTotalOrdenes');
+            totalOrdenesElement.textContent = totalOrdenes.toLocaleString('es-MX');
+            var totalOrdenesTooltip = 'Número total de órdenes gestionadas: ' + totalOrdenes.toLocaleString('es-MX') + '. ';
+            if (totalOrdenes === 0) {
+                totalOrdenesTooltip += '⚠️ Sin órdenes - Vendedor nuevo o sin actividad. Considerar capacitación o reasignación.';
+            } else if (totalOrdenes < 10) {
+                totalOrdenesTooltip += '⚠️ Órdenes bajas - Actividad limitada. Revisar estrategia de ventas.';
+            } else if (totalOrdenes < 50) {
+                totalOrdenesTooltip += '📊 Órdenes moderadas - Actividad estándar.';
+            } else if (totalOrdenes < 200) {
+                totalOrdenesTooltip += '✅ Órdenes altas - Buen nivel de actividad.';
+            } else {
+                totalOrdenesTooltip += '🏆 Órdenes excepcionales - Top performer con alta actividad.';
+            }
+            totalOrdenesElement.setAttribute('data-tooltip', totalOrdenesTooltip);
+            
+            // Total Ventas con tooltip contextual
             var totalVentas = parseFloat(vendedor.TotalVentas || 0);
-            document.getElementById('modalTotalVentas').textContent = '$' + totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var totalVentasElement = document.getElementById('modalTotalVentas');
+            totalVentasElement.textContent = '$' + totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var totalVentasTooltip = 'Monto total de ventas generadas: $' + totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '. ';
+            if (totalVentas === 0) {
+                totalVentasTooltip += '⚠️ Sin ventas - Vendedor nuevo o sin actividad registrada.';
+            } else if (totalVentas < 100000) {
+                totalVentasTooltip += '⚠️ Ventas bajas - Considerar capacitación, reasignación de zona o revisión de estrategia.';
+            } else if (totalVentas < 500000) {
+                totalVentasTooltip += '📊 Ventas moderadas - Rendimiento estándar del mercado.';
+            } else if (totalVentas < 2000000) {
+                totalVentasTooltip += '✅ Ventas altas - Buen rendimiento. Vendedor productivo.';
+            } else {
+                totalVentasTooltip += '🏆 Ventas excepcionales - Top performer. Considerar reconocimiento y mejores incentivos.';
+            }
+            totalVentasElement.setAttribute('data-tooltip', totalVentasTooltip);
+            
+            // Total Comisiones con tooltip contextual
             var totalComisiones = parseFloat(vendedor.TotalComisiones || 0);
-            document.getElementById('modalTotalComisiones').textContent = '$' + totalComisiones.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('modalCadenasAsignadas').textContent = (vendedor.CadenasAsignadas || 0).toLocaleString('es-MX');
+            var totalComisionesElement = document.getElementById('modalTotalComisiones');
+            totalComisionesElement.textContent = '$' + totalComisiones.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var totalComisionesTooltip = 'Monto total de comisiones ganadas: $' + totalComisiones.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '. ';
+            var porcentajeComision = totalVentas > 0 ? ((totalComisiones / totalVentas) * 100).toFixed(2) : 0;
+            totalComisionesTooltip += 'Representa el ' + porcentajeComision + '% del total de ventas. ';
+            if (totalComisiones === 0) {
+                totalComisionesTooltip += '⚠️ Sin comisiones - No hay ventas registradas.';
+            } else if (totalComisiones < 5000) {
+                totalComisionesTooltip += '⚠️ Comisiones bajas - Corresponden a ventas limitadas.';
+            } else if (totalComisiones < 50000) {
+                totalComisionesTooltip += '📊 Comisiones moderadas - Nivel estándar.';
+            } else if (totalComisiones < 200000) {
+                totalComisionesTooltip += '✅ Comisiones altas - Buen rendimiento.';
+            } else {
+                totalComisionesTooltip += '🏆 Comisiones excepcionales - Top performer.';
+            }
+            totalComisionesElement.setAttribute('data-tooltip', totalComisionesTooltip);
+            
+            // Cadenas Asignadas con tooltip contextual
+            var cadenasAsignadas = vendedor.CadenasAsignadas || 0;
+            var cadenasElement = document.getElementById('modalCadenasAsignadas');
+            cadenasElement.textContent = cadenasAsignadas.toLocaleString('es-MX');
+            var cadenasTooltip = 'Número de cadenas comerciales asignadas: ' + cadenasAsignadas.toLocaleString('es-MX') + '. ';
+            if (cadenasAsignadas === 0) {
+                cadenasTooltip += '⚠️ Sin cadenas asignadas - Vendedor sin clientes corporativos asignados. Considerar asignación de cadenas.';
+            } else if (cadenasAsignadas < 2) {
+                cadenasTooltip += '📊 Pocas cadenas - Oportunidad de crecimiento asignando más clientes corporativos.';
+            } else if (cadenasAsignadas < 5) {
+                cadenasTooltip += '✅ Cadenas estándar - Número adecuado de clientes corporativos.';
+            } else {
+                cadenasTooltip += '🏆 Muchas cadenas - Vendedor con alta responsabilidad y múltiples clientes corporativos.';
+            }
+            cadenasElement.setAttribute('data-tooltip', cadenasTooltip);
+            
+            // Asegurar que todos los elementos tengan la clase para tooltips
+            [idElement, nombreElement, emailElement, telefonoElement, zonaElement, 
+             comisionBaseElement, comisionVarElement, fechaElement, totalOrdenesElement, 
+             totalVentasElement, totalComisionesElement, cadenasElement].forEach(function(el) {
+                if (el && !el.classList.contains('info-tooltip-vendedor')) {
+                    el.classList.add('info-tooltip-vendedor');
+                }
+            });
         },
         
         AbrirDialog: function() {

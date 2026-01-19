@@ -42,7 +42,8 @@
           toolbarClick="salespersonsGridToolbarClick"
           toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
           dataBound="salespersonsGridDataBound"
-          created="salespersonsGridCreated">
+          created="salespersonsGridCreated"
+          queryCellInfo="salespersonsGridQueryCellInfo">
     <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
     <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
     <e-grid-columns>
@@ -177,6 +178,103 @@
         console.log('Grid de vendedores creado');
         if (window.Salespersons && window.Salespersons.Grid) {
             window.Salespersons.Grid.CargarDatos();
+        }
+    };
+    
+    // Tooltips contextuales en celdas del grid con mensajes catalogados
+    window.salespersonsGridQueryCellInfo = function(args) {
+        if (!args.data || !args.column || !args.cell) return;
+        
+        var field = args.column.field;
+        var data = args.data;
+        var tooltipText = '';
+        var icon = '';
+        
+        switch (field) {
+            case 'IdVendedor':
+                tooltipText = 'Identificador único del vendedor en el sistema';
+                break;
+                
+            case 'NombreCompleto':
+                tooltipText = 'Nombre completo del vendedor. Haga clic en "Ver" para más detalles.';
+                break;
+                
+            case 'Email':
+                tooltipText = 'Correo electrónico de contacto del vendedor';
+                break;
+                
+            case 'Telefono':
+                tooltipText = 'Número de teléfono de contacto del vendedor';
+                break;
+                
+            case 'ZonaCobertura':
+                tooltipText = 'Zona geográfica asignada al vendedor: ' + (data.ZonaCobertura || 'No asignada');
+                break;
+                
+            case 'ComisionBase':
+                var comisionBase = parseFloat(data.ComisionBase || 0);
+                tooltipText = 'Comisión base fija: ' + comisionBase.toFixed(2) + '%';
+                if (comisionBase < 4.0) {
+                    tooltipText += ' ⚠️ Comisión baja - Considerar revisar estructura de comisiones';
+                } else if (comisionBase > 6.0) {
+                    tooltipText += ' ✅ Comisión alta - Vendedor con estructura de comisiones preferencial';
+                } else {
+                    tooltipText += ' - Comisión estándar del mercado';
+                }
+                break;
+                
+            case 'ComisionVariable':
+                var comisionVar = parseFloat(data.ComisionVariable || 0);
+                tooltipText = 'Comisión variable adicional: ' + comisionVar.toFixed(2) + '%';
+                if (comisionVar < 2.0) {
+                    tooltipText += ' ⚠️ Variable baja - Incentivo limitado por volumen';
+                } else if (comisionVar > 3.5) {
+                    tooltipText += ' ✅ Variable alta - Fuerte incentivo por volumen de ventas';
+                } else {
+                    tooltipText += ' - Variable estándar';
+                }
+                break;
+                
+            case 'Estado':
+                var estado = data.Estado || 'ACTIVE';
+                switch (estado) {
+                    case 'ACTIVE':
+                        tooltipText = '✅ Vendedor activo y operativo - Puede recibir órdenes y generar comisiones';
+                        break;
+                    case 'INACTIVE':
+                        tooltipText = '❌ Vendedor inactivo - No puede recibir órdenes nuevas';
+                        break;
+                    case 'ON_LEAVE':
+                        tooltipText = '⏸️ Vendedor en licencia - Temporalmente no disponible';
+                        break;
+                    default:
+                        tooltipText = 'Estado: ' + estado;
+                }
+                break;
+                
+            case 'TotalVentas':
+                var totalVentas = parseFloat(data.TotalVentas || 0);
+                tooltipText = 'Total de ventas generadas: $' + totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (totalVentas === 0) {
+                    tooltipText += ' ⚠️ Sin ventas - Vendedor nuevo o sin actividad';
+                } else if (totalVentas < 100000) {
+                    tooltipText += ' ⚠️ Ventas bajas - Considerar capacitación o reasignación de zona';
+                } else if (totalVentas < 500000) {
+                    tooltipText += ' 📊 Ventas moderadas - Rendimiento estándar';
+                } else if (totalVentas < 2000000) {
+                    tooltipText += ' ✅ Ventas altas - Buen rendimiento';
+                } else {
+                    tooltipText += ' 🏆 Ventas excepcionales - Top performer';
+                }
+                break;
+                
+            default:
+                return;
+        }
+        
+        if (tooltipText) {
+            args.cell.setAttribute('title', tooltipText);
+            args.cell.style.cursor = 'help';
         }
     };
 </script>
