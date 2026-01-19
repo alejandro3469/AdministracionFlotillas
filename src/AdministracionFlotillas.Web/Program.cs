@@ -26,10 +26,22 @@ builder.Services.AddControllersWithViews()
 // Repositorios
 builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
+builder.Services.AddScoped<IChainsRepository, ChainsRepository>();
+builder.Services.AddScoped<ISalespersonsRepository, SalespersonsRepository>();
+builder.Services.AddScoped<IRoutesRepository, RoutesRepository>();
+builder.Services.AddScoped<IAddendumsRepository, AddendumsRepository>();
+builder.Services.AddScoped<IOrderChannelsRepository, OrderChannelsRepository>();
+builder.Services.AddScoped<IInvoicingRepository, InvoicingRepository>();
 
 // Servicios (por ahora usamos directamente Oracle, luego se puede usar Factory)
 builder.Services.AddScoped<IEmployeesService, EmployeesServiceOracle>();
 builder.Services.AddScoped<IOrdersService, OrdersServiceOracle>();
+builder.Services.AddScoped<IChainsService, ChainsService>();
+builder.Services.AddScoped<ISalespersonsService, SalespersonsService>();
+builder.Services.AddScoped<IRoutesService, RoutesService>();
+builder.Services.AddScoped<IAddendumsService, AddendumsService>();
+builder.Services.AddScoped<IOrderChannelsService, OrderChannelsService>();
+builder.Services.AddScoped<IInvoicingService, InvoicingService>();
 
 var app = builder.Build();
 

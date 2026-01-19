@@ -176,27 +176,35 @@ window.Products = window.Products || {};
             }
             
             // El Grid maneja el loading automáticamente con Shimmer
-            $.ajax({
-                url: '/Products/ObtenerProducts',
-                method: 'POST',
-                contentType: 'application/json',
-                success: function(respuesta) {
-                    if (respuesta.exito && respuesta.datos) {
-                        grid.dataSource = respuesta.datos;
-                        grid.refresh();
-                        console.log('Productos cargados:', respuesta.datos.length);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ObtenerProducts', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                grid.dataSource = respuesta.datos;
+                                grid.refresh();
+                                console.log('Productos cargados:', respuesta.datos.length);
+                            } else {
+                                window.Products.Utilidades.MostrarError(
+                                    'Error al cargar datos',
+                                    respuesta.mensaje || 'No se pudieron cargar los productos.'
+                                );
+                            }
+                        } catch (e) {
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            console.error('Error al parsear respuesta:', e);
+                        }
                     } else {
-                        window.Products.Utilidades.MostrarError(
-                            'Error al cargar datos',
-                            respuesta.mensaje || 'No se pudieron cargar los productos.'
-                        );
+                        window.Products.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
+                        console.error('Error al cargar productos:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function(xhr, status, error) {
-                    window.Products.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
-                    console.error('Error al cargar productos:', error);
                 }
-            });
+            };
+            xhr.send();
         },
         
         Recargar: function() {
@@ -229,23 +237,31 @@ window.Products = window.Products || {};
             };
             
             // El Grid maneja el loading automáticamente con Shimmer
-            $.ajax({
-                url: '/Products/BuscarProducts',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(filtros),
-                success: function(respuesta) {
-                    if (respuesta.exito) {
-                        grid.dataSource = respuesta.datos;
-                        grid.refresh();
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/BuscarProducts', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                grid.dataSource = respuesta.datos;
+                                grid.refresh();
+                            } else {
+                                window.Products.Utilidades.MostrarError('Error al aplicar filtros', respuesta.mensaje || 'No se pudieron aplicar los filtros.');
+                            }
+                        } catch (e) {
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            console.error('Error al parsear respuesta:', e);
+                        }
                     } else {
-                        window.Products.Utilidades.MostrarError('Error al aplicar filtros', respuesta.mensaje || 'No se pudieron aplicar los filtros.');
+                        window.Products.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
+                        console.error('Error al aplicar filtros:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function() {
-                    window.Products.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
                 }
-            });
+            };
+            xhr.send(JSON.stringify(filtros));
         },
         
         Limpiar: function() {
@@ -302,29 +318,44 @@ window.Products = window.Products || {};
     // Sub-namespace para Dashboard
     window.Products.Dashboard = {
         ActualizarMetricas: function() {
-            $.ajax({
-                url: '/Products/ObtenerMetricas',
-                method: 'POST',
-                success: function(respuesta) {
-                    if (respuesta.exito && respuesta.datos) {
-                        var datos = respuesta.datos;
-                        var total = datos.totalProductos || 0;
-                        $('#totalProductos').text(total);
-                        $('#productosActivos').text(datos.productosActivos || 0);
-                        $('#stockBajo').text(datos.stockBajo || 0);
-                        $('#valorInventario').text('$' + parseFloat(datos.valorInventario || 0).toFixed(2));
-                        
-                        // Actualizar contador en breadcrumb si existe
-                        var breadcrumbContador = document.querySelector('[id^="breadcrumb-contador-"]');
-                        if (breadcrumbContador) {
-                            breadcrumbContador.textContent = total.toString();
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ObtenerMetricas', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                var datos = respuesta.datos;
+                                var total = datos.totalProductos || 0;
+                                
+                                // Helper function para obtener elemento y establecer texto
+                                function setText(id, text) {
+                                    var el = document.getElementById(id);
+                                    if (el) el.textContent = text;
+                                }
+                                
+                                setText('totalProductos', total);
+                                setText('productosActivos', datos.productosActivos || 0);
+                                setText('stockBajo', datos.stockBajo || 0);
+                                setText('valorInventario', '$' + parseFloat(datos.valorInventario || 0).toFixed(2));
+                                
+                                // Actualizar contador en breadcrumb si existe
+                                var breadcrumbContador = document.querySelector('[id^="breadcrumb-contador-"]');
+                                if (breadcrumbContador) {
+                                    breadcrumbContador.textContent = total.toString();
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear métricas:', e);
                         }
+                    } else {
+                        console.error('Error al actualizar métricas de productos:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function() {
-                    console.error('Error al actualizar métricas de productos');
                 }
-            });
+            };
+            xhr.send();
         }
     };
     
@@ -345,31 +376,52 @@ window.Products = window.Products || {};
         },
         
         CargarDatosProducto: function(idProducto) {
-            $.ajax({
-                url: '/Products/ObtenerProductPorId',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(idProducto),
-                success: function(respuesta) {
-                    if (respuesta.exito && respuesta.datos) {
-                        window.Products.Modal.MostrarDatos(respuesta.datos);
-                        window.Products.Modal.AbrirDialog();
+            var self = this;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ObtenerProductPorId', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                self.MostrarDatos(respuesta.datos);
+                                self.AbrirDialog();
+                            } else {
+                                window.Products.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el producto.');
+                            }
+                        } catch (e) {
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            console.error('Error al parsear respuesta:', e);
+                        }
                     } else {
-                        window.Products.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el producto.');
+                        window.Products.Utilidades.MostrarError('Error de Conexión', 'Error al cargar el producto.');
+                        console.error('Error al cargar producto:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function(xhr, status, error) {
-                    window.Products.Utilidades.MostrarError('Error de Conexión', 'Error al cargar el producto.');
-                    console.error('Error al cargar producto:', error);
                 }
-            });
+            };
+            xhr.send(JSON.stringify(idProducto));
         },
         
         MostrarDatos: function(producto) {
-            $('#modalProductoTitulo').text(producto.IdProducto);
-            $('#modalIdProducto').text(producto.IdProducto);
-            $('#modalNombreProducto').text(producto.NombreProducto || '-');
-            $('#modalCategoria').text(producto.Categoria || '-');
+            // Helper functions para obtener elementos y establecer valores
+            function getElement(id) {
+                return document.getElementById(id);
+            }
+            function setText(id, text) {
+                var el = getElement(id);
+                if (el) el.textContent = text;
+            }
+            function setHtml(id, html) {
+                var el = getElement(id);
+                if (el) el.innerHTML = html;
+            }
+            
+            setText('modalProductoTitulo', producto.IdProducto);
+            setText('modalIdProducto', producto.IdProducto);
+            setText('modalNombreProducto', producto.NombreProducto || '-');
+            setText('modalCategoria', producto.Categoria || '-');
             
             // Estado con badge y tooltip
             var estadoHtml = '';
@@ -378,12 +430,12 @@ window.Products = window.Products || {};
             } else {
                 estadoHtml = '<span class="badge bg-secondary info-tooltip-producto" data-field="Estado" data-tooltip="Producto inactivo, no disponible para venta">' + (producto.Estado || 'INACTIVE') + '</span>';
             }
-            $('#modalEstadoProducto').html(estadoHtml);
+            setHtml('modalEstadoProducto', estadoHtml);
             
-            $('#modalCodigoBarras').text(producto.CodigoBarras || '-');
-            $('#modalPrecioUnitario').text('$' + (producto.PrecioUnitario || 0).toFixed(2));
-            $('#modalPrecioCosto').text('$' + (producto.PrecioCosto || 0).toFixed(2));
-            $('#modalMargenGanancia').text('$' + (producto.MargenGanancia || 0).toFixed(2));
+            setText('modalCodigoBarras', producto.CodigoBarras || '-');
+            setText('modalPrecioUnitario', '$' + (producto.PrecioUnitario || 0).toFixed(2));
+            setText('modalPrecioCosto', '$' + (producto.PrecioCosto || 0).toFixed(2));
+            setText('modalMargenGanancia', '$' + (producto.MargenGanancia || 0).toFixed(2));
             
             // Stock con indicador visual
             var stock = producto.CantidadStock || 0;
@@ -395,24 +447,75 @@ window.Products = window.Products || {};
             } else {
                 stockHtml = '<span class="text-success">' + stock + '</span>';
             }
-            $('#modalCantidadStock').html(stockHtml);
+            setHtml('modalCantidadStock', stockHtml);
             
-            $('#modalDescripcion').text(producto.Descripcion || '-');
+            setText('modalDescripcion', producto.Descripcion || '-');
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalProducto');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50; // 5 segundos
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                // Prioridad 1: Instancia guardada en window.modalProductoInstance
+                if (typeof window.modalProductoInstance !== 'undefined' && window.modalProductoInstance !== null) {
+                    return window.modalProductoInstance;
+                }
                 
-                // Reinicializar tooltip después de abrir el modal
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalProducto');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalProductoObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
+                // Prioridad 2: Instancia del DOM
+                var dialogElement = document.getElementById('modalProducto');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal abierto correctamente después de ' + intentos + ' intentos');
+                        
+                        // Guardar instancia para uso futuro
+                        window.modalProductoInstance = dialogInstance;
+                        
+                        // Reinicializar tooltip después de abrir el modal
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalProducto');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                if (typeof tooltipModalProductoObj !== 'undefined') {
+                                    tooltipModalProductoObj = tooltipElement.ej2_instances[0];
+                                }
+                            }
+                        }, 100);
+                        return; // Éxito, salir
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal:', error);
+                        window.Products.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return; // Error, salir
+                    }
+                }
+                
+                // Si no hay instancia disponible, seguir intentando
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal no inicializado después de ' + maxIntentos + ' intentos');
+                    window.Products.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            // Iniciar intentos después de un pequeño delay
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idProducto) {

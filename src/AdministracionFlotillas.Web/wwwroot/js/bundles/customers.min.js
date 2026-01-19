@@ -164,27 +164,35 @@ window.Customers = window.Customers || {};
             }
             
             // El Grid maneja el loading automáticamente con Shimmer
-            $.ajax({
-                url: '/Customers/ObtenerCustomers',
-                method: 'POST',
-                contentType: 'application/json',
-                success: function(respuesta) {
-                    if (respuesta.exito && respuesta.datos) {
-                        grid.dataSource = respuesta.datos;
-                        grid.refresh();
-                        console.log('Clientes cargados:', respuesta.datos.length);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ObtenerCustomers', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                grid.dataSource = respuesta.datos;
+                                grid.refresh();
+                                console.log('Clientes cargados:', respuesta.datos.length);
+                            } else {
+                                window.Customers.Utilidades.MostrarError(
+                                    'Error al cargar datos',
+                                    respuesta.mensaje || 'No se pudieron cargar los clientes.'
+                                );
+                            }
+                        } catch (e) {
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            console.error('Error al parsear respuesta:', e);
+                        }
                     } else {
-                        window.Customers.Utilidades.MostrarError(
-                            'Error al cargar datos',
-                            respuesta.mensaje || 'No se pudieron cargar los clientes.'
-                        );
+                        window.Customers.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
+                        console.error('Error al cargar clientes:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function(xhr, status, error) {
-                    window.Customers.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
-                    console.error('Error al cargar clientes:', error);
                 }
-            });
+            };
+            xhr.send();
         },
         
         Recargar: function() {
@@ -207,23 +215,31 @@ window.Customers = window.Customers || {};
             };
             
             // El Grid maneja el loading automáticamente con Shimmer
-            $.ajax({
-                url: '/Customers/BuscarCustomers',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(filtros),
-                success: function(respuesta) {
-                    if (respuesta.exito) {
-                        grid.dataSource = respuesta.datos;
-                        grid.refresh();
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/BuscarCustomers', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                grid.dataSource = respuesta.datos;
+                                grid.refresh();
+                            } else {
+                                window.Customers.Utilidades.MostrarError('Error al aplicar filtros', respuesta.mensaje || 'No se pudieron aplicar los filtros.');
+                            }
+                        } catch (e) {
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            console.error('Error al parsear respuesta:', e);
+                        }
                     } else {
-                        window.Customers.Utilidades.MostrarError('Error al aplicar filtros', respuesta.mensaje || 'No se pudieron aplicar los filtros.');
+                        window.Customers.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
+                        console.error('Error al aplicar filtros:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function() {
-                    window.Customers.Utilidades.MostrarError('Error de Conexión', 'Error al conectar con el servidor.');
                 }
-            });
+            };
+            xhr.send(JSON.stringify(filtros));
         },
         
         Limpiar: function() {
@@ -259,29 +275,44 @@ window.Customers = window.Customers || {};
     // Sub-namespace para Dashboard
     window.Customers.Dashboard = {
         ActualizarMetricas: function() {
-            $.ajax({
-                url: '/Customers/ObtenerMetricas',
-                method: 'POST',
-                success: function(respuesta) {
-                    if (respuesta.exito && respuesta.datos) {
-                        var datos = respuesta.datos;
-                        var total = datos.totalClientes || 0;
-                        $('#totalClientes').text(total);
-                        $('#clientesActivos').text(datos.clientesActivos || 0);
-                        $('#clientesInactivos').text(datos.clientesInactivos || 0);
-                        $('#clientesNuevos').text(datos.clientesNuevos || 0);
-                        
-                        // Actualizar contador en breadcrumb si existe
-                        var breadcrumbContador = document.querySelector('[id^="breadcrumb-contador-"]');
-                        if (breadcrumbContador) {
-                            breadcrumbContador.textContent = total.toString();
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ObtenerMetricas', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                var datos = respuesta.datos;
+                                var total = datos.totalClientes || 0;
+                                
+                                // Helper function para obtener elemento y establecer texto
+                                function setText(id, text) {
+                                    var el = document.getElementById(id);
+                                    if (el) el.textContent = text;
+                                }
+                                
+                                setText('totalClientes', total);
+                                setText('clientesActivos', datos.clientesActivos || 0);
+                                setText('clientesInactivos', datos.clientesInactivos || 0);
+                                setText('clientesNuevos', datos.clientesNuevos || 0);
+                                
+                                // Actualizar contador en breadcrumb si existe
+                                var breadcrumbContador = document.querySelector('[id^="breadcrumb-contador-"]');
+                                if (breadcrumbContador) {
+                                    breadcrumbContador.textContent = total.toString();
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear métricas:', e);
                         }
+                    } else {
+                        console.error('Error al actualizar métricas de clientes:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function() {
-                    console.error('Error al actualizar métricas de clientes');
                 }
-            });
+            };
+            xhr.send();
         }
     };
     
@@ -302,32 +333,53 @@ window.Customers = window.Customers || {};
         },
         
         CargarDatosCliente: function(idCliente) {
-            $.ajax({
-                url: '/Customers/ObtenerCustomerPorId',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(idCliente),
-                success: function(respuesta) {
-                    if (respuesta.exito && respuesta.datos) {
-                        window.Customers.Modal.MostrarDatos(respuesta.datos);
-                        window.Customers.Modal.AbrirDialog();
+            var self = this;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ObtenerCustomerPorId', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                self.MostrarDatos(respuesta.datos);
+                                self.AbrirDialog();
+                            } else {
+                                window.Customers.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el cliente.');
+                            }
+                        } catch (e) {
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            console.error('Error al parsear respuesta:', e);
+                        }
                     } else {
-                        window.Customers.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el cliente.');
+                        window.Customers.Utilidades.MostrarError('Error de Conexión', 'Error al cargar el cliente.');
+                        console.error('Error al cargar cliente:', xhr.status, xhr.statusText);
                     }
-                },
-                error: function(xhr, status, error) {
-                    window.Customers.Utilidades.MostrarError('Error de Conexión', 'Error al cargar el cliente.');
-                    console.error('Error al cargar cliente:', error);
                 }
-            });
+            };
+            xhr.send(JSON.stringify(idCliente));
         },
         
         MostrarDatos: function(cliente) {
-            $('#modalClienteTitulo').text(cliente.IdCliente);
-            $('#modalIdCliente').text(cliente.IdCliente);
-            $('#modalNombreCliente').text(cliente.NombreCliente || '-');
-            $('#modalEmailCliente').text(cliente.Email || '-');
-            $('#modalTelefonoCliente').text(cliente.Telefono || '-');
+            // Helper functions para obtener elementos y establecer valores
+            function getElement(id) {
+                return document.getElementById(id);
+            }
+            function setText(id, text) {
+                var el = getElement(id);
+                if (el) el.textContent = text;
+            }
+            function setHtml(id, html) {
+                var el = getElement(id);
+                if (el) el.innerHTML = html;
+            }
+            
+            setText('modalClienteTitulo', cliente.IdCliente);
+            setText('modalIdCliente', cliente.IdCliente);
+            setText('modalNombreCliente', cliente.NombreCliente || '-');
+            setText('modalEmailCliente', cliente.Email || '-');
+            setText('modalTelefonoCliente', cliente.Telefono || '-');
             
             // Estado con badge y tooltip
             var estadoHtml = '';
@@ -336,40 +388,91 @@ window.Customers = window.Customers || {};
             } else {
                 estadoHtml = '<span class="badge bg-secondary info-tooltip-cliente" data-field="EstadoCliente" data-tooltip="Cliente inactivo, bloqueado o suspendido">' + (cliente.EstadoCliente || 'INACTIVE') + '</span>';
             }
-            $('#modalEstadoCliente').html(estadoHtml);
+            setHtml('modalEstadoCliente', estadoHtml);
             
             // Dirección
-            $('#modalDireccionCliente').text(cliente.Direccion || '-');
-            $('#modalCiudadCliente').text(cliente.Ciudad || '-');
-            $('#modalEstadoDireccionCliente').text(cliente.Estado || '-');
-            $('#modalCodigoPostalCliente').text(cliente.CodigoPostal || '-');
-            $('#modalPaisCliente').text(cliente.Pais || '-');
+            setText('modalDireccionCliente', cliente.Direccion || '-');
+            setText('modalCiudadCliente', cliente.Ciudad || '-');
+            setText('modalEstadoDireccionCliente', cliente.Estado || '-');
+            setText('modalCodigoPostalCliente', cliente.CodigoPostal || '-');
+            setText('modalPaisCliente', cliente.Pais || '-');
             
             // Información comercial
-            $('#modalLimiteCredito').text('$' + (cliente.LimiteCredito || 0).toFixed(2));
-            $('#modalTotalOrdenes').text(cliente.TotalOrdenes || 0);
-            $('#modalTotalCompras').text('$' + (cliente.TotalCompras || 0).toFixed(2));
+            setText('modalLimiteCredito', '$' + (cliente.LimiteCredito || 0).toFixed(2));
+            setText('modalTotalOrdenes', cliente.TotalOrdenes || 0);
+            setText('modalTotalCompras', '$' + (cliente.TotalCompras || 0).toFixed(2));
             
             if (cliente.FechaRegistro) {
-                $('#modalFechaRegistro').text(new Date(cliente.FechaRegistro).toLocaleDateString('es-MX'));
+                setText('modalFechaRegistro', new Date(cliente.FechaRegistro).toLocaleDateString('es-MX'));
             } else {
-                $('#modalFechaRegistro').text('-');
+                setText('modalFechaRegistro', '-');
             }
         },
         
         AbrirDialog: function() {
-            var dialogElement = document.getElementById('modalCliente');
-            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                dialogElement.ej2_instances[0].show();
+            var self = this;
+            var intentos = 0;
+            var maxIntentos = 50; // 5 segundos
+            var intervaloEspera = 100;
+            
+            function obtenerInstancia() {
+                // Prioridad 1: Instancia guardada en window.modalClienteInstance
+                if (typeof window.modalClienteInstance !== 'undefined' && window.modalClienteInstance !== null) {
+                    return window.modalClienteInstance;
+                }
                 
-                // Reinicializar tooltip después de abrir el modal
-                setTimeout(function() {
-                    var tooltipElement = document.getElementById('tooltipModalCliente');
-                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
-                        tooltipModalClienteObj = tooltipElement.ej2_instances[0];
-                    }
-                }, 100);
+                // Prioridad 2: Instancia del DOM
+                var dialogElement = document.getElementById('modalCliente');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    return dialogElement.ej2_instances[0];
+                }
+                
+                return null;
             }
+            
+            function intentarAbrir() {
+                intentos++;
+                var dialogInstance = obtenerInstancia();
+                
+                if (dialogInstance) {
+                    try {
+                        dialogInstance.show();
+                        console.log('✅ Modal abierto correctamente después de ' + intentos + ' intentos');
+                        
+                        // Guardar instancia para uso futuro
+                        window.modalClienteInstance = dialogInstance;
+                        
+                        // Reinicializar tooltip después de abrir el modal
+                        setTimeout(function() {
+                            var tooltipElement = document.getElementById('tooltipModalCliente');
+                            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                                if (typeof tooltipModalClienteObj !== 'undefined') {
+                                    tooltipModalClienteObj = tooltipElement.ej2_instances[0];
+                                }
+                            }
+                        }, 100);
+                        return; // Éxito, salir
+                    } catch (error) {
+                        console.error('❌ Error al abrir modal:', error);
+                        window.Customers.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        return; // Error, salir
+                    }
+                }
+                
+                // Si no hay instancia disponible, seguir intentando
+                if (intentos < maxIntentos) {
+                    if (intentos % 10 === 0) {
+                        console.log('⏳ Esperando inicialización del modal... Intento ' + intentos + '/' + maxIntentos);
+                    }
+                    setTimeout(intentarAbrir, intervaloEspera);
+                } else {
+                    console.error('❌ Modal no inicializado después de ' + maxIntentos + ' intentos');
+                    window.Customers.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                }
+            }
+            
+            // Iniciar intentos después de un pequeño delay
+            setTimeout(intentarAbrir, 50);
         },
         
         CambiarAModoEdicion: function(idCliente) {
