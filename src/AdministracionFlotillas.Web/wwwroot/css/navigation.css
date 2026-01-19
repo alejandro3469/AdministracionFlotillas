@@ -28,11 +28,12 @@
     /* Sin transformación - solo cambio de color para feedback visual */
 }
 
-.navbar-brand::before {
+/* Emoji del camión removido - ya no se muestra */
+/* .navbar-brand::before {
     content: "🚚";
     font-size: 1.5rem;
     margin-right: 0.25rem;
-}
+} */
 
 /* Navbar Items con mejor espaciado y hover */
 .navbar-nav {
