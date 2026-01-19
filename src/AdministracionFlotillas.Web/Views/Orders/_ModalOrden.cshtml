@@ -1,0 +1,378 @@
+@* Modal unificado Ver/Editar Orden usando Syncfusion Dialog *@
+<ejs-tooltip id="tooltipModalOrden" 
+             target=".info-tooltip-orden" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalOrdenBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentOrden"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+@* PROBLEMA IDENTIFICADO: El tag helper <ejs-dialog> NO renderiza un div en el HTML inicialmente *@
+@* Syncfusion crea el elemento dinámicamente cuando el Script Manager ejecuta appendTo() *@
+@* Si el elemento no existe, el Script Manager falla silenciosamente *@
+@* SOLUCIÓN: Crear el elemento explícitamente para que el Script Manager pueda hacer appendTo() *@
+<div id="modalOrden" style="display: none;"></div>
+
+<ejs-dialog id="modalOrden" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="90%" 
+            height="85%" 
+            visible="false"
+            header="Orden #<span id='modalOrdenTitulo'>0</span>"
+            created="modalOrdenCreated"
+            open="modalOrdenOpen"
+            close="modalOrdenClose"
+            beforeClose="modalOrdenBeforeClose">
+    <e-content-template>
+        <div id="modalOrdenContenido">
+            <!-- Tabs para organizar el contenido -->
+            <ejs-tab id="tabsModalOrden" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModal" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información de la Orden</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID de Orden:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdOrden" class="info-tooltip-orden" data-field="IdOrden" data-tooltip="Identificador único de la orden en el sistema">-</strong>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Fecha de Orden:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaOrden" class="info-tooltip-orden" data-field="FechaOrden" data-tooltip="Fecha y hora en que se registró la orden">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoOrden">
+                                                        <span class="info-tooltip-orden" data-field="EstadoOrden" data-tooltip="Estado actual de la orden: COMPLETE (completada), CANCELLED (cancelada), REFUNDED (reembolsada), PENDING (pendiente)">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">ID Cliente:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalIdCliente" class="info-tooltip-orden" data-field="IdCliente" data-tooltip="Identificador del cliente que realizó la orden">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Nombre Cliente:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreCliente" class="info-tooltip-orden" data-field="NombreCliente" data-tooltip="Nombre completo del cliente">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">ID Tienda:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalIdTienda" class="info-tooltip-orden" data-field="IdTienda" data-tooltip="Identificador de la tienda donde se procesó la orden">-</span>
+                                                    </dd>
+
+                                                    <dt class="col-sm-5">Nombre Tienda:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreTienda" class="info-tooltip-orden" data-field="NombreTienda" data-tooltip="Nombre de la tienda">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Totales</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table table-borderless">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-end"><strong>Subtotal:</strong></td>
+                                                            <td class="text-end">
+                                                                <span id="modalSubtotal" class="info-tooltip-orden" data-field="Subtotal" data-tooltip="Suma de todos los items antes de descuentos e impuestos">$0.00</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-end"><strong>Descuentos:</strong></td>
+                                                            <td class="text-end text-danger">
+                                                                <span id="modalDescuentos" class="info-tooltip-orden" data-field="Descuentos" data-tooltip="Total de descuentos aplicados a la orden">-$0.00</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-end"><strong>Impuestos:</strong></td>
+                                                            <td class="text-end">
+                                                                <span id="modalImpuestos" class="info-tooltip-orden" data-field="Impuestos" data-tooltip="Total de impuestos calculados sobre el subtotal">$0.00</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="border-top">
+                                                            <td class="text-end"><h4>Total:</h4></td>
+                                                            <td class="text-end">
+                                                                <h4 class="text-primary">
+                                                                    <span id="modalTotal" class="info-tooltip-orden" data-field="Total" data-tooltip="Monto total de la orden (Subtotal - Descuentos + Impuestos)">$0.00</span>
+                                                                </h4>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Items de Factura" })">
+                        <e-content-template>
+                            <div id="tabItemsModal" class="mt-3">
+                                <ejs-grid id="gridItemsModalOrden" 
+                                          allowPaging="true"
+                                          allowSorting="true"
+                                          allowExcelExport="true"
+                                          allowPdfExport="true"
+                                          toolbar="@(new List<string>() { "ExcelExport", "PdfExport" })"
+                                          toolbarClick="itemsModalOrdenToolbarClick"
+                                          queryCellInfo="gridItemsModalOrdenQueryCellInfo">
+                                    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+                                    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50 })"></e-grid-pagesettings>
+                                    <e-grid-columns>
+                                        <e-grid-column field="IdItem" headerText="ID" width="80" type="number" textAlign="Right"></e-grid-column>
+                                        <e-grid-column field="NombreProducto" headerText="Producto" width="200"></e-grid-column>
+                                        <e-grid-column field="Cantidad" headerText="Cantidad" width="100" type="number" textAlign="Right"></e-grid-column>
+                                        <e-grid-column field="PrecioUnitario" headerText="Precio Unit." width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+                                        <e-grid-column field="Descuento" headerText="Descuento" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+                                        <e-grid-column field="Subtotal" headerText="Subtotal" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+                                        <e-grid-column field="Impuesto" headerText="Impuesto" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+                                        <e-grid-column field="Total" headerText="Total" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+                                    </e-grid-columns>
+                                </ejs-grid>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Imprimir" isPrimary="false" cssClass="e-flat" click="modalOrdenImprimir"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalOrdenEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalOrdenCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    // Variables globales para el modal
+    var modalOrdenModo = 'ver'; // 'ver' o 'editar'
+    var modalOrdenId = null;
+    var tooltipModalOrdenObj = null;
+    // IMPORTANTE: Variable global para la instancia del Dialog - debe ser accesible desde Orders.js
+    window.modalOrdenInstance = null; // Instancia del Dialog de Syncfusion - se guarda en el evento 'created'
+    
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    // Uso: window.mostrarModalOrden() o window.ocultarModalOrden()
+    window.mostrarModalOrden = function() {
+        var elemento = document.getElementById('modalOrden');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        console.warn('⚠️ Modal no disponible aún, intentando obtener instancia...');
+        // Si no está disponible, intentar obtenerla
+        if (window.modalOrdenInstance) {
+            window.modalOrdenInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalOrden = function() {
+        var elemento = document.getElementById('modalOrden');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalOrdenInstance) {
+            window.modalOrdenInstance.hide();
+            return true;
+        }
+        return false;
+    };
+
+    // Evento created del Dialog - SOLUCIÓN DE RAÍZ según documentación oficial
+    // Este evento se ejecuta cuando Syncfusion inicializa el componente después de <ejs-scripts>
+    // Es el momento correcto para guardar la referencia a la instancia
+    window.modalOrdenCreated = function(args) {
+        console.log('✅ Modal de orden creado e inicializado por Syncfusion');
+        console.log('Args recibidos:', args);
+        // IMPORTANTE: args.component es la instancia del Dialog, no args directamente
+        if (args && args.component) {
+            window.modalOrdenInstance = args.component;
+            console.log('✅ Instancia del Dialog guardada correctamente');
+        } else {
+            // Fallback: intentar obtener del DOM directamente
+            var dialogElement = document.getElementById('modalOrden');
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                window.modalOrdenInstance = dialogElement.ej2_instances[0];
+                console.log('⚠️ Instancia obtenida del DOM (fallback en created)');
+            } else {
+                console.error('❌ No se pudo obtener la instancia del Dialog en el evento created');
+            }
+        }
+        
+        // Inicializar tooltip después de que el modal esté creado
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalOrden');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalOrdenObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+
+    // Inicializar tooltip cuando el DOM esté listo (fallback)
+    // También verificar si el modal ya está inicializado después de que Syncfusion procese los componentes
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalOrden');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalOrdenObj = tooltipElement.ej2_instances[0];
+        }
+        
+        // Verificar si el modal ya está inicializado después de que <ejs-scripts> procese los componentes
+        // Esperar más tiempo para que Syncfusion termine de procesar
+        setTimeout(function() {
+            if (!window.modalOrdenInstance) {
+                var dialogElement = document.getElementById('modalOrden');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalOrdenInstance = dialogElement.ej2_instances[0];
+                    console.log('✅ Instancia del modal obtenida del DOM después de DOMContentLoaded (fallback)');
+                } else {
+                    console.warn('⚠️ Modal aún no inicializado después de DOMContentLoaded + 1 segundo');
+                }
+            }
+        }, 1000); // Aumentado a 1 segundo para dar tiempo a Syncfusion
+    });
+
+    // Evento beforeRender del tooltip
+    window.tooltipModalOrdenBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            // Crear contenido del tooltip
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalOrdenObj) {
+                tooltipModalOrdenObj.content = contentDiv;
+            }
+        }
+    };
+
+    // Eventos del modal
+    window.modalOrdenOpen = function(args) {
+        console.log('Modal de orden abierto');
+    };
+
+    window.modalOrdenClose = function(args) {
+        console.log('Modal de orden cerrado');
+        modalOrdenId = null;
+        modalOrdenModo = 'ver';
+    };
+
+    window.modalOrdenBeforeClose = function(args) {
+        // Aquí se puede agregar validación antes de cerrar
+        return true;
+    };
+
+    // Botones del modal
+    window.modalOrdenImprimir = function() {
+        if (modalOrdenId) {
+            if (window.Orders && window.Orders.Facturacion) {
+                window.Orders.Facturacion.Imprimir(modalOrdenId);
+            }
+        }
+    };
+
+    window.modalOrdenEditar = function() {
+        if (modalOrdenId) {
+            modalOrdenModo = 'editar';
+            // Cambiar a modo edición
+            if (window.Orders && window.Orders.Modal) {
+                window.Orders.Modal.CambiarAModoEdicion(modalOrdenId);
+            }
+        }
+    };
+
+    window.modalOrdenCerrar = function() {
+        // Usar la función helper simple
+        if (typeof window.ocultarModalOrden === 'function') {
+            window.ocultarModalOrden();
+        } else {
+            // Fallback al método anterior
+            var dialogElement = document.getElementById('modalOrden');
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                dialogElement.ej2_instances[0].hide();
+            }
+        }
+    };
+
+    // Evento para exportar items del modal
+    window.itemsModalOrdenToolbarClick = function(args) {
+        var gridElement = document.getElementById('gridItemsModalOrden');
+        if (!gridElement || !gridElement.ej2_instances || !gridElement.ej2_instances[0]) {
+            console.warn('Grid de items no encontrado');
+            return;
+        }
+        
+        var grid = gridElement.ej2_instances[0];
+        var fileNamePrefix = 'ItemsFactura_Orden_' + modalOrdenId;
+        
+        if (args.item.text === 'Excel Export' || (args.item.id && args.item.id.includes('excelexport'))) {
+            grid.excelExport({
+                fileName: fileNamePrefix + '.xlsx'
+            });
+        } else if (args.item.text === 'Pdf Export' || (args.item.id && args.item.id.includes('pdfexport'))) {
+            grid.pdfExport({
+                fileName: fileNamePrefix + '.pdf'
+            });
+        }
+    };
+    
+    // Agregar tooltips a las celdas del grid de items
+    window.gridItemsModalOrdenQueryCellInfo = function(args) {
+        if (args.column && args.column.field) {
+            var tooltips = {
+                'IdItem': 'Identificador único del item en la factura',
+                'NombreProducto': 'Nombre del producto incluido en este item',
+                'Cantidad': 'Número de unidades del producto',
+                'PrecioUnitario': 'Precio por unidad del producto',
+                'Descuento': 'Descuento aplicado a este item',
+                'Subtotal': 'Cantidad × Precio Unitario - Descuento',
+                'Impuesto': 'Impuesto calculado sobre el subtotal',
+                'Total': 'Subtotal + Impuesto'
+            };
+            
+            var tooltipText = tooltips[args.column.field];
+            if (tooltipText && args.cell) {
+                args.cell.setAttribute('title', tooltipText);
+                args.cell.style.cursor = 'help';
+            }
+        }
+    };
+</script>
