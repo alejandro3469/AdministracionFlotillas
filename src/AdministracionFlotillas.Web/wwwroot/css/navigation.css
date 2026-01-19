@@ -210,7 +210,7 @@
     animation: fadeInBadge 0.2s ease;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInBadge {
     from {
         opacity: 0;
     }
