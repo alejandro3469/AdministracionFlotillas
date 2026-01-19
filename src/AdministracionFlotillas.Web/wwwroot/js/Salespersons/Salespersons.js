@@ -217,15 +217,15 @@ window.Salespersons = window.Salespersons || {};
     window.Salespersons.Modal = {
         Abrir: function(idVendedor, modo) {
             var id = parseInt(idVendedor, 10);
-            
+
             if (!id || isNaN(id) || id <= 0) {
                 window.Salespersons.Utilidades.MostrarError('Error', 'ID de vendedor no válido.');
                 return;
             }
-            
+
             modalVendedorId = id;
             modalVendedorModo = modo || 'ver';
-            
+
             this.CargarDatosVendedor(id);
         },
         
