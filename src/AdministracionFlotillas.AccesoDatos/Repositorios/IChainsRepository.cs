@@ -6,5 +6,5 @@ public interface IChainsRepository
 {
     Task<List<Chain>> ObtenerChainsAsync();
     Task<Chain?> ObtenerChainPorIdAsync(int idCadena);
-    Task<List<Chain>> BuscarChainsAsync(string? nombre, string? estado);
+    Task<List<Chain>> BuscarChainsAsync(string? nombre = null, string? estado = null, string? rfc = null);
 }
