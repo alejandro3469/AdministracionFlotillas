@@ -1,0 +1,123 @@
+@using AdministracionFlotillas.Web.ViewModels
+@{
+    ViewData["Title"] = "Órdenes";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb Navigation Mejorado -->
+    @if (ViewBag.Breadcrumb != null)
+    {
+        @await Html.PartialAsync("_BreadcrumbConIndicadores", ViewBag.Breadcrumb as BreadcrumbViewModel)
+    }
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="mb-0">Gestión de Órdenes</h2>
+            <p class="text-muted">Visualización y análisis de órdenes con componentes Syncfusion</p>
+        </div>
+    </div>
+
+    <!-- Indicadores Compactos con Filtros -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-shopping-cart text-primary"></i>
+                            <span class="text-muted small">Total:</span>
+                            <button type="button" class="btn btn-link text-primary p-0 border-0 text-decoration-none" onclick="Orders.Filtros.FiltrarPorEstado(null)" id="btnFiltroTotal">
+                                <strong id="totalOrders">0</strong>
+                            </button>
+                </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="text-muted small">Completadas:</span>
+                            <button type="button" class="btn btn-link text-success p-0 border-0 text-decoration-none" onclick="Orders.Filtros.FiltrarPorEstado('COMPLETE')" id="btnFiltroComplete">
+                                <strong id="completedOrders">0</strong>
+                            </button>
+            </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-times-circle text-warning"></i>
+                            <span class="text-muted small">Canceladas:</span>
+                            <button type="button" class="btn btn-link text-warning p-0 border-0 text-decoration-none" onclick="Orders.Filtros.FiltrarPorEstado('CANCELLED')" id="btnFiltroCancelled">
+                                <strong id="cancelledOrders">0</strong>
+                            </button>
+        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-undo text-danger"></i>
+                            <span class="text-muted small">Reembolsadas:</span>
+                            <button type="button" class="btn btn-link text-danger p-0 border-0 text-decoration-none" onclick="Orders.Filtros.FiltrarPorEstado('REFUNDED')" id="btnFiltroRefunded">
+                                <strong id="refundedOrders">0</strong>
+                            </button>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de Órdenes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                    <h5 class="card-title mb-0">Lista de Órdenes</h5>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="Orders.Grid.Recargar()">
+                        <i class="fas fa-sync-alt"></i> <span class="d-none d-sm-inline">Actualizar</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @await Html.PartialAsync("_OrdersGrid")
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Ver/Editar Orden -->
+    @await Html.PartialAsync("_ModalOrden")
+</div>
+
+@section Scripts {
+    <script src="~/js/Orders/Orders.js" asp-append-version="true"></script>
+    <script>
+        // Función helper para obtener clase de badge según estado
+        window.getEstadoBadgeClass = function(estado) {
+            if (estado === 'COMPLETE') {
+                return 'bg-success';
+            } else if (estado === 'CANCELLED') {
+                return 'bg-warning';
+            } else if (estado === 'REFUNDED') {
+                return 'bg-danger';
+            } else {
+                return 'bg-secondary';
+            }
+        };
+        
+        // Inicializar métricas al cargar la página
+        // Usar addEventListener en lugar de jQuery para evitar dependencia
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                inicializarMetricas();
+            });
+        } else {
+            inicializarMetricas();
+        }
+        
+        function inicializarMetricas() {
+            // Esperar a que el namespace esté disponible
+            if (window.Orders && window.Orders.Dashboard) {
+                window.Orders.Dashboard.ActualizarMetricas();
+            } else {
+                setTimeout(function() {
+                    if (window.Orders && window.Orders.Dashboard) {
+                        window.Orders.Dashboard.ActualizarMetricas();
+                    }
+                }, 500);
+            }
+        }
+    </script>
+}
