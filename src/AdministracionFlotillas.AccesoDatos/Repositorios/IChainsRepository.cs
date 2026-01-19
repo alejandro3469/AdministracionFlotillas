@@ -7,4 +7,9 @@ public interface IChainsRepository
     Task<List<Chain>> ObtenerChainsAsync();
     Task<Chain?> ObtenerChainPorIdAsync(int idCadena);
     Task<List<Chain>> BuscarChainsAsync(string? nombre = null, string? estado = null, string? rfc = null);
+    Task<int> CrearChainAsync(Chain cadena);
+    Task ActualizarChainAsync(Chain cadena);
+    Task EliminarChainAsync(int idCadena);
+    Task<int> ContarChainsActivasAsync();
+    Task<int> ContarChainsInactivasAsync();
 }

@@ -78,7 +78,7 @@ public class InvoicingController : Controller
     {
         try
         {
-            var invoices = await _servicio.BuscarInvoicesAsync(solicitud.IdOrden, solicitud.Estado, solicitud.FechaInicio, solicitud.FechaFin);
+            var invoices = await _servicio.BuscarInvoicesAsync(solicitud.IdOrden, solicitud.Folio, solicitud.Estado, solicitud.FechaInicio, solicitud.FechaFin);
             var modelosVista = InvoiceParseador.ConvertirListaAVista(invoices);
             return Json(new { exito = true, datos = modelosVista });
         }
@@ -117,6 +117,7 @@ public class InvoicingController : Controller
 public class SolicitudBuscarInvoices
 {
     public int? IdOrden { get; set; }
+    public string? Folio { get; set; }
     public string? Estado { get; set; }
     public DateTime? FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }

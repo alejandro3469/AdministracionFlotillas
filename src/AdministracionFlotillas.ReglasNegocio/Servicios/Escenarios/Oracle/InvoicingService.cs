@@ -30,13 +30,13 @@ public class InvoicingService : IInvoicingService
         return await _repositorio.ObtenerInvoicePorIdAsync(idFactura);
     }
     
-    public async Task<List<Invoice>> BuscarInvoicesAsync(int? idOrden, string? estado, DateTime? fechaInicio, DateTime? fechaFin)
+    public async Task<List<Invoice>> BuscarInvoicesAsync(int? idOrden = null, string? folio = null, string? estado = null, DateTime? fechaInicio = null, DateTime? fechaFin = null)
     {
         if (fechaInicio.HasValue && fechaFin.HasValue && fechaInicio > fechaFin)
         {
             throw new ArgumentException("La fecha de inicio no puede ser mayor que la fecha de fin");
         }
         
-        return await _repositorio.BuscarInvoicesAsync(idOrden, estado, fechaInicio, fechaFin);
+        return await _repositorio.BuscarInvoicesAsync(idOrden, folio, estado, fechaInicio, fechaFin);
     }
 }

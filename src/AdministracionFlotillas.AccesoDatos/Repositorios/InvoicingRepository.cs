@@ -549,13 +549,18 @@ public class InvoicingRepository : IInvoicingRepository
         return Task.FromResult(invoice);
     }
 
-    public Task<List<Invoice>> BuscarInvoicesAsync(int? idOrden, string? estado, DateTime? fechaInicio, DateTime? fechaFin)
+    public Task<List<Invoice>> BuscarInvoicesAsync(int? idOrden = null, string? folio = null, string? estado = null, DateTime? fechaInicio = null, DateTime? fechaFin = null)
     {
         var resultado = _invoicesMock.AsQueryable();
 
         if (idOrden.HasValue)
         {
             resultado = resultado.Where(i => i.OrderId == idOrden.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(folio))
+        {
+            resultado = resultado.Where(i => i.Folio != null && i.Folio.Contains(folio, StringComparison.OrdinalIgnoreCase));
         }
 
         if (!string.IsNullOrWhiteSpace(estado))
