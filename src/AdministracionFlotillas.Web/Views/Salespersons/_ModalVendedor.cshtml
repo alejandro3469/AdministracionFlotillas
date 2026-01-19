@@ -292,28 +292,34 @@
         }, 1000);
     });
 
-    // Evento beforeRender del tooltip
+    // Evento beforeRender del tooltip - Mejorado para mostrar información contextual
     window.tooltipModalVendedorBeforeRender = function(args) {
         var target = args.target;
         var tooltipText = target.getAttribute('data-tooltip');
-        var field = target.getAttribute('data-field');
+        var field = target.getAttribute('data-field') || target.id.replace('modal', '').replace(/([A-Z])/g, ' $1').trim();
         
         if (tooltipText) {
             var contentDiv = document.createElement('div');
-            contentDiv.style.padding = '8px';
+            contentDiv.style.padding = '10px';
             contentDiv.style.fontSize = '13px';
-            contentDiv.style.lineHeight = '1.5';
+            contentDiv.style.lineHeight = '1.6';
+            contentDiv.style.maxWidth = '350px';
             
-            var fieldName = document.createElement('strong');
-            fieldName.textContent = field + ': ';
-            fieldName.style.display = 'block';
-            fieldName.style.marginBottom = '4px';
-            fieldName.style.color = '#007bff';
+            // Nombre del campo
+            if (field) {
+                var fieldName = document.createElement('strong');
+                fieldName.textContent = field + ':';
+                fieldName.style.display = 'block';
+                fieldName.style.marginBottom = '6px';
+                fieldName.style.color = '#007bff';
+                fieldName.style.fontSize = '14px';
+                contentDiv.appendChild(fieldName);
+            }
             
-            var description = document.createElement('span');
-            description.textContent = tooltipText;
-            
-            contentDiv.appendChild(fieldName);
+            // Descripción con formato mejorado
+            var description = document.createElement('div');
+            description.innerHTML = tooltipText.replace(/\n/g, '<br>');
+            description.style.color = '#333';
             contentDiv.appendChild(description);
             
             if (tooltipModalVendedorObj) {
