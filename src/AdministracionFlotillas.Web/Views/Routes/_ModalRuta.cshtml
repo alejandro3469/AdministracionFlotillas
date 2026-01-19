@@ -116,6 +116,33 @@
     var tooltipModalRutaObj = null;
     window.modalRutaInstance = null;
     
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    window.mostrarModalRuta = function() {
+        var elemento = document.getElementById('modalRuta');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        if (window.modalRutaInstance) {
+            window.modalRutaInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalRuta = function() {
+        var elemento = document.getElementById('modalRuta');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalRutaInstance) {
+            window.modalRutaInstance.hide();
+            return true;
+        }
+        return false;
+    };
+    
     window.modalRutaCreated = function(args) {
         console.log('✅ Modal de ruta creado');
         if (args && args.component) {
@@ -191,10 +218,14 @@
     };
     
     window.modalRutaCerrar = function() {
-        if (window.modalRutaInstance) {
-            window.modalRutaInstance.hide();
+        if (typeof window.ocultarModalRuta === 'function') {
+            window.ocultarModalRuta();
         } else {
-            console.warn('No se pudo cerrar el modal de ruta');
+            if (window.modalRutaInstance) {
+                window.modalRutaInstance.hide();
+            } else {
+                console.warn('No se pudo cerrar el modal de ruta');
+            }
         }
     };
 </script>

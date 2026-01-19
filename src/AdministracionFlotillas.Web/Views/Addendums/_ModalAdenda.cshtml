@@ -128,6 +128,33 @@
     var tooltipModalAdendaObj = null;
     window.modalAdendaInstance = null;
     
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    window.mostrarModalAdenda = function() {
+        var elemento = document.getElementById('modalAdenda');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        if (window.modalAdendaInstance) {
+            window.modalAdendaInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalAdenda = function() {
+        var elemento = document.getElementById('modalAdenda');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalAdendaInstance) {
+            window.modalAdendaInstance.hide();
+            return true;
+        }
+        return false;
+    };
+    
     window.modalAdendaCreated = function(args) {
         console.log('✅ Modal de adenda creado');
         if (args && args.component) {
@@ -203,10 +230,14 @@
     };
     
     window.modalAdendaCerrar = function() {
-        if (window.modalAdendaInstance) {
-            window.modalAdendaInstance.hide();
+        if (typeof window.ocultarModalAdenda === 'function') {
+            window.ocultarModalAdenda();
         } else {
-            console.warn('No se pudo cerrar el modal de adenda');
+            if (window.modalAdendaInstance) {
+                window.modalAdendaInstance.hide();
+            } else {
+                console.warn('No se pudo cerrar el modal de adenda');
+            }
         }
     };
 </script>

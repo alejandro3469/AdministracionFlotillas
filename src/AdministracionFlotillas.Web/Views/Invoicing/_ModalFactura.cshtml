@@ -168,6 +168,33 @@
     var tooltipModalFacturaObj = null;
     window.modalFacturaInstance = null;
     
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    window.mostrarModalFactura = function() {
+        var elemento = document.getElementById('modalFactura');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        if (window.modalFacturaInstance) {
+            window.modalFacturaInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalFactura = function() {
+        var elemento = document.getElementById('modalFactura');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalFacturaInstance) {
+            window.modalFacturaInstance.hide();
+            return true;
+        }
+        return false;
+    };
+    
     window.modalFacturaCreated = function(args) {
         console.log('✅ Modal de factura creado');
         if (args && args.component) {
@@ -243,10 +270,14 @@
     };
     
     window.modalFacturaCerrar = function() {
-        if (window.modalFacturaInstance) {
-            window.modalFacturaInstance.hide();
+        if (typeof window.ocultarModalFactura === 'function') {
+            window.ocultarModalFactura();
         } else {
-            console.warn('No se pudo cerrar el modal de factura');
+            if (window.modalFacturaInstance) {
+                window.modalFacturaInstance.hide();
+            } else {
+                console.warn('No se pudo cerrar el modal de factura');
+            }
         }
     };
 </script>

@@ -120,6 +120,33 @@
     var tooltipModalCanalObj = null;
     window.modalCanalInstance = null;
     
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    window.mostrarModalCanal = function() {
+        var elemento = document.getElementById('modalCanal');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        if (window.modalCanalInstance) {
+            window.modalCanalInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalCanal = function() {
+        var elemento = document.getElementById('modalCanal');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalCanalInstance) {
+            window.modalCanalInstance.hide();
+            return true;
+        }
+        return false;
+    };
+    
     window.modalCanalCreated = function(args) {
         console.log('✅ Modal de canal creado');
         if (args && args.component) {
@@ -195,10 +222,14 @@
     };
     
     window.modalCanalCerrar = function() {
-        if (window.modalCanalInstance) {
-            window.modalCanalInstance.hide();
+        if (typeof window.ocultarModalCanal === 'function') {
+            window.ocultarModalCanal();
         } else {
-            console.warn('No se pudo cerrar el modal de canal');
+            if (window.modalCanalInstance) {
+                window.modalCanalInstance.hide();
+            } else {
+                console.warn('No se pudo cerrar el modal de canal');
+            }
         }
     };
 </script>

@@ -124,6 +124,33 @@
     var tooltipModalVendedorObj = null;
     window.modalVendedorInstance = null;
     
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    window.mostrarModalVendedor = function() {
+        var elemento = document.getElementById('modalVendedor');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        if (window.modalVendedorInstance) {
+            window.modalVendedorInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalVendedor = function() {
+        var elemento = document.getElementById('modalVendedor');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalVendedorInstance) {
+            window.modalVendedorInstance.hide();
+            return true;
+        }
+        return false;
+    };
+    
     window.modalVendedorCreated = function(args) {
         console.log('✅ Modal de vendedor creado');
         if (args && args.component) {
@@ -199,10 +226,14 @@
     };
     
     window.modalVendedorCerrar = function() {
-        if (window.modalVendedorInstance) {
-            window.modalVendedorInstance.hide();
+        if (typeof window.ocultarModalVendedor === 'function') {
+            window.ocultarModalVendedor();
         } else {
-            console.warn('No se pudo cerrar el modal de vendedor');
+            if (window.modalVendedorInstance) {
+                window.modalVendedorInstance.hide();
+            } else {
+                console.warn('No se pudo cerrar el modal de vendedor');
+            }
         }
     };
 </script>

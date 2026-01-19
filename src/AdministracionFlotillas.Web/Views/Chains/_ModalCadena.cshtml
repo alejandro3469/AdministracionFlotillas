@@ -154,6 +154,33 @@
     var tooltipModalCadenaObj = null;
     window.modalCadenaInstance = null;
     
+    // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
+    window.mostrarModalCadena = function() {
+        var elemento = document.getElementById('modalCadena');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].show();
+            return true;
+        }
+        if (window.modalCadenaInstance) {
+            window.modalCadenaInstance.show();
+            return true;
+        }
+        return false;
+    };
+    
+    window.ocultarModalCadena = function() {
+        var elemento = document.getElementById('modalCadena');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            elemento.ej2_instances[0].hide();
+            return true;
+        }
+        if (window.modalCadenaInstance) {
+            window.modalCadenaInstance.hide();
+            return true;
+        }
+        return false;
+    };
+    
     window.modalCadenaCreated = function(args) {
         console.log('✅ Modal de cadena creado e inicializado por Syncfusion');
         if (args && args.component) {
@@ -229,10 +256,14 @@
     };
     
     window.modalCadenaCerrar = function() {
-        if (window.modalCadenaInstance) {
-            window.modalCadenaInstance.hide();
+        if (typeof window.ocultarModalCadena === 'function') {
+            window.ocultarModalCadena();
         } else {
-            console.warn('No se pudo cerrar el modal de cadena: instancia no disponible.');
+            if (window.modalCadenaInstance) {
+                window.modalCadenaInstance.hide();
+            } else {
+                console.warn('No se pudo cerrar el modal de cadena: instancia no disponible.');
+            }
         }
     };
 </script>
