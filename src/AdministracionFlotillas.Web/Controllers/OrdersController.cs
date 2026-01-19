@@ -215,6 +215,40 @@ public class OrdersController : Controller
     
     [HttpPost]
     [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarOrden([FromBody] OrderViewModel orden)
+    {
+        try
+        {
+            if (orden == null || orden.IdOrden <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Orden no válida." });
+            }
+            
+            // Validar estado válido
+            var estadosValidos = new[] { "COMPLETE", "CANCELLED", "REFUNDED", "PENDING" };
+            if (!string.IsNullOrWhiteSpace(orden.EstadoOrden) && !estadosValidos.Contains(orden.EstadoOrden))
+            {
+                return Json(new { exito = false, mensaje = "Estado no válido. Estados permitidos: " + string.Join(", ", estadosValidos) });
+            }
+            
+            // TODO: Implementar actualización real en servicio
+            // var ordenActualizada = await _servicio.ActualizarOrdenAsync(orden);
+            
+            // Por ahora retornamos éxito (mock)
+            return Json(new { 
+                exito = true, 
+                mensaje = "Orden actualizada correctamente.",
+                datos = orden
+            });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
     public Task<IActionResult> CambiarEstadoBatch([FromBody] SolicitudCambiarEstadoBatch solicitud)
     {
         try

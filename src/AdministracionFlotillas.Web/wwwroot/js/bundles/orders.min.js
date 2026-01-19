@@ -1160,8 +1160,202 @@ window.Orders = window.Orders || {};
         },
         
         CambiarAModoEdicion: function(idOrden) {
-            // TODO: Implementar modo edición
-            window.Orders.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idOrden || idOrden <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'ID de orden no válido.');
+                return;
+            }
+            
+            modalOrdenId = idOrden;
+            modalOrdenModo = 'editar';
+            
+            // Cambiar modo del modal
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            // Cambiar campos de solo lectura a editables
+            this.ConvertirCamposAEditables();
+            
+            // Cambiar botones del modal
+            this.ActualizarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalOrdenTitulo');
+            if (titulo) {
+                titulo.textContent = modalOrdenId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            // Restaurar campos a solo lectura
+            this.ConvertirCamposASoloLectura();
+            
+            // Restaurar botones del modal
+            this.RestaurarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalOrdenTitulo');
+            if (titulo) {
+                titulo.textContent = modalOrdenId;
+            }
+            
+            modalOrdenModo = 'ver';
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoOrden');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoOrden" class="form-select form-select-sm">' +
+                    '<option value="PENDING"' + (estadoActual === 'PENDING' ? ' selected' : '') + '>PENDING</option>' +
+                    '<option value="COMPLETE"' + (estadoActual === 'COMPLETE' ? ' selected' : '') + '>COMPLETE</option>' +
+                    '<option value="CANCELLED"' + (estadoActual === 'CANCELLED' ? ' selected' : '') + '>CANCELLED</option>' +
+                    '<option value="REFUNDED"' + (estadoActual === 'REFUNDED' ? ' selected' : '') + '>REFUNDED</option>' +
+                    '</select>';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoOrden');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoOrden');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'COMPLETE') {
+                        estadoHtml = '<span class="badge bg-success">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'CANCELLED') {
+                        estadoHtml = '<span class="badge bg-warning text-dark">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'REFUNDED') {
+                        estadoHtml = '<span class="badge bg-danger">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-info text-dark">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            // Ocultar botones de modo ver
+            var btnImprimir = document.getElementById('btnModalImprimir');
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnImprimir) btnImprimir.classList.add('d-none');
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            // Mostrar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            // Ocultar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            // Mostrar botones de modo ver
+            var btnImprimir = document.getElementById('btnModalImprimir');
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnImprimir) btnImprimir.classList.remove('d-none');
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (!modalOrdenId || modalOrdenId <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'No hay orden seleccionada para guardar.');
+                return;
+            }
+            
+            // Obtener valores editados
+            var selectEstado = document.getElementById('editEstadoOrden');
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            
+            if (!nuevoEstado) {
+                window.Orders.Utilidades.MostrarError('Error', 'Debe seleccionar un estado válido.');
+                return;
+            }
+            
+            // Preparar datos para enviar
+            var datosActualizacion = {
+                IdOrden: modalOrdenId,
+                EstadoOrden: nuevoEstado
+                // Agregar más campos editables aquí cuando se implementen
+            };
+            
+            // Enviar al servidor
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Orders/ActualizarOrden', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Orders.Utilidades.MostrarExito(
+                                    'Orden actualizada',
+                                    'Los cambios se guardaron correctamente.'
+                                );
+                                
+                                // Desactivar modo edición
+                                if (window.Orders && window.Orders.Modal) {
+                                    window.Orders.Modal.DesactivarModoEdicion();
+                                    
+                                    // Recargar datos de la orden
+                                    window.Orders.Modal.CargarDatosOrden(modalOrdenId);
+                                    
+                                    // Recargar grid
+                                    if (window.Orders && window.Orders.Grid) {
+                                        window.Orders.Grid.Recargar();
+                                    }
+                                    
+                                    // Actualizar métricas
+                                    if (window.Orders && window.Orders.Dashboard) {
+                                        window.Orders.Dashboard.ActualizarMetricas();
+                                    }
+                                }
+                            } else {
+                                window.Orders.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                );
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Orders.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Orders.Utilidades.MostrarError('Error de Conexión', mensajeError);
+                        console.error('Error al guardar orden:', mensajeError);
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            // Recargar datos originales
+            if (modalOrdenId) {
+                this.CargarDatosOrden(modalOrdenId);
+            }
+            
+            // Desactivar modo edición
+            this.DesactivarModoEdicion();
         }
     };
     
