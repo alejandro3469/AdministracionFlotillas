@@ -2,9 +2,11 @@ using AdministracionFlotillas.AccesoDatos.Repositorios;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Interfaces;
 using AdministracionFlotillas.ReglasNegocio.Servicios.Escenarios.Oracle;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Syncfusion.Licensing;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,31 @@ builder.Services.AddControllersWithViews()
         // Mantener PascalCase para compatibilidad con JavaScript
         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
     }); // Para soporte de JSON en AJAX
+
+// Agregar caché en memoria para mejorar rendimiento
+builder.Services.AddMemoryCache();
+
+// Agregar compresión de respuestas (Gzip/Brotli) para mejorar rendimiento
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/javascript", "text/css", "application/json" }
+    );
+});
+
+// Configurar nivel de compresión
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Optimal;
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Optimal;
+});
 
 // Repositorios
 builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
@@ -58,7 +85,19 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Debe ir ANTES de UseRouting()
+
+// Habilitar compresión de respuestas (debe ir antes de UseStaticFiles)
+app.UseResponseCompression();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    // Cachear archivos estáticos por 7 días
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=604800");
+    }
+}); // Debe ir ANTES de UseRouting()
+
 app.UseRouting();
 
 app.UseAuthorization();

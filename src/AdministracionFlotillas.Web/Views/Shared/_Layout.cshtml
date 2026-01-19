@@ -6,6 +6,18 @@
     <title>@ViewData["Title"] - AdministracionFlotillas.Web</title>
     <script type="importmap"></script>
     
+    <!-- Preload de recursos críticos para mejorar rendimiento -->
+    <link rel="preload" href="~/lib/bootstrap/dist/css/bootstrap.min.css" as="style" />
+    <link rel="preload" href="https://cdn.syncfusion.com/ej2/32.1.23/fluent.css" as="style" />
+    <link rel="preload" href="~/css/site.css" as="style" />
+    <link rel="preload" href="~/css/navigation.css" as="style" />
+    
+    <!-- DNS Prefetch para CDNs externos -->
+    <link rel="dns-prefetch" href="https://cdn.syncfusion.com" />
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+    <link rel="dns-prefetch" href="https://code.jquery.com" />
+    <link rel="dns-prefetch" href="https://cdn.datatables.net" />
+    
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     

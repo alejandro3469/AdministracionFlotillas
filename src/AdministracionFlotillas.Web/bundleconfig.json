@@ -5,8 +5,8 @@
       "wwwroot/js/Orders/Orders.js"
     ],
     "minify": {
-      "enabled": false,
-      "renameLocals": false
+      "enabled": true,
+      "renameLocals": true
     },
     "sourceMap": false
   },
@@ -16,8 +16,8 @@
       "wwwroot/js/Products/Products.js"
     ],
     "minify": {
-      "enabled": false,
-      "renameLocals": false
+      "enabled": true,
+      "renameLocals": true
     },
     "sourceMap": false
   },
@@ -27,8 +27,8 @@
       "wwwroot/js/Customers/Customers.js"
     ],
     "minify": {
-      "enabled": false,
-      "renameLocals": false
+      "enabled": true,
+      "renameLocals": true
     },
     "sourceMap": false
   },
@@ -38,8 +38,8 @@
       "wwwroot/js/Dashboard/Dashboard.js"
     ],
     "minify": {
-      "enabled": false,
-      "renameLocals": false
+      "enabled": true,
+      "renameLocals": true
     },
     "sourceMap": false
   }
