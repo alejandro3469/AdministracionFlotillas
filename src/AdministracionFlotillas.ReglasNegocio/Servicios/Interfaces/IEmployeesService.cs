@@ -49,5 +49,7 @@ public interface IEmployeesService
     /// <param name="empleado">Empleado para calcular salario anual</param>
     /// <returns>Salario anual estimado</returns>
     decimal CalcularSalarioAnualEstimado(Employee empleado);
+
+    Task<EmployeeResumen> ObtenerResumenAsync();
 }
 

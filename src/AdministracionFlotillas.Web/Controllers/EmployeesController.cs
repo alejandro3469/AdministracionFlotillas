@@ -88,5 +88,15 @@ public class EmployeesController : Controller
     {
         return Json(new { exito = false, mensaje = mensaje });
     }
+
+    public async Task<IActionResult> Resumen()
+    {
+        var resumenNegocio = await _servicio.ObtenerResumenAsync();
+
+        var resumenVista = EmployeeResumenParseador.ConvertirAVista(resumenNegocio);
+
+        return View(resumenVista);
+    }
+
 }
 

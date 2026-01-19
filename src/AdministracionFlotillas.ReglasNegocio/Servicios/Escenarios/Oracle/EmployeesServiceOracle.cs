@@ -206,5 +206,41 @@ public class EmployeesServiceOracle : IEmployeesService
 
         return true;
     }
+
+    public async Task<EmployeeResumen> ObtenerResumenAsync()
+    {
+        var empleados = await _repositorio.ObtenerEmployeesAsync();
+
+        return new EmployeeResumen
+        {
+            TotalEmpleados = empleados.Count,
+
+            PromedioSalario = empleados.Any(e => e.Salary.HasValue)
+                ? empleados.Where(e => e.Salary.HasValue).Average(e => e.Salary.Value)
+                : 0m,
+
+            EmpleadoMayorSalario = empleados
+                .Where(e => e.Salary.HasValue)
+                .OrderByDescending(e => e.Salary.Value)
+                .Select(e => $"{e.FirstName} {e.LastName}")
+                .FirstOrDefault(),
+
+            AntiguedadMayor = empleados.Any()
+                ? empleados.Max(e => CalcularAntiguedadEnAnios(e))
+                : 0,
+
+            EmpleadosPorDepartamento = empleados
+                .GroupBy(e => e.DepartmentId)
+                .Select(g => new EmpleadosPorDepartamento
+                {
+                    IdDepartamento = g.Key,
+                    Total = g.Count()
+                })
+                .ToList()
+        };
+    }
+
+
+
 }
 
