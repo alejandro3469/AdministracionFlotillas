@@ -1,0 +1,100 @@
+@using AdministracionFlotillas.Web.ViewModels
+@{
+    ViewData["Title"] = "Gestión de Cadenas";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb Navigation Mejorado -->
+    @if (ViewBag.Breadcrumb != null)
+    {
+        @await Html.PartialAsync("_BreadcrumbConIndicadores", ViewBag.Breadcrumb as BreadcrumbViewModel)
+    }
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="mb-0">Gestión de Cadenas Comerciales</h2>
+            <p class="text-muted">Administración de cadenas comerciales y clientes corporativos</p>
+        </div>
+    </div>
+
+    <!-- Indicadores Compactos -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-building text-primary"></i>
+                            <span class="text-muted small">Total:</span>
+                            <strong class="text-primary" id="totalCadenas">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="text-muted small">Activas:</span>
+                            <strong class="text-success" id="cadenasActivas">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-store text-info"></i>
+                            <span class="text-muted small">Total Sucursales:</span>
+                            <strong class="text-info" id="totalSucursales">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-dollar-sign text-success"></i>
+                            <span class="text-muted small">Total Ventas:</span>
+                            <strong class="text-success" id="totalVentas">$0.00</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de Cadenas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                    <h5 class="card-title mb-0">Lista de Cadenas</h5>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="Chains.Grid.Recargar()">
+                        <i class="fas fa-sync-alt"></i> <span class="d-none d-sm-inline">Actualizar</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @await Html.PartialAsync("_ChainsGrid")
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Ver/Editar Cadena -->
+    @await Html.PartialAsync("_ModalCadena")
+</div>
+
+@section Scripts {
+    <script src="~/js/Chains/Chains.js" asp-append-version="true"></script>
+    <script>
+        // Inicializar métricas al cargar la página
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                inicializarMetricasChains();
+            });
+        } else {
+            inicializarMetricasChains();
+        }
+        
+        function inicializarMetricasChains() {
+            if (window.Chains && window.Chains.Dashboard) {
+                window.Chains.Dashboard.ActualizarMetricas();
+            } else {
+                setTimeout(function() {
+                    if (window.Chains && window.Chains.Dashboard) {
+                        window.Chains.Dashboard.ActualizarMetricas();
+                    }
+                }, 500);
+            }
+        }
+    </script>
+}

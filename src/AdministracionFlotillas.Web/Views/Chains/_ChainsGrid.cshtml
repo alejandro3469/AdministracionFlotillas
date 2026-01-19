@@ -1,0 +1,178 @@
+<!-- Filtros -->
+<div class="row mb-3 g-3">
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label">Nombre</label>
+        <ejs-textbox id="filtroNombre" 
+                     placeholder="Buscar por nombre..."
+                     change="filtroNombreChange">
+        </ejs-textbox>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Estado</label>
+        <ejs-dropdownlist id="filtroEstado" 
+                          placeholder="Todos los estados"
+                          dataSource="@(new string[] { "ACTIVE", "INACTIVE", "SUSPENDED" })"
+                          change="filtroEstadoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 d-flex align-items-end">
+        <button type="button" class="btn btn-secondary w-100" onclick="Chains.Filtros.Limpiar()">
+            <i class="fas fa-times"></i> Limpiar Filtros
+        </button>
+    </div>
+</div>
+
+<!-- Grid Syncfusion -->
+<ejs-grid id="chainsGrid" 
+          allowPaging="true"
+          allowFiltering="true"
+          allowSorting="true"
+          allowSelection="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          allowResizing="true"
+          is-responsive="true"
+          enable-responsive-row="true"
+          toolbarClick="chainsGridToolbarClick"
+          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
+          dataBound="chainsGridDataBound"
+          created="chainsGridCreated">
+    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column field="IdCadena" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="NombreCadena" headerText="Nombre" width="200"></e-grid-column>
+        <e-grid-column field="RazonSocial" headerText="Razón Social" width="200"></e-grid-column>
+        <e-grid-column field="RFC" headerText="RFC" width="120"></e-grid-column>
+        <e-grid-column field="NumeroSucursales" headerText="Sucursales" width="100" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="LimiteCredito" headerText="Límite Crédito" width="140" type="number" format="C2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="DiasCredito" headerText="Días Crédito" width="120" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Estado" headerText="Estado" width="120" template="#estadoTemplate"></e-grid-column>
+        <e-grid-column field="TotalVentas" headerText="Total Ventas" width="140" type="number" format="C2" textAlign="Right"></e-grid-column>
+        <e-grid-column headerText="Acciones" width="150" template="#accionesTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<!-- Template para estado -->
+<script id="estadoTemplate" type="text/x-template">
+    ${if(Estado === 'ACTIVE')}
+        <span class="badge bg-success">${Estado}</span>
+    ${else if(Estado === 'INACTIVE')}
+        <span class="badge bg-secondary">${Estado}</span>
+    ${else if(Estado === 'SUSPENDED')}
+        <span class="badge bg-warning text-dark">${Estado}</span>
+    ${else}
+        <span class="badge bg-secondary">${Estado || 'ACTIVE'}</span>
+    ${/if}
+</script>
+
+<!-- Template para acciones -->
+<script id="accionesTemplate" type="text/x-template">
+    ${if(IdCadena && IdCadena > 0)}
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-info btn-ver-cadena" data-id-cadena="${IdCadena}" title="Ver detalles">
+                <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+            </button>
+            <button class="btn btn-sm btn-primary btn-editar-cadena" data-id-cadena="${IdCadena}" title="Editar cadena">
+                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+            </button>
+        </div>
+    ${else}
+        <div class="d-flex gap-1">
+            <span class="text-muted small">-</span>
+        </div>
+    ${/if}
+</script>
+
+<script>
+    // Event delegation para botones de acciones
+    if (!window.chainsGridActionButtonHandler) {
+        window.chainsGridActionButtonHandler = function(event) {
+            var target = event.target;
+            var button = target.closest('.btn-ver-cadena, .btn-editar-cadena');
+            
+            if (button) {
+                var idCadena = button.getAttribute('data-id-cadena');
+                
+                if (!idCadena || idCadena === 'undefined' || idCadena === 'null' || idCadena === '') {
+                    var gridElement = document.getElementById('chainsGrid');
+                    if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
+                        var grid = gridElement.ej2_instances[0];
+                        var row = button.closest('.e-row');
+                        if (row) {
+                            try {
+                                var rowInfo = grid.getRowInfo(row);
+                                var rowData = rowInfo ? rowInfo.rowData : null;
+                                if (rowData) {
+                                    idCadena = rowData.IdCadena || rowData.idCadena;
+                                }
+                            } catch (e) {
+                                console.warn('Error al obtener datos de la fila:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (idCadena && idCadena !== 'undefined' && idCadena !== 'null' && idCadena !== '') {
+                    idCadena = parseInt(idCadena, 10);
+                    if (idCadena && !isNaN(idCadena) && idCadena > 0) {
+                        if (button.classList.contains('btn-ver-cadena')) {
+                            if (window.Chains && window.Chains.Modal) {
+                                window.Chains.Modal.Abrir(idCadena, 'ver');
+                            }
+                        } else if (button.classList.contains('btn-editar-cadena')) {
+                            if (window.Chains && window.Chains.Modal) {
+                                window.Chains.Modal.Abrir(idCadena, 'editar');
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        // Registrar el handler una vez
+        document.addEventListener('click', window.chainsGridActionButtonHandler);
+    }
+    
+    // Handlers de filtros
+    window.filtroNombreChange = function(args) {
+        if (window.Chains && window.Chains.Filtros) {
+            window.Chains.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroEstadoChange = function(args) {
+        if (window.Chains && window.Chains.Filtros) {
+            window.Chains.Filtros.Aplicar();
+        }
+    };
+    
+    // Handlers del grid
+    window.chainsGridToolbarClick = function(args) {
+        var gridElement = document.getElementById('chainsGrid');
+        if (!gridElement || !gridElement.ej2_instances || !gridElement.ej2_instances[0]) {
+            return;
+        }
+        
+        var grid = gridElement.ej2_instances[0];
+        var fileNamePrefix = 'Cadenas_' + new Date().toISOString().split('T')[0];
+        
+        if (args.item.text === 'Excel Export' || (args.item.id && args.item.id.includes('excelexport'))) {
+            grid.excelExport({
+                fileName: fileNamePrefix + '.xlsx'
+            });
+        } else if (args.item.text === 'Pdf Export' || (args.item.id && args.item.id.includes('pdfexport'))) {
+            grid.pdfExport({
+                fileName: fileNamePrefix + '.pdf'
+            });
+        }
+    };
+    
+    window.chainsGridDataBound = function(args) {
+        // Event delegation ya está registrado arriba
+    };
+    
+    window.chainsGridCreated = function(args) {
+        console.log('Grid de cadenas creado');
+    };
+</script>
