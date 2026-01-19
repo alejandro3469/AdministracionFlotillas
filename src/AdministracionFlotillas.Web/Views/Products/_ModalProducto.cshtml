@@ -272,9 +272,15 @@
     };
 
     window.modalProductoCerrar = function() {
-        var dialogElement = document.getElementById('modalProducto');
-        if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-            dialogElement.ej2_instances[0].hide();
+        if (typeof window.ocultarModalProducto === 'function') {
+            window.ocultarModalProducto();
+        } else {
+            var dialogElement = document.getElementById('modalProducto');
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                dialogElement.ej2_instances[0].hide();
+            } else if (window.modalProductoInstance) {
+                window.modalProductoInstance.hide();
+            }
         }
     };
 </script>
