@@ -1,0 +1,208 @@
+<ejs-tooltip id="tooltipModalVendedor" 
+             target=".info-tooltip-vendedor" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalVendedorBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentVendedor"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<div id="modalVendedor" style="display: none;"></div>
+
+<ejs-dialog id="modalVendedor" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="75%" 
+            height="85%" 
+            visible="false"
+            header="Vendedor #<span id='modalVendedorTitulo'>0</span>"
+            created="modalVendedorCreated"
+            open="modalVendedorOpen"
+            close="modalVendedorClose"
+            beforeClose="modalVendedorBeforeClose">
+    <e-content-template>
+        <div id="modalVendedorContenido">
+            <ejs-tab id="tabsModalVendedor" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalVendedor" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información Personal</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Vendedor:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdVendedor" class="info-tooltip-vendedor" data-field="IdVendedor" data-tooltip="Identificador único del vendedor">-</strong>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Nombre Completo:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreCompleto" class="info-tooltip-vendedor" data-field="NombreCompleto" data-tooltip="Nombre completo del vendedor">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Email:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalEmail" class="info-tooltip-vendedor" data-field="Email" data-tooltip="Correo electrónico de contacto">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Teléfono:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTelefono" class="info-tooltip-vendedor" data-field="Telefono" data-tooltip="Teléfono de contacto">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Zona de Cobertura:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalZonaCobertura" class="info-tooltip-vendedor" data-field="ZonaCobertura" data-tooltip="Zona geográfica asignada">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoVendedor">
+                                                        <span class="info-tooltip-vendedor" data-field="Estado" data-tooltip="Estado del vendedor: ACTIVE (activo), INACTIVE (inactivo), ON_LEAVE (en licencia)">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información Comercial</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Comisión Base:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalComisionBase" class="info-tooltip-vendedor" data-field="ComisionBase" data-tooltip="Porcentaje de comisión base">0%</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Comisión Variable:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalComisionVariable" class="info-tooltip-vendedor" data-field="ComisionVariable" data-tooltip="Porcentaje de comisión variable por volumen">0%</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Fecha Contratación:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaContratacion" class="info-tooltip-vendedor" data-field="FechaContratacion" data-tooltip="Fecha de contratación">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Total Órdenes:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTotalOrdenes" class="info-tooltip-vendedor" data-field="TotalOrdenes" data-tooltip="Número total de órdenes gestionadas">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Total Ventas:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTotalVentas" class="info-tooltip-vendedor" data-field="TotalVentas" data-tooltip="Monto total de ventas generadas">$0.00</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Total Comisiones:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTotalComisiones" class="info-tooltip-vendedor" data-field="TotalComisiones" data-tooltip="Monto total de comisiones ganadas">$0.00</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Cadenas Asignadas:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCadenasAsignadas" class="info-tooltip-vendedor" data-field="CadenasAsignadas" data-tooltip="Número de cadenas asignadas">0</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalVendedorEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalVendedorCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    var modalVendedorModo = 'ver';
+    var modalVendedorId = null;
+    var tooltipModalVendedorObj = null;
+    window.modalVendedorInstance = null;
+    
+    window.modalVendedorCreated = function(args) {
+        console.log('✅ Modal de vendedor creado');
+        if (args && args.component) {
+            window.modalVendedorInstance = args.component;
+        }
+    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalVendedor');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalVendedorObj = tooltipElement.ej2_instances[0];
+        }
+        setTimeout(function() {
+            if (!window.modalVendedorInstance) {
+                var dialogElement = document.getElementById('modalVendedor');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalVendedorInstance = dialogElement.ej2_instances[0];
+                }
+            }
+        }, 500);
+    });
+    
+    window.tooltipModalVendedorBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalVendedorObj) {
+                tooltipModalVendedorObj.content = contentDiv;
+            }
+        }
+    };
+    
+    window.modalVendedorOpen = function(args) {
+        console.log('Modal de vendedor abierto');
+    };
+    
+    window.modalVendedorClose = function(args) {
+        console.log('Modal de vendedor cerrado');
+        modalVendedorId = null;
+        modalVendedorModo = 'ver';
+    };
+    
+    window.modalVendedorBeforeClose = function(args) {
+        return true;
+    };
+    
+    window.modalVendedorEditar = function() {
+        if (modalVendedorId) {
+            modalVendedorModo = 'editar';
+            if (window.Salespersons && window.Salespersons.Modal) {
+                window.Salespersons.Modal.CambiarAModoEdicion(modalVendedorId);
+            }
+        }
+    };
+    
+    window.modalVendedorCerrar = function() {
+        if (window.modalVendedorInstance) {
+            window.modalVendedorInstance.hide();
+        } else {
+            console.warn('No se pudo cerrar el modal de vendedor');
+        }
+    };
+</script>

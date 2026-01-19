@@ -1,0 +1,188 @@
+<div class="row mb-3 g-3">
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label">Nombre</label>
+        <ejs-textbox id="filtroNombre" 
+                     placeholder="Buscar por nombre..."
+                     change="filtroNombreChange">
+        </ejs-textbox>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Zona</label>
+        <ejs-dropdownlist id="filtroZona" 
+                          placeholder="Todas las zonas"
+                          dataSource="@(new string[] { "Norte", "Sur", "Centro", "Este", "Oeste", "Metropolitana", "Periferia", "Todas" })"
+                          change="filtroZonaChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Estado</label>
+        <ejs-dropdownlist id="filtroEstado" 
+                          placeholder="Todos los estados"
+                          dataSource="@(new string[] { "ACTIVE", "INACTIVE", "MAINTENANCE" })"
+                          change="filtroEstadoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-2 d-flex align-items-end">
+        <button type="button" class="btn btn-secondary w-100" onclick="Routes.Filtros.Limpiar()">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
+    </div>
+</div>
+
+<ejs-grid id="routesGrid" 
+          allowPaging="true"
+          allowFiltering="true"
+          allowSorting="true"
+          allowSelection="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          allowResizing="true"
+          is-responsive="true"
+          enable-responsive-row="true"
+          toolbarClick="routesGridToolbarClick"
+          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
+          dataBound="routesGridDataBound"
+          created="routesGridCreated">
+    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column field="IdRuta" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="NombreRuta" headerText="Nombre" width="200"></e-grid-column>
+        <e-grid-column field="ZonaGeografica" headerText="Zona" width="120"></e-grid-column>
+        <e-grid-column field="RepartidorAsignado" headerText="Repartidor" width="150"></e-grid-column>
+        <e-grid-column field="TiempoEstimado" headerText="Tiempo Est. (min)" width="130" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="CapacidadMaxima" headerText="Capacidad" width="100" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="TotalEntregas" headerText="Total Entregas" width="120" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Eficiencia" headerText="Eficiencia" width="120" type="number" format="N2" textAlign="Right" template="#eficienciaTemplate"></e-grid-column>
+        <e-grid-column field="Estado" headerText="Estado" width="120" template="#estadoTemplate"></e-grid-column>
+        <e-grid-column headerText="Acciones" width="150" template="#accionesTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="estadoTemplate" type="text/x-template">
+    ${if(Estado === 'ACTIVE')}
+        <span class="badge bg-success">${Estado}</span>
+    ${else if(Estado === 'INACTIVE')}
+        <span class="badge bg-secondary">${Estado}</span>
+    ${else if(Estado === 'MAINTENANCE')}
+        <span class="badge bg-warning text-dark">${Estado}</span>
+    ${else}
+        <span class="badge bg-secondary">${Estado || 'ACTIVE'}</span>
+    ${/if}
+</script>
+
+<script id="eficienciaTemplate" type="text/x-template">
+    <span class="${if(Eficiencia >= 90)}text-success fw-bold${else if(Eficiencia >= 75)}text-info${else if(Eficiencia >= 60)}text-warning${else}text-danger${/if}">
+        ${Eficiencia}%
+    </span>
+</script>
+
+<script id="accionesTemplate" type="text/x-template">
+    ${if(IdRuta && IdRuta > 0)}
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-info btn-ver-ruta" data-id-ruta="${IdRuta}" title="Ver detalles">
+                <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+            </button>
+            <button class="btn btn-sm btn-primary btn-editar-ruta" data-id-ruta="${IdRuta}" title="Editar ruta">
+                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+            </button>
+        </div>
+    ${else}
+        <div class="d-flex gap-1">
+            <span class="text-muted small">-</span>
+        </div>
+    ${/if}
+</script>
+
+<script>
+    if (!window.routesGridActionButtonHandler) {
+        window.routesGridActionButtonHandler = function(event) {
+            var target = event.target;
+            var button = target.closest('.btn-ver-ruta, .btn-editar-ruta');
+            
+            if (button) {
+                var idRuta = button.getAttribute('data-id-ruta');
+                
+                if (!idRuta || idRuta === 'undefined' || idRuta === 'null' || idRuta === '') {
+                    var gridElement = document.getElementById('routesGrid');
+                    if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
+                        var grid = gridElement.ej2_instances[0];
+                        var row = button.closest('.e-row');
+                        if (row) {
+                            try {
+                                var rowInfo = grid.getRowInfo(row);
+                                var rowData = rowInfo ? rowInfo.rowData : null;
+                                if (rowData) {
+                                    idRuta = rowData.IdRuta || rowData.idRuta;
+                                }
+                            } catch (e) {
+                                console.warn('Error al obtener datos de la fila:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (idRuta && idRuta !== 'undefined' && idRuta !== 'null' && idRuta !== '') {
+                    idRuta = parseInt(idRuta, 10);
+                    if (idRuta && !isNaN(idRuta) && idRuta > 0) {
+                        if (button.classList.contains('btn-ver-ruta')) {
+                            if (window.Routes && window.Routes.Modal) {
+                                window.Routes.Modal.Abrir(idRuta, 'ver');
+                            }
+                        } else if (button.classList.contains('btn-editar-ruta')) {
+                            if (window.Routes && window.Routes.Modal) {
+                                window.Routes.Modal.Abrir(idRuta, 'editar');
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        document.addEventListener('click', window.routesGridActionButtonHandler);
+    }
+    
+    window.filtroNombreChange = function(args) {
+        if (window.Routes && window.Routes.Filtros) {
+            window.Routes.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroZonaChange = function(args) {
+        if (window.Routes && window.Routes.Filtros) {
+            window.Routes.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroEstadoChange = function(args) {
+        if (window.Routes && window.Routes.Filtros) {
+            window.Routes.Filtros.Aplicar();
+        }
+    };
+    
+    window.routesGridToolbarClick = function(args) {
+        var gridElement = document.getElementById('routesGrid');
+        if (!gridElement || !gridElement.ej2_instances || !gridElement.ej2_instances[0]) {
+            return;
+        }
+        
+        var grid = gridElement.ej2_instances[0];
+        var fileNamePrefix = 'Rutas_' + new Date().toISOString().split('T')[0];
+        
+        if (args.item.text === 'Excel Export' || (args.item.id && args.item.id.includes('excelexport'))) {
+            grid.excelExport({ fileName: fileNamePrefix + '.xlsx' });
+        } else if (args.item.text === 'Pdf Export' || (args.item.id && args.item.id.includes('pdfexport'))) {
+            grid.pdfExport({ fileName: fileNamePrefix + '.pdf' });
+        }
+    };
+    
+    window.routesGridDataBound = function(args) {
+        // Event delegation ya está registrado
+    };
+    
+    window.routesGridCreated = function(args) {
+        console.log('Grid de rutas creado');
+        if (window.Routes && window.Routes.Grid) {
+            window.Routes.Grid.CargarDatos();
+        }
+    };
+</script>

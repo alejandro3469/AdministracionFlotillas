@@ -1,0 +1,200 @@
+<ejs-tooltip id="tooltipModalRuta" 
+             target=".info-tooltip-ruta" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalRutaBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentRuta"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<div id="modalRuta" style="display: none;"></div>
+
+<ejs-dialog id="modalRuta" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="75%" 
+            height="85%" 
+            visible="false"
+            header="Ruta #<span id='modalRutaTitulo'>0</span>"
+            created="modalRutaCreated"
+            open="modalRutaOpen"
+            close="modalRutaClose"
+            beforeClose="modalRutaBeforeClose">
+    <e-content-template>
+        <div id="modalRutaContenido">
+            <ejs-tab id="tabsModalRuta" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalRuta" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información de la Ruta</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Ruta:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdRuta" class="info-tooltip-ruta" data-field="IdRuta" data-tooltip="Identificador único de la ruta">-</strong>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Nombre:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreRuta" class="info-tooltip-ruta" data-field="NombreRuta" data-tooltip="Nombre de la ruta">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Descripción:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalDescripcion" class="info-tooltip-ruta" data-field="Descripcion" data-tooltip="Descripción detallada de la ruta">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Zona Geográfica:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalZonaGeografica" class="info-tooltip-ruta" data-field="ZonaGeografica" data-tooltip="Zona geográfica de cobertura">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoRuta">
+                                                        <span class="info-tooltip-ruta" data-field="Estado" data-tooltip="Estado de la ruta: ACTIVE (activa), INACTIVE (inactiva), MAINTENANCE (en mantenimiento)">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información Operativa</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Repartidor Asignado:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalRepartidorAsignado" class="info-tooltip-ruta" data-field="RepartidorAsignado" data-tooltip="Nombre del repartidor asignado">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Tiempo Estimado:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTiempoEstimado" class="info-tooltip-ruta" data-field="TiempoEstimado" data-tooltip="Tiempo estimado de recorrido en minutos">0 min</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Capacidad Máxima:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalCapacidadMaxima" class="info-tooltip-ruta" data-field="CapacidadMaxima" data-tooltip="Número máximo de entregas por ruta">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Total Entregas:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTotalEntregas" class="info-tooltip-ruta" data-field="TotalEntregas" data-tooltip="Total de entregas realizadas">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Tiempo Promedio:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTiempoPromedio" class="info-tooltip-ruta" data-field="TiempoPromedioEntrega" data-tooltip="Tiempo promedio de entrega en minutos">0 min</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Eficiencia:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalEficiencia" class="info-tooltip-ruta" data-field="Eficiencia" data-tooltip="Porcentaje de eficiencia de la ruta">0%</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalRutaEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalRutaCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    var modalRutaModo = 'ver';
+    var modalRutaId = null;
+    var tooltipModalRutaObj = null;
+    window.modalRutaInstance = null;
+    
+    window.modalRutaCreated = function(args) {
+        console.log('✅ Modal de ruta creado');
+        if (args && args.component) {
+            window.modalRutaInstance = args.component;
+        }
+    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalRuta');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalRutaObj = tooltipElement.ej2_instances[0];
+        }
+        setTimeout(function() {
+            if (!window.modalRutaInstance) {
+                var dialogElement = document.getElementById('modalRuta');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalRutaInstance = dialogElement.ej2_instances[0];
+                }
+            }
+        }, 500);
+    });
+    
+    window.tooltipModalRutaBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalRutaObj) {
+                tooltipModalRutaObj.content = contentDiv;
+            }
+        }
+    };
+    
+    window.modalRutaOpen = function(args) {
+        console.log('Modal de ruta abierto');
+    };
+    
+    window.modalRutaClose = function(args) {
+        console.log('Modal de ruta cerrado');
+        modalRutaId = null;
+        modalRutaModo = 'ver';
+    };
+    
+    window.modalRutaBeforeClose = function(args) {
+        return true;
+    };
+    
+    window.modalRutaEditar = function() {
+        if (modalRutaId) {
+            modalRutaModo = 'editar';
+            if (window.Routes && window.Routes.Modal) {
+                window.Routes.Modal.CambiarAModoEdicion(modalRutaId);
+            }
+        }
+    };
+    
+    window.modalRutaCerrar = function() {
+        if (window.modalRutaInstance) {
+            window.modalRutaInstance.hide();
+        } else {
+            console.warn('No se pudo cerrar el modal de ruta');
+        }
+    };
+</script>
