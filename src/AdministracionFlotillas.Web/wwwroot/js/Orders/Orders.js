@@ -358,6 +358,10 @@ window.filtroFechaFinChange = function(args) {
 // Namespace principal
 window.Orders = window.Orders || {};
 
+// Variables globales para el modal (fuera del IIFE para evitar problemas con minificación en strict mode)
+var modalOrdenId = null;
+var modalOrdenModo = 'ver';
+
 (function() {
     'use strict';
     

@@ -121,6 +121,10 @@ window.filtroPrecioMaxChange = function(args) {
 // Namespace principal
 window.Products = window.Products || {};
 
+// Variables globales para el modal (fuera del IIFE para evitar problemas con minificación)
+var modalProductoId = null;
+var modalProductoModo = 'ver';
+
 (function() {
     'use strict';
     
@@ -536,6 +540,10 @@ window.Products = window.Products || {};
         Editar: function(idProducto) {
             window.Products.Modal.Abrir(idProducto, 'editar');
         }
+    };
+    
+})();
+
     };
     
 })();

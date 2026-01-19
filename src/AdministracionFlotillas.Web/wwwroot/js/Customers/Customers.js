@@ -109,6 +109,10 @@ window.filtroEstadoChange = function(args) {
 // Namespace principal
 window.Customers = window.Customers || {};
 
+// Variables globales para el modal (fuera del IIFE para evitar problemas con minificación en strict mode)
+var modalClienteId = null;
+var modalClienteModo = 'ver';
+
 (function() {
     'use strict';
     
