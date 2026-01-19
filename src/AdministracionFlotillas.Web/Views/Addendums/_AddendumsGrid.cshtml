@@ -1,0 +1,176 @@
+<div class="row mb-3 g-3">
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label">ID Cadena</label>
+        <ejs-numerictextbox id="filtroIdCadena" 
+                             placeholder="Todas las cadenas"
+                             change="filtroIdCadenaChange">
+        </ejs-numerictextbox>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Estado</label>
+        <ejs-dropdownlist id="filtroEstado" 
+                          placeholder="Todos los estados"
+                          dataSource="@(new string[] { "ACTIVE", "EXPIRED", "CANCELLED" })"
+                          change="filtroEstadoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 d-flex align-items-end">
+        <button type="button" class="btn btn-secondary w-100" onclick="Addendums.Filtros.Limpiar()">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
+    </div>
+</div>
+
+<ejs-grid id="addendumsGrid" 
+          allowPaging="true"
+          allowFiltering="true"
+          allowSorting="true"
+          allowSelection="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          allowResizing="true"
+          is-responsive="true"
+          enable-responsive-row="true"
+          toolbarClick="addendumsGridToolbarClick"
+          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
+          dataBound="addendumsGridDataBound"
+          created="addendumsGridCreated">
+    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column field="IdAdenda" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="NombreAdenda" headerText="Nombre" width="200"></e-grid-column>
+        <e-grid-column field="NombreCadena" headerText="Cadena" width="180"></e-grid-column>
+        <e-grid-column field="DescuentoEspecial" headerText="Descuento" width="120" type="number" format="N2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="DiasCredito" headerText="Días Crédito" width="120" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="FechaInicio" headerText="Fecha Inicio" width="120" type="date" format="dd/MM/yyyy"></e-grid-column>
+        <e-grid-column field="FechaFin" headerText="Fecha Fin" width="120" type="date" format="dd/MM/yyyy"></e-grid-column>
+        <e-grid-column field="Estado" headerText="Estado" width="120" template="#estadoTemplate"></e-grid-column>
+        <e-grid-column field="RenovacionAutomatica" headerText="Auto Renovación" width="130" template="#renovacionTemplate"></e-grid-column>
+        <e-grid-column headerText="Acciones" width="150" template="#accionesTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="estadoTemplate" type="text/x-template">
+    ${if(Estado === 'ACTIVE')}
+        <span class="badge bg-success">${Estado}</span>
+    ${else if(Estado === 'EXPIRED')}
+        <span class="badge bg-warning text-dark">${Estado}</span>
+    ${else if(Estado === 'CANCELLED')}
+        <span class="badge bg-danger">${Estado}</span>
+    ${else}
+        <span class="badge bg-secondary">${Estado || 'ACTIVE'}</span>
+    ${/if}
+</script>
+
+<script id="renovacionTemplate" type="text/x-template">
+    ${if(RenovacionAutomatica)}
+        <span class="badge bg-success"><i class="fas fa-check"></i> Sí</span>
+    ${else}
+        <span class="badge bg-secondary"><i class="fas fa-times"></i> No</span>
+    ${/if}
+</script>
+
+<script id="accionesTemplate" type="text/x-template">
+    ${if(IdAdenda && IdAdenda > 0)}
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-info btn-ver-adenda" data-id-adenda="${IdAdenda}" title="Ver detalles">
+                <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+            </button>
+            <button class="btn btn-sm btn-primary btn-editar-adenda" data-id-adenda="${IdAdenda}" title="Editar adenda">
+                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+            </button>
+        </div>
+    ${else}
+        <div class="d-flex gap-1">
+            <span class="text-muted small">-</span>
+        </div>
+    ${/if}
+</script>
+
+<script>
+    if (!window.addendumsGridActionButtonHandler) {
+        window.addendumsGridActionButtonHandler = function(event) {
+            var target = event.target;
+            var button = target.closest('.btn-ver-adenda, .btn-editar-adenda');
+            
+            if (button) {
+                var idAdenda = button.getAttribute('data-id-adenda');
+                
+                if (!idAdenda || idAdenda === 'undefined' || idAdenda === 'null' || idAdenda === '') {
+                    var gridElement = document.getElementById('addendumsGrid');
+                    if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
+                        var grid = gridElement.ej2_instances[0];
+                        var row = button.closest('.e-row');
+                        if (row) {
+                            try {
+                                var rowInfo = grid.getRowInfo(row);
+                                var rowData = rowInfo ? rowInfo.rowData : null;
+                                if (rowData) {
+                                    idAdenda = rowData.IdAdenda || rowData.idAdenda;
+                                }
+                            } catch (e) {
+                                console.warn('Error al obtener datos de la fila:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (idAdenda && idAdenda !== 'undefined' && idAdenda !== 'null' && idAdenda !== '') {
+                    idAdenda = parseInt(idAdenda, 10);
+                    if (idAdenda && !isNaN(idAdenda) && idAdenda > 0) {
+                        if (button.classList.contains('btn-ver-adenda')) {
+                            if (window.Addendums && window.Addendums.Modal) {
+                                window.Addendums.Modal.Abrir(idAdenda, 'ver');
+                            }
+                        } else if (button.classList.contains('btn-editar-adenda')) {
+                            if (window.Addendums && window.Addendums.Modal) {
+                                window.Addendums.Modal.Abrir(idAdenda, 'editar');
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        document.addEventListener('click', window.addendumsGridActionButtonHandler);
+    }
+    
+    window.filtroIdCadenaChange = function(args) {
+        if (window.Addendums && window.Addendums.Filtros) {
+            window.Addendums.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroEstadoChange = function(args) {
+        if (window.Addendums && window.Addendums.Filtros) {
+            window.Addendums.Filtros.Aplicar();
+        }
+    };
+    
+    window.addendumsGridToolbarClick = function(args) {
+        var gridElement = document.getElementById('addendumsGrid');
+        if (!gridElement || !gridElement.ej2_instances || !gridElement.ej2_instances[0]) {
+            return;
+        }
+        
+        var grid = gridElement.ej2_instances[0];
+        var fileNamePrefix = 'Adendas_' + new Date().toISOString().split('T')[0];
+        
+        if (args.item.text === 'Excel Export' || (args.item.id && args.item.id.includes('excelexport'))) {
+            grid.excelExport({ fileName: fileNamePrefix + '.xlsx' });
+        } else if (args.item.text === 'Pdf Export' || (args.item.id && args.item.id.includes('pdfexport'))) {
+            grid.pdfExport({ fileName: fileNamePrefix + '.pdf' });
+        }
+    };
+    
+    window.addendumsGridDataBound = function(args) {
+        // Event delegation ya está registrado
+    };
+    
+    window.addendumsGridCreated = function(args) {
+        console.log('Grid de adendas creado');
+        if (window.Addendums && window.Addendums.Grid) {
+            window.Addendums.Grid.CargarDatos();
+        }
+    };
+</script>

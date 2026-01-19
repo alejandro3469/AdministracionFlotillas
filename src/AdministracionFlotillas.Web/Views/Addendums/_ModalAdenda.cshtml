@@ -1,0 +1,212 @@
+<ejs-tooltip id="tooltipModalAdenda" 
+             target=".info-tooltip-adenda" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalAdendaBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentAdenda"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<div id="modalAdenda" style="display: none;"></div>
+
+<ejs-dialog id="modalAdenda" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="75%" 
+            height="85%" 
+            visible="false"
+            header="Adenda #<span id='modalAdendaTitulo'>0</span>"
+            created="modalAdendaCreated"
+            open="modalAdendaOpen"
+            close="modalAdendaClose"
+            beforeClose="modalAdendaBeforeClose">
+    <e-content-template>
+        <div id="modalAdendaContenido">
+            <ejs-tab id="tabsModalAdenda" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalAdenda" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información de la Adenda</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Adenda:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdAdenda" class="info-tooltip-adenda" data-field="IdAdenda" data-tooltip="Identificador único de la adenda">-</strong>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Nombre:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreAdenda" class="info-tooltip-adenda" data-field="NombreAdenda" data-tooltip="Nombre del contrato o adenda">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Cadena:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreCadena" class="info-tooltip-adenda" data-field="NombreCadena" data-tooltip="Cadena comercial asociada">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">ID Cadena:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalIdCadena" class="info-tooltip-adenda" data-field="IdCadena" data-tooltip="ID de la cadena comercial">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoAdenda">
+                                                        <span class="info-tooltip-adenda" data-field="Estado" data-tooltip="Estado: ACTIVE (activa), EXPIRED (expirada), CANCELLED (cancelada)">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Condiciones Comerciales</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Descuento Especial:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalDescuentoEspecial" class="info-tooltip-adenda" data-field="DescuentoEspecial" data-tooltip="Porcentaje de descuento aplicado">0%</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Días de Crédito:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalDiasCredito" class="info-tooltip-adenda" data-field="DiasCredito" data-tooltip="Plazo de crédito extendido">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Monto Mínimo Pedido:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalMontoMinimoPedido" class="info-tooltip-adenda" data-field="MontoMinimoPedido" data-tooltip="Monto mínimo requerido por pedido">$0.00</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Renovación Automática:</dt>
+                                                    <dd class="col-sm-7" id="modalRenovacionAutomatica">
+                                                        <span class="info-tooltip-adenda" data-field="RenovacionAutomatica" data-tooltip="Si se renueva automáticamente al vencer">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Fecha Inicio:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaInicio" class="info-tooltip-adenda" data-field="FechaInicio" data-tooltip="Fecha de inicio de vigencia">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Fecha Fin:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaFin" class="info-tooltip-adenda" data-field="FechaFin" data-tooltip="Fecha de fin de vigencia">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Condiciones Especiales</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p id="modalCondicionesEspeciales" class="mb-0">-</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalAdendaEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalAdendaCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    var modalAdendaModo = 'ver';
+    var modalAdendaId = null;
+    var tooltipModalAdendaObj = null;
+    window.modalAdendaInstance = null;
+    
+    window.modalAdendaCreated = function(args) {
+        console.log('✅ Modal de adenda creado');
+        if (args && args.component) {
+            window.modalAdendaInstance = args.component;
+        }
+    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalAdenda');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
+        }
+        setTimeout(function() {
+            if (!window.modalAdendaInstance) {
+                var dialogElement = document.getElementById('modalAdenda');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalAdendaInstance = dialogElement.ej2_instances[0];
+                }
+            }
+        }, 500);
+    });
+    
+    window.tooltipModalAdendaBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalAdendaObj) {
+                tooltipModalAdendaObj.content = contentDiv;
+            }
+        }
+    };
+    
+    window.modalAdendaOpen = function(args) {
+        console.log('Modal de adenda abierto');
+    };
+    
+    window.modalAdendaClose = function(args) {
+        console.log('Modal de adenda cerrado');
+        modalAdendaId = null;
+        modalAdendaModo = 'ver';
+    };
+    
+    window.modalAdendaBeforeClose = function(args) {
+        return true;
+    };
+    
+    window.modalAdendaEditar = function() {
+        if (modalAdendaId) {
+            modalAdendaModo = 'editar';
+            if (window.Addendums && window.Addendums.Modal) {
+                window.Addendums.Modal.CambiarAModoEdicion(modalAdendaId);
+            }
+        }
+    };
+    
+    window.modalAdendaCerrar = function() {
+        if (window.modalAdendaInstance) {
+            window.modalAdendaInstance.hide();
+        } else {
+            console.warn('No se pudo cerrar el modal de adenda');
+        }
+    };
+</script>

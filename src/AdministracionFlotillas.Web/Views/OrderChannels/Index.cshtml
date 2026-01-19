@@ -1,0 +1,95 @@
+@using AdministracionFlotillas.Web.ViewModels
+@{
+    ViewData["Title"] = "Canales de Pedidos";
+}
+
+<div class="container-fluid">
+    @if (ViewBag.Breadcrumb != null)
+    {
+        @await Html.PartialAsync("_BreadcrumbConIndicadores", ViewBag.Breadcrumb as BreadcrumbViewModel)
+    }
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="mb-0">Canales de Pedidos</h2>
+            <p class="text-muted">Gestión y análisis de canales de recepción de pedidos</p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body py-2">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-mobile-alt text-primary"></i>
+                            <span class="text-muted small">Total Canales:</span>
+                            <strong class="text-primary" id="totalCanales">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="text-muted small">Activos:</span>
+                            <strong class="text-success" id="canalesActivos">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-shopping-cart text-info"></i>
+                            <span class="text-muted small">Total Pedidos:</span>
+                            <strong class="text-info" id="totalPedidos">0</strong>
+                        </div>
+                        <div class="vr"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-percent text-success"></i>
+                            <span class="text-muted small">Tasa Conversión Promedio:</span>
+                            <strong class="text-success" id="tasaConversionPromedio">0%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                    <h5 class="card-title mb-0">Lista de Canales</h5>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="OrderChannels.Grid.Recargar()">
+                        <i class="fas fa-sync-alt"></i> <span class="d-none d-sm-inline">Actualizar</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @await Html.PartialAsync("_OrderChannelsGrid")
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @await Html.PartialAsync("_ModalCanal")
+</div>
+
+@section Scripts {
+    <script src="~/js/OrderChannels/OrderChannels.js" asp-append-version="true"></script>
+    <script>
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                inicializarMetricasOrderChannels();
+            });
+        } else {
+            inicializarMetricasOrderChannels();
+        }
+        
+        function inicializarMetricasOrderChannels() {
+            if (window.OrderChannels && window.OrderChannels.Dashboard) {
+                window.OrderChannels.Dashboard.ActualizarMetricas();
+            } else {
+                setTimeout(function() {
+                    if (window.OrderChannels && window.OrderChannels.Dashboard) {
+                        window.OrderChannels.Dashboard.ActualizarMetricas();
+                    }
+                }, 500);
+            }
+        }
+    </script>
+}

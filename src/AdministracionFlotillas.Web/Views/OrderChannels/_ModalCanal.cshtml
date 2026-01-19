@@ -1,0 +1,204 @@
+<ejs-tooltip id="tooltipModalCanal" 
+             target=".info-tooltip-canal" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalCanalBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentCanal"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<div id="modalCanal" style="display: none;"></div>
+
+<ejs-dialog id="modalCanal" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="70%" 
+            height="80%" 
+            visible="false"
+            header="Canal #<span id='modalCanalTitulo'>0</span>"
+            created="modalCanalCreated"
+            open="modalCanalOpen"
+            close="modalCanalClose"
+            beforeClose="modalCanalBeforeClose">
+    <e-content-template>
+        <div id="modalCanalContenido">
+            <ejs-tab id="tabsModalCanal" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalCanal" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información del Canal</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Canal:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdCanal" class="info-tooltip-canal" data-field="IdCanal" data-tooltip="Identificador único del canal">-</strong>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Nombre:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalNombreCanal" class="info-tooltip-canal" data-field="NombreCanal" data-tooltip="Nombre del canal de pedidos">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Tipo:</dt>
+                                                    <dd class="col-sm-7" id="modalTipoCanal">
+                                                        <span class="info-tooltip-canal" data-field="TipoCanal" data-tooltip="Tipo de canal: MOBILE, CALL_CENTER, EMAIL, WEB">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Descripción:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalDescripcion" class="info-tooltip-canal" data-field="Descripcion" data-tooltip="Descripción del canal">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoCanal">
+                                                        <span class="info-tooltip-canal" data-field="Estado" data-tooltip="Estado del canal: ACTIVE (activo), INACTIVE (inactivo), MAINTENANCE (mantenimiento)">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Métricas del Canal</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Total Pedidos:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTotalPedidos" class="info-tooltip-canal" data-field="TotalPedidos" data-tooltip="Total de pedidos recibidos por este canal">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Tasa de Conversión:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalTasaConversion" class="info-tooltip-canal" data-field="TasaConversion" data-tooltip="Porcentaje de conversión de visitas a pedidos">0%</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Valor Promedio Pedido:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalValorPromedioPedido" class="info-tooltip-canal" data-field="ValorPromedioPedido" data-tooltip="Valor promedio de cada pedido">$0.00</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Pedidos Hoy:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalPedidosHoy" class="info-tooltip-canal" data-field="PedidosHoy" data-tooltip="Pedidos recibidos hoy">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Pedidos Este Mes:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalPedidosEsteMes" class="info-tooltip-canal" data-field="PedidosEsteMes" data-tooltip="Pedidos recibidos este mes">0</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Eficiencia:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalEficiencia" class="info-tooltip-canal" data-field="Eficiencia" data-tooltip="Porcentaje de eficiencia del canal">0%</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Último Pedido:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaUltimoPedido" class="info-tooltip-canal" data-field="FechaUltimoPedido" data-tooltip="Fecha del último pedido recibido">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalCanalEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalCanalCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    var modalCanalModo = 'ver';
+    var modalCanalId = null;
+    var tooltipModalCanalObj = null;
+    window.modalCanalInstance = null;
+    
+    window.modalCanalCreated = function(args) {
+        console.log('✅ Modal de canal creado');
+        if (args && args.component) {
+            window.modalCanalInstance = args.component;
+        }
+    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalCanal');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalCanalObj = tooltipElement.ej2_instances[0];
+        }
+        setTimeout(function() {
+            if (!window.modalCanalInstance) {
+                var dialogElement = document.getElementById('modalCanal');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalCanalInstance = dialogElement.ej2_instances[0];
+                }
+            }
+        }, 500);
+    });
+    
+    window.tooltipModalCanalBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalCanalObj) {
+                tooltipModalCanalObj.content = contentDiv;
+            }
+        }
+    };
+    
+    window.modalCanalOpen = function(args) {
+        console.log('Modal de canal abierto');
+    };
+    
+    window.modalCanalClose = function(args) {
+        console.log('Modal de canal cerrado');
+        modalCanalId = null;
+        modalCanalModo = 'ver';
+    };
+    
+    window.modalCanalBeforeClose = function(args) {
+        return true;
+    };
+    
+    window.modalCanalEditar = function() {
+        if (modalCanalId) {
+            modalCanalModo = 'editar';
+            if (window.OrderChannels && window.OrderChannels.Modal) {
+                window.OrderChannels.Modal.CambiarAModoEdicion(modalCanalId);
+            }
+        }
+    };
+    
+    window.modalCanalCerrar = function() {
+        if (window.modalCanalInstance) {
+            window.modalCanalInstance.hide();
+        } else {
+            console.warn('No se pudo cerrar el modal de canal');
+        }
+    };
+</script>

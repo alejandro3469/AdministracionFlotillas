@@ -1,0 +1,183 @@
+<div class="row mb-3 g-3">
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label">Tipo</label>
+        <ejs-dropdownlist id="filtroTipo" 
+                          placeholder="Todos los tipos"
+                          dataSource="@(new string[] { "MOBILE", "CALL_CENTER", "EMAIL", "WEB" })"
+                          change="filtroTipoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Estado</label>
+        <ejs-dropdownlist id="filtroEstado" 
+                          placeholder="Todos los estados"
+                          dataSource="@(new string[] { "ACTIVE", "INACTIVE", "MAINTENANCE" })"
+                          change="filtroEstadoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 d-flex align-items-end">
+        <button type="button" class="btn btn-secondary w-100" onclick="OrderChannels.Filtros.Limpiar()">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
+    </div>
+</div>
+
+<ejs-grid id="orderChannelsGrid" 
+          allowPaging="true"
+          allowFiltering="true"
+          allowSorting="true"
+          allowSelection="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          allowResizing="true"
+          is-responsive="true"
+          enable-responsive-row="true"
+          toolbarClick="orderChannelsGridToolbarClick"
+          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
+          dataBound="orderChannelsGridDataBound"
+          created="orderChannelsGridCreated">
+    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column field="IdCanal" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="NombreCanal" headerText="Nombre" width="180"></e-grid-column>
+        <e-grid-column field="TipoCanal" headerText="Tipo" width="130" template="#tipoTemplate"></e-grid-column>
+        <e-grid-column field="TotalPedidos" headerText="Total Pedidos" width="120" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="TasaConversion" headerText="Tasa Conversión" width="140" type="number" format="N2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="ValorPromedioPedido" headerText="Valor Promedio" width="140" type="number" format="C2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="PedidosHoy" headerText="Pedidos Hoy" width="120" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Eficiencia" headerText="Eficiencia" width="120" type="number" format="N2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Estado" headerText="Estado" width="120" template="#estadoTemplate"></e-grid-column>
+        <e-grid-column headerText="Acciones" width="150" template="#accionesTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="tipoTemplate" type="text/x-template">
+    ${if(TipoCanal === 'MOBILE')}
+        <span class="badge bg-primary"><i class="fas fa-mobile-alt"></i> Móvil</span>
+    ${else if(TipoCanal === 'CALL_CENTER')}
+        <span class="badge bg-info"><i class="fas fa-phone"></i> Call Center</span>
+    ${else if(TipoCanal === 'EMAIL')}
+        <span class="badge bg-secondary"><i class="fas fa-envelope"></i> Email</span>
+    ${else if(TipoCanal === 'WEB')}
+        <span class="badge bg-success"><i class="fas fa-globe"></i> Web</span>
+    ${else}
+        <span class="badge bg-secondary">${TipoCanal}</span>
+    ${/if}
+</script>
+
+<script id="estadoTemplate" type="text/x-template">
+    ${if(Estado === 'ACTIVE')}
+        <span class="badge bg-success">${Estado}</span>
+    ${else if(Estado === 'INACTIVE')}
+        <span class="badge bg-secondary">${Estado}</span>
+    ${else if(Estado === 'MAINTENANCE')}
+        <span class="badge bg-warning text-dark">${Estado}</span>
+    ${else}
+        <span class="badge bg-secondary">${Estado || 'ACTIVE'}</span>
+    ${/if}
+</script>
+
+<script id="accionesTemplate" type="text/x-template">
+    ${if(IdCanal && IdCanal > 0)}
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-info btn-ver-canal" data-id-canal="${IdCanal}" title="Ver detalles">
+                <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+            </button>
+            <button class="btn btn-sm btn-primary btn-editar-canal" data-id-canal="${IdCanal}" title="Editar canal">
+                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+            </button>
+        </div>
+    ${else}
+        <div class="d-flex gap-1">
+            <span class="text-muted small">-</span>
+        </div>
+    ${/if}
+</script>
+
+<script>
+    if (!window.orderChannelsGridActionButtonHandler) {
+        window.orderChannelsGridActionButtonHandler = function(event) {
+            var target = event.target;
+            var button = target.closest('.btn-ver-canal, .btn-editar-canal');
+            
+            if (button) {
+                var idCanal = button.getAttribute('data-id-canal');
+                
+                if (!idCanal || idCanal === 'undefined' || idCanal === 'null' || idCanal === '') {
+                    var gridElement = document.getElementById('orderChannelsGrid');
+                    if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
+                        var grid = gridElement.ej2_instances[0];
+                        var row = button.closest('.e-row');
+                        if (row) {
+                            try {
+                                var rowInfo = grid.getRowInfo(row);
+                                var rowData = rowInfo ? rowInfo.rowData : null;
+                                if (rowData) {
+                                    idCanal = rowData.IdCanal || rowData.idCanal;
+                                }
+                            } catch (e) {
+                                console.warn('Error al obtener datos de la fila:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (idCanal && idCanal !== 'undefined' && idCanal !== 'null' && idCanal !== '') {
+                    idCanal = parseInt(idCanal, 10);
+                    if (idCanal && !isNaN(idCanal) && idCanal > 0) {
+                        if (button.classList.contains('btn-ver-canal')) {
+                            if (window.OrderChannels && window.OrderChannels.Modal) {
+                                window.OrderChannels.Modal.Abrir(idCanal, 'ver');
+                            }
+                        } else if (button.classList.contains('btn-editar-canal')) {
+                            if (window.OrderChannels && window.OrderChannels.Modal) {
+                                window.OrderChannels.Modal.Abrir(idCanal, 'editar');
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        document.addEventListener('click', window.orderChannelsGridActionButtonHandler);
+    }
+    
+    window.filtroTipoChange = function(args) {
+        if (window.OrderChannels && window.OrderChannels.Filtros) {
+            window.OrderChannels.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroEstadoChange = function(args) {
+        if (window.OrderChannels && window.OrderChannels.Filtros) {
+            window.OrderChannels.Filtros.Aplicar();
+        }
+    };
+    
+    window.orderChannelsGridToolbarClick = function(args) {
+        var gridElement = document.getElementById('orderChannelsGrid');
+        if (!gridElement || !gridElement.ej2_instances || !gridElement.ej2_instances[0]) {
+            return;
+        }
+        
+        var grid = gridElement.ej2_instances[0];
+        var fileNamePrefix = 'CanalesPedidos_' + new Date().toISOString().split('T')[0];
+        
+        if (args.item.text === 'Excel Export' || (args.item.id && args.item.id.includes('excelexport'))) {
+            grid.excelExport({ fileName: fileNamePrefix + '.xlsx' });
+        } else if (args.item.text === 'Pdf Export' || (args.item.id && args.item.id.includes('pdfexport'))) {
+            grid.pdfExport({ fileName: fileNamePrefix + '.pdf' });
+        }
+    };
+    
+    window.orderChannelsGridDataBound = function(args) {
+        // Event delegation ya está registrado
+    };
+    
+    window.orderChannelsGridCreated = function(args) {
+        console.log('Grid de canales creado');
+        if (window.OrderChannels && window.OrderChannels.Grid) {
+            window.OrderChannels.Grid.CargarDatos();
+        }
+    };
+</script>

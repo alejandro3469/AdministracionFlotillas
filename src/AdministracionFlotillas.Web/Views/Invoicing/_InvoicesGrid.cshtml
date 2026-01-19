@@ -1,0 +1,197 @@
+<div class="row mb-3 g-3">
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">ID Orden</label>
+        <ejs-numerictextbox id="filtroIdOrden" 
+                             placeholder="Todas las órdenes"
+                             change="filtroIdOrdenChange">
+        </ejs-numerictextbox>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Estado</label>
+        <ejs-dropdownlist id="filtroEstado" 
+                          placeholder="Todos los estados"
+                          dataSource="@(new string[] { "DRAFT", "STAMPED", "CANCELLED", "PAID" })"
+                          change="filtroEstadoChange">
+        </ejs-dropdownlist>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Fecha Inicio</label>
+        <ejs-datepicker id="filtroFechaInicio" 
+                        placeholder="Desde"
+                        change="filtroFechaInicioChange">
+        </ejs-datepicker>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label">Fecha Fin</label>
+        <ejs-datepicker id="filtroFechaFin" 
+                        placeholder="Hasta"
+                        change="filtroFechaFinChange">
+        </ejs-datepicker>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3 d-flex align-items-end">
+        <button type="button" class="btn btn-secondary w-100" onclick="Invoicing.Filtros.Limpiar()">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
+    </div>
+</div>
+
+<ejs-grid id="invoicesGrid" 
+          allowPaging="true"
+          allowFiltering="true"
+          allowSorting="true"
+          allowSelection="true"
+          allowExcelExport="true"
+          allowPdfExport="true"
+          allowResizing="true"
+          is-responsive="true"
+          enable-responsive-row="true"
+          toolbarClick="invoicesGridToolbarClick"
+          toolbar="@(new List<string>() { "Search", "ExcelExport", "PdfExport" })"
+          dataBound="invoicesGridDataBound"
+          created="invoicesGridCreated">
+    <e-grid-loadingIndicator indicatorType="Shimmer"></e-grid-loadingIndicator>
+    <e-grid-pagesettings pageSize="10" pageSizes="@(new int[] { 10, 25, 50, 100 })"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column field="IdFactura" headerText="ID" width="80" isPrimaryKey="true" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Folio" headerText="Folio" width="140"></e-grid-column>
+        <e-grid-column field="UUID" headerText="UUID" width="200"></e-grid-column>
+        <e-grid-column field="IdOrden" headerText="ID Orden" width="100" type="number" textAlign="Right"></e-grid-column>
+        <e-grid-column field="RFCReceptor" headerText="RFC Receptor" width="130"></e-grid-column>
+        <e-grid-column field="FechaEmision" headerText="Fecha Emisión" width="130" type="date" format="dd/MM/yyyy"></e-grid-column>
+        <e-grid-column field="Subtotal" headerText="Subtotal" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Impuesto" headerText="IVA" width="100" type="number" format="C2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Total" headerText="Total" width="120" type="number" format="C2" textAlign="Right"></e-grid-column>
+        <e-grid-column field="Estado" headerText="Estado" width="120" template="#estadoTemplate"></e-grid-column>
+        <e-grid-column headerText="Acciones" width="150" template="#accionesTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="estadoTemplate" type="text/x-template">
+    ${if(Estado === 'STAMPED')}
+        <span class="badge bg-success">${Estado}</span>
+    ${else if(Estado === 'DRAFT')}
+        <span class="badge bg-secondary">${Estado}</span>
+    ${else if(Estado === 'CANCELLED')}
+        <span class="badge bg-danger">${Estado}</span>
+    ${else if(Estado === 'PAID')}
+        <span class="badge bg-info">${Estado}</span>
+    ${else}
+        <span class="badge bg-secondary">${Estado || 'DRAFT'}</span>
+    ${/if}
+</script>
+
+<script id="accionesTemplate" type="text/x-template">
+    ${if(IdFactura && IdFactura > 0)}
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-info btn-ver-factura" data-id-factura="${IdFactura}" title="Ver detalles">
+                <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+            </button>
+            <button class="btn btn-sm btn-primary btn-editar-factura" data-id-factura="${IdFactura}" title="Editar factura">
+                <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+            </button>
+        </div>
+    ${else}
+        <div class="d-flex gap-1">
+            <span class="text-muted small">-</span>
+        </div>
+    ${/if}
+</script>
+
+<script>
+    if (!window.invoicesGridActionButtonHandler) {
+        window.invoicesGridActionButtonHandler = function(event) {
+            var target = event.target;
+            var button = target.closest('.btn-ver-factura, .btn-editar-factura');
+            
+            if (button) {
+                var idFactura = button.getAttribute('data-id-factura');
+                
+                if (!idFactura || idFactura === 'undefined' || idFactura === 'null' || idFactura === '') {
+                    var gridElement = document.getElementById('invoicesGrid');
+                    if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
+                        var grid = gridElement.ej2_instances[0];
+                        var row = button.closest('.e-row');
+                        if (row) {
+                            try {
+                                var rowInfo = grid.getRowInfo(row);
+                                var rowData = rowInfo ? rowInfo.rowData : null;
+                                if (rowData) {
+                                    idFactura = rowData.IdFactura || rowData.idFactura;
+                                }
+                            } catch (e) {
+                                console.warn('Error al obtener datos de la fila:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (idFactura && idFactura !== 'undefined' && idFactura !== 'null' && idFactura !== '') {
+                    idFactura = parseInt(idFactura, 10);
+                    if (idFactura && !isNaN(idFactura) && idFactura > 0) {
+                        if (button.classList.contains('btn-ver-factura')) {
+                            if (window.Invoicing && window.Invoicing.Modal) {
+                                window.Invoicing.Modal.Abrir(idFactura, 'ver');
+                            }
+                        } else if (button.classList.contains('btn-editar-factura')) {
+                            if (window.Invoicing && window.Invoicing.Modal) {
+                                window.Invoicing.Modal.Abrir(idFactura, 'editar');
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        document.addEventListener('click', window.invoicesGridActionButtonHandler);
+    }
+    
+    window.filtroIdOrdenChange = function(args) {
+        if (window.Invoicing && window.Invoicing.Filtros) {
+            window.Invoicing.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroEstadoChange = function(args) {
+        if (window.Invoicing && window.Invoicing.Filtros) {
+            window.Invoicing.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroFechaInicioChange = function(args) {
+        if (window.Invoicing && window.Invoicing.Filtros) {
+            window.Invoicing.Filtros.Aplicar();
+        }
+    };
+    
+    window.filtroFechaFinChange = function(args) {
+        if (window.Invoicing && window.Invoicing.Filtros) {
+            window.Invoicing.Filtros.Aplicar();
+        }
+    };
+    
+    window.invoicesGridToolbarClick = function(args) {
+        var gridElement = document.getElementById('invoicesGrid');
+        if (!gridElement || !gridElement.ej2_instances || !gridElement.ej2_instances[0]) {
+            return;
+        }
+        
+        var grid = gridElement.ej2_instances[0];
+        var fileNamePrefix = 'Facturas_' + new Date().toISOString().split('T')[0];
+        
+        if (args.item.text === 'Excel Export' || (args.item.id && args.item.id.includes('excelexport'))) {
+            grid.excelExport({ fileName: fileNamePrefix + '.xlsx' });
+        } else if (args.item.text === 'Pdf Export' || (args.item.id && args.item.id.includes('pdfexport'))) {
+            grid.pdfExport({ fileName: fileNamePrefix + '.pdf' });
+        }
+    };
+    
+    window.invoicesGridDataBound = function(args) {
+        // Event delegation ya está registrado
+    };
+    
+    window.invoicesGridCreated = function(args) {
+        console.log('Grid de facturas creado');
+        if (window.Invoicing && window.Invoicing.Grid) {
+            window.Invoicing.Grid.CargarDatos();
+        }
+    };
+</script>

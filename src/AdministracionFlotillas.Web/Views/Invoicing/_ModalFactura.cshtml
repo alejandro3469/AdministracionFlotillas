@@ -1,0 +1,252 @@
+<ejs-tooltip id="tooltipModalFactura" 
+             target=".info-tooltip-factura" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalFacturaBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentFactura"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<div id="modalFactura" style="display: none;"></div>
+
+<ejs-dialog id="modalFactura" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="80%" 
+            height="85%" 
+            visible="false"
+            header="Factura #<span id='modalFacturaTitulo'>0</span>"
+            created="modalFacturaCreated"
+            open="modalFacturaOpen"
+            close="modalFacturaClose"
+            beforeClose="modalFacturaBeforeClose">
+    <e-content-template>
+        <div id="modalFacturaContenido">
+            <ejs-tab id="tabsModalFactura" heightAdjustMode="Auto">
+                <e-tab-tabitems>
+                    <e-tab-item header="@(new Syncfusion.EJ2.Navigations.TabHeader { Text = "Información General" })">
+                        <e-content-template>
+                            <div id="tabInfoModalFactura" class="mt-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información de la Factura</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">ID Factura:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalIdFactura" class="info-tooltip-factura" data-field="IdFactura" data-tooltip="Identificador único de la factura">-</strong>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Folio:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFolio" class="info-tooltip-factura" data-field="Folio" data-tooltip="Folio fiscal de la factura">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">UUID:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalUUID" class="info-tooltip-factura" data-field="UUID" data-tooltip="UUID del CFDI timbrado">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">ID Orden:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalIdOrden" class="info-tooltip-factura" data-field="IdOrden" data-tooltip="ID de la orden asociada">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dd class="col-sm-7" id="modalEstadoFactura">
+                                                        <span class="info-tooltip-factura" data-field="Estado" data-tooltip="Estado: DRAFT (borrador), STAMPED (timbrada), CANCELLED (cancelada), PAID (pagada)">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Información Fiscal</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">RFC Emisor:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalRFCEmisor" class="info-tooltip-factura" data-field="RFCEmisor" data-tooltip="RFC de la empresa emisora">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">RFC Receptor:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalRFCReceptor" class="info-tooltip-factura" data-field="RFCReceptor" data-tooltip="RFC del cliente receptor">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Fecha Emisión:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaEmision" class="info-tooltip-factura" data-field="FechaEmision" data-tooltip="Fecha de emisión de la factura">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Método de Pago:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalMetodoPago" class="info-tooltip-factura" data-field="MetodoPago" data-tooltip="Método de pago (PUE o PPD)">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Forma de Pago:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFormaPago" class="info-tooltip-factura" data-field="FormaPago" data-tooltip="Forma de pago (código SAT)">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Moneda:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalMoneda" class="info-tooltip-factura" data-field="Moneda" data-tooltip="Moneda de la factura">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Totales</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Subtotal:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalSubtotal" class="info-tooltip-factura" data-field="Subtotal" data-tooltip="Subtotal sin impuestos">$0.00</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Impuesto (IVA):</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalImpuesto" class="info-tooltip-factura" data-field="Impuesto" data-tooltip="Impuesto al valor agregado">$0.00</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Total:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <strong id="modalTotal" class="info-tooltip-factura" data-field="Total" data-tooltip="Total a pagar">$0.00</strong>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Archivos</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Ruta XML:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalRutaXML" class="info-tooltip-factura" data-field="RutaXML" data-tooltip="Ruta del archivo XML del CFDI">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Ruta PDF:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalRutaPDF" class="info-tooltip-factura" data-field="RutaPDF" data-tooltip="Ruta del archivo PDF de la factura">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Fecha Cancelación:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalFechaCancelacion" class="info-tooltip-factura" data-field="FechaCancelacion" data-tooltip="Fecha de cancelación (si aplica)">-</span>
+                                                    </dd>
+                                                    <dt class="col-sm-5">Motivo Cancelación:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <span id="modalMotivoCancelacion" class="info-tooltip-factura" data-field="MotivoCancelacion" data-tooltip="Motivo de cancelación">-</span>
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </e-content-template>
+                    </e-tab-item>
+                </e-tab-tabitems>
+            </ejs-tab>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalFacturaEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalFacturaCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    var modalFacturaModo = 'ver';
+    var modalFacturaId = null;
+    var tooltipModalFacturaObj = null;
+    window.modalFacturaInstance = null;
+    
+    window.modalFacturaCreated = function(args) {
+        console.log('✅ Modal de factura creado');
+        if (args && args.component) {
+            window.modalFacturaInstance = args.component;
+        }
+    };
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipElement = document.getElementById('tooltipModalFactura');
+        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+            tooltipModalFacturaObj = tooltipElement.ej2_instances[0];
+        }
+        setTimeout(function() {
+            if (!window.modalFacturaInstance) {
+                var dialogElement = document.getElementById('modalFactura');
+                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                    window.modalFacturaInstance = dialogElement.ej2_instances[0];
+                }
+            }
+        }, 500);
+    });
+    
+    window.tooltipModalFacturaBeforeRender = function(args) {
+        var target = args.target;
+        var tooltipText = target.getAttribute('data-tooltip');
+        var field = target.getAttribute('data-field');
+        
+        if (tooltipText) {
+            var contentDiv = document.createElement('div');
+            contentDiv.style.padding = '8px';
+            contentDiv.style.fontSize = '13px';
+            contentDiv.style.lineHeight = '1.5';
+            
+            var fieldName = document.createElement('strong');
+            fieldName.textContent = field + ': ';
+            fieldName.style.display = 'block';
+            fieldName.style.marginBottom = '4px';
+            fieldName.style.color = '#007bff';
+            
+            var description = document.createElement('span');
+            description.textContent = tooltipText;
+            
+            contentDiv.appendChild(fieldName);
+            contentDiv.appendChild(description);
+            
+            if (tooltipModalFacturaObj) {
+                tooltipModalFacturaObj.content = contentDiv;
+            }
+        }
+    };
+    
+    window.modalFacturaOpen = function(args) {
+        console.log('Modal de factura abierto');
+    };
+    
+    window.modalFacturaClose = function(args) {
+        console.log('Modal de factura cerrado');
+        modalFacturaId = null;
+        modalFacturaModo = 'ver';
+    };
+    
+    window.modalFacturaBeforeClose = function(args) {
+        return true;
+    };
+    
+    window.modalFacturaEditar = function() {
+        if (modalFacturaId) {
+            modalFacturaModo = 'editar';
+            if (window.Invoicing && window.Invoicing.Modal) {
+                window.Invoicing.Modal.CambiarAModoEdicion(modalFacturaId);
+            }
+        }
+    };
+    
+    window.modalFacturaCerrar = function() {
+        if (window.modalFacturaInstance) {
+            window.modalFacturaInstance.hide();
+        } else {
+            console.warn('No se pudo cerrar el modal de factura');
+        }
+    };
+</script>
