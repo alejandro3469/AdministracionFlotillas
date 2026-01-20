@@ -443,6 +443,15 @@ var modalClienteModo = 'ver';
             var chartContainer = document.getElementById('chartActividadCliente');
             if (!chartContainer) return;
             
+            // Verificar que ej esté disponible
+            if (typeof ej === 'undefined' || !ej.charts || !ej.charts.Chart) {
+                console.warn('Syncfusion Charts no está disponible aún, reintentando...');
+                setTimeout(function() {
+                    window.Customers.Modal.ActualizarGraficaActividad(cliente);
+                }, 500);
+                return;
+            }
+            
             var totalOrdenes = cliente.TotalOrdenes || 0;
             var totalCompras = cliente.TotalCompras || 0;
             var limiteCredito = cliente.LimiteCredito || 0;

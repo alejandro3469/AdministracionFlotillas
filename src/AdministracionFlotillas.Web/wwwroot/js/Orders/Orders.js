@@ -994,6 +994,15 @@ var modalOrdenModo = 'ver';
             var chartContainer = document.getElementById('chartTotalesOrden');
             if (!chartContainer) return;
             
+            // Verificar que ej esté disponible
+            if (typeof ej === 'undefined' || !ej.charts || !ej.charts.Chart) {
+                console.warn('Syncfusion Charts no está disponible aún, reintentando...');
+                setTimeout(function() {
+                    window.Orders.Modal.ActualizarGraficaTotales(orden);
+                }, 500);
+                return;
+            }
+            
             var subtotal = orden.Subtotal || 0;
             var descuentos = orden.Descuentos || 0;
             var impuestos = orden.Impuestos || 0;

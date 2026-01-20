@@ -928,6 +928,15 @@ var modalProductoModo = 'ver';
             var chartContainer = document.getElementById('chartPrecios');
             if (!chartContainer) return;
             
+            // Verificar que ej esté disponible
+            if (typeof ej === 'undefined' || !ej.charts || !ej.charts.Chart) {
+                console.warn('Syncfusion Charts no está disponible aún, reintentando...');
+                setTimeout(function() {
+                    window.Products.Modal.ActualizarGraficaPrecios(producto);
+                }, 500);
+                return;
+            }
+            
             var precioUnitario = producto.PrecioUnitario || 0;
             var precioCosto = producto.PrecioCosto || 0;
             var margenGanancia = producto.MargenGanancia || 0;
@@ -982,6 +991,15 @@ var modalProductoModo = 'ver';
         ActualizarGaugeEstado: function(valor) {
             var gaugeContainer = document.getElementById('gaugeEstado');
             if (!gaugeContainer) return;
+            
+            // Verificar que ej esté disponible
+            if (typeof ej === 'undefined' || !ej.circulargauge || !ej.circulargauge.CircularGauge) {
+                console.warn('Syncfusion CircularGauge no está disponible aún, reintentando...');
+                setTimeout(function() {
+                    window.Products.Modal.ActualizarGaugeEstado(valor);
+                }, 500);
+                return;
+            }
             
             // Destruir gauge anterior si existe
             if (gaugeContainer.ej2_instances && gaugeContainer.ej2_instances[0]) {
