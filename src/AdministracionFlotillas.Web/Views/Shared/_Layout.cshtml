@@ -203,8 +203,8 @@
     <script src="~/js/utils/debounce.js" asp-append-version="true"></script>
     <script src="~/js/utils/modal-buttons.js" asp-append-version="true"></script>
     
-    <!-- 11. Syncfusion ASP.NET Core controls scripts -->
-    <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js" defer></script>
+    <!-- 11. Syncfusion ASP.NET Core controls scripts (SIN defer para que esté disponible antes del Script Manager) -->
+    <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script>
     
     <!-- 12. Custom scripts (antes de Script Manager para que funciones de eventos estén disponibles) -->
     <script src="~/js/navigation.js" asp-append-version="true" defer></script>
@@ -213,7 +213,7 @@
     <!-- 13. Page-specific scripts (se renderizan aquí ANTES de Script Manager) -->
     @await RenderSectionAsync("Scripts", required: false)
     
-    <!-- 14. Syncfusion ASP.NET Core Script Manager (OBLIGATORIO - debe ir al final) -->
+    <!-- 14. Syncfusion ASP.NET Core Script Manager (OBLIGATORIO - debe ir al final, después de ej2.min.js) -->
     <ejs-scripts></ejs-scripts>
 </body>
 </html>
