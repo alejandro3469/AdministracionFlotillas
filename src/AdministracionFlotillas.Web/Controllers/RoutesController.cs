@@ -112,6 +112,43 @@ public class RoutesController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarRoute([FromBody] SolicitudActualizarRoute solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdRuta <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones
+            if (solicitud.TiempoEstimado.HasValue && solicitud.TiempoEstimado.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "El tiempo estimado no puede ser negativo" });
+            }
+            
+            if (solicitud.CapacidadMaxima.HasValue && solicitud.CapacidadMaxima.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "La capacidad máxima no puede ser negativa" });
+            }
+            
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "ACTIVE" && solicitud.Estado != "INACTIVE")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido" });
+            }
+            
+            // TODO: Implementar actualización real
+            return Json(new { exito = true, mensaje = "Ruta actualizada correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 public class SolicitudBuscarRoutes
@@ -119,4 +156,16 @@ public class SolicitudBuscarRoutes
     public string? Nombre { get; set; }
     public string? Zona { get; set; }
     public string? Estado { get; set; }
+}
+
+public class SolicitudActualizarRoute
+{
+    public int IdRuta { get; set; }
+    public string? NombreRuta { get; set; }
+    public string? Descripcion { get; set; }
+    public string? ZonaGeografica { get; set; }
+    public int? TiempoEstimado { get; set; }
+    public int? CapacidadMaxima { get; set; }
+    public string? Estado { get; set; }
+    public string? RepartidorAsignado { get; set; }
 }

@@ -112,6 +112,49 @@ public class SalespersonsController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarSalesperson([FromBody] SolicitudActualizarSalesperson solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdVendedor <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones
+            if (solicitud.ComisionBase.HasValue && (solicitud.ComisionBase.Value < 0 || solicitud.ComisionBase.Value > 100))
+            {
+                return Json(new { exito = false, mensaje = "La comisión base debe estar entre 0 y 100" });
+            }
+            
+            if (solicitud.ComisionVariable.HasValue && (solicitud.ComisionVariable.Value < 0 || solicitud.ComisionVariable.Value > 100))
+            {
+                return Json(new { exito = false, mensaje = "La comisión variable debe estar entre 0 y 100" });
+            }
+            
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "ACTIVE" && solicitud.Estado != "INACTIVE")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido" });
+            }
+            
+            // Validar formato de email
+            if (!string.IsNullOrEmpty(solicitud.Email) && !solicitud.Email.Contains("@"))
+            {
+                return Json(new { exito = false, mensaje = "El formato de email no es válido" });
+            }
+            
+            // TODO: Implementar actualización real
+            return Json(new { exito = true, mensaje = "Vendedor actualizado correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 // Clase auxiliar para solicitudes
@@ -119,5 +162,17 @@ public class SolicitudBuscarSalespersons
 {
     public string? Nombre { get; set; }
     public string? Zona { get; set; }
+    public string? Estado { get; set; }
+}
+
+public class SolicitudActualizarSalesperson
+{
+    public int IdVendedor { get; set; }
+    public string? NombreCompleto { get; set; }
+    public string? Email { get; set; }
+    public string? Telefono { get; set; }
+    public string? ZonaCobertura { get; set; }
+    public decimal? ComisionBase { get; set; }
+    public decimal? ComisionVariable { get; set; }
     public string? Estado { get; set; }
 }

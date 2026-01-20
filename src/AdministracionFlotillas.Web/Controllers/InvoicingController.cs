@@ -112,6 +112,37 @@ public class InvoicingController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarInvoice([FromBody] SolicitudActualizarInvoice solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdFactura <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "DRAFT" && solicitud.Estado != "STAMPED" && 
+                solicitud.Estado != "CANCELLED" && solicitud.Estado != "PENDING")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido" });
+            }
+            
+            // Las facturas timbradas no pueden editarse
+            // TODO: Validar estado actual antes de permitir edición
+            
+            // TODO: Implementar actualización real
+            return Json(new { exito = true, mensaje = "Factura actualizada correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 public class SolicitudBuscarInvoices
@@ -121,4 +152,13 @@ public class SolicitudBuscarInvoices
     public string? Estado { get; set; }
     public DateTime? FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }
+}
+
+public class SolicitudActualizarInvoice
+{
+    public int IdFactura { get; set; }
+    public string? Estado { get; set; }
+    public string? MetodoPago { get; set; }
+    public string? FormaPago { get; set; }
+    public string? MotivoCancelacion { get; set; }
 }

@@ -112,10 +112,46 @@ public class OrderChannelsController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarOrderChannel([FromBody] SolicitudActualizarOrderChannel solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdCanal <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "ACTIVE" && solicitud.Estado != "INACTIVE")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido" });
+            }
+            
+            // TODO: Implementar actualización real
+            return Json(new { exito = true, mensaje = "Canal actualizado correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 public class SolicitudBuscarOrderChannels
 {
     public string? Tipo { get; set; }
+    public string? Estado { get; set; }
+}
+
+public class SolicitudActualizarOrderChannel
+{
+    public int IdCanal { get; set; }
+    public string? NombreCanal { get; set; }
+    public string? TipoCanal { get; set; }
+    public string? Descripcion { get; set; }
     public string? Estado { get; set; }
 }

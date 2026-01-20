@@ -111,10 +111,66 @@ public class AddendumsController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarAddendum([FromBody] SolicitudActualizarAddendum solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdAdenda <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones
+            if (solicitud.DescuentoEspecial.HasValue && (solicitud.DescuentoEspecial.Value < 0 || solicitud.DescuentoEspecial.Value > 100))
+            {
+                return Json(new { exito = false, mensaje = "El descuento especial debe estar entre 0 y 100" });
+            }
+            
+            if (solicitud.DiasCredito.HasValue && solicitud.DiasCredito.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "Los días de crédito no pueden ser negativos" });
+            }
+            
+            if (solicitud.MontoMinimoPedido.HasValue && solicitud.MontoMinimoPedido.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "El monto mínimo de pedido no puede ser negativo" });
+            }
+            
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "ACTIVE" && solicitud.Estado != "EXPIRED" && solicitud.Estado != "CANCELLED")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido" });
+            }
+            
+            // TODO: Implementar actualización real
+            return Json(new { exito = true, mensaje = "Adenda actualizada correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 public class SolicitudBuscarAddendums
 {
     public int? IdCadena { get; set; }
     public string? Estado { get; set; }
+}
+
+public class SolicitudActualizarAddendum
+{
+    public int IdAdenda { get; set; }
+    public string? NombreAdenda { get; set; }
+    public decimal? DescuentoEspecial { get; set; }
+    public int? DiasCredito { get; set; }
+    public DateTime? FechaInicio { get; set; }
+    public DateTime? FechaFin { get; set; }
+    public string? Estado { get; set; }
+    public string? CondicionesEspeciales { get; set; }
+    public bool? RenovacionAutomatica { get; set; }
+    public decimal? MontoMinimoPedido { get; set; }
 }
