@@ -1,0 +1,228 @@
+@* Modal de Información de Cabecera de la Orden - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalCabeceraOrden" 
+             target=".info-tooltip-cabecera-orden" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalCabeceraOrdenBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentCabeceraOrden"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalCabeceraOrden" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="700px" 
+            height="auto"
+            visible="false"
+            header="Información de Cabecera - Orden #<span id='modalCabeceraOrdenTitulo'>0</span>"
+            created="modalCabeceraOrdenCreated"
+            open="modalCabeceraOrdenOpen"
+            close="modalCabeceraOrdenClose">
+    <e-content-template>
+        <div id="modalCabeceraOrdenContenido" class="p-3">
+            <div class="alert alert-info mb-3">
+                <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>¿Qué es la Información de Cabecera?</h6>
+                <p class="mb-0 small">
+                    La información de cabecera contiene los datos básicos e identificadores de la orden: 
+                    ID único, estado, fecha, cliente y tienda. Estos campos son fundamentales para identificar y gestionar la orden en el sistema.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-id-card me-2"></i>Datos de Identificación</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    ID Orden
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="IdOrden" 
+                                       data-tooltip="Identificador único de la orden en el sistema. No se puede modificar."></i>
+                                </label>
+                                <input type="text" id="modalCabeceraIdOrden" class="form-control" readonly>
+                                <small class="text-muted">Este campo no se puede modificar</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Fecha de Orden
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="FechaOrden" 
+                                       data-tooltip="Fecha y hora en que se registró la orden. Se usa para ordenar y filtrar órdenes por fecha."></i>
+                                </label>
+                                <input type="datetime-local" id="modalCabeceraFechaOrden" class="form-control">
+                                <small class="text-muted">Fecha y hora de registro</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Estado
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="EstadoOrden" 
+                                       data-tooltip="Estado de la orden: COMPLETE (completada), CANCELLED (cancelada), REFUNDED (reembolsada), PENDING (pendiente)."></i>
+                                </label>
+                                <select id="modalCabeceraEstadoOrden" class="form-select">
+                                    <option value="PENDING">PENDING - Pendiente</option>
+                                    <option value="COMPLETE">COMPLETE - Completada</option>
+                                    <option value="CANCELLED">CANCELLED - Cancelada</option>
+                                    <option value="REFUNDED">REFUNDED - Reembolsada</option>
+                                </select>
+                                <small class="text-muted">El estado determina el flujo de la orden</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-users me-2"></i>Cliente y Tienda</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    ID Cliente
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="IdCliente" 
+                                       data-tooltip="Identificador del cliente que realizó la orden. Se usa para vincular la orden con el cliente."></i>
+                                </label>
+                                <input type="number" id="modalCabeceraIdCliente" class="form-control" min="1">
+                                <small class="text-muted">ID del cliente</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Nombre Cliente
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="NombreCliente" 
+                                       data-tooltip="Nombre completo del cliente. Se muestra para referencia rápida."></i>
+                                </label>
+                                <input type="text" id="modalCabeceraNombreCliente" class="form-control" readonly>
+                                <small class="text-muted">Solo lectura - Se obtiene del cliente</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    ID Tienda
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="IdTienda" 
+                                       data-tooltip="Identificador de la tienda donde se procesó la orden. Se usa para reportes por tienda."></i>
+                                </label>
+                                <input type="number" id="modalCabeceraIdTienda" class="form-control" min="1">
+                                <small class="text-muted">ID de la tienda</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Nombre Tienda
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-orden" 
+                                       data-field="NombreTienda" 
+                                       data-tooltip="Nombre de la tienda. Se muestra para referencia rápida."></i>
+                                </label>
+                                <input type="text" id="modalCabeceraNombreTienda" class="form-control" readonly>
+                                <small class="text-muted">Solo lectura - Se obtiene de la tienda</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalCabeceraOrdenGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalCabeceraOrdenGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCabeceraOrdenCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalCabeceraOrdenCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalCabeceraOrdenId === 'undefined') {
+        window.modalCabeceraOrdenId = null;
+    }
+    if (typeof modalCabeceraOrdenId === 'undefined') {
+        var modalCabeceraOrdenId = null;
+    }
+    var tooltipModalCabeceraOrdenObj = null;
+    window.modalCabeceraOrdenInstance = null;
+    
+    window.mostrarModalCabeceraOrden = function() {
+        if (window.modalCabeceraOrdenInstance) {
+            try {
+                window.modalCabeceraOrdenInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalCabeceraOrden');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalCabeceraOrdenInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalCabeceraOrden = function() {
+        if (window.modalCabeceraOrdenInstance) {
+            try {
+                window.modalCabeceraOrdenInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalCabeceraOrdenCreated = function(args) {
+        if (args && args.component) {
+            window.modalCabeceraOrdenInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalCabeceraOrden');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalCabeceraOrdenInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalCabeceraOrdenOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalCabeceraOrden');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalCabeceraOrdenObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalCabeceraOrdenClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalCabeceraOrdenGuardar = function() {
+        if (window.Orders && window.Orders.Modal) {
+            window.Orders.Modal.GuardarCabecera();
+        }
+    };
+    
+    window.modalCabeceraOrdenCancelar = function() {
+        window.ocultarModalCabeceraOrden();
+    };
+    
+    window.tooltipModalCabeceraOrdenBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentCabeceraOrden');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

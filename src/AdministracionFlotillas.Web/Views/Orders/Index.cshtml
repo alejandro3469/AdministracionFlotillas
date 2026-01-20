@@ -77,8 +77,10 @@
         </div>
     </div>
     
-    <!-- Modal Ver/Editar Orden -->
-    @await Html.PartialAsync("_ModalOrden")
+    <!-- Modales Especializados -->
+    @await Html.PartialAsync("_ModalCabeceraOrden")
+    @await Html.PartialAsync("_ModalComercialOrden")
+    @await Html.PartialAsync("_ModalDetallesOrden")
 </div>
 
 @section Scripts {

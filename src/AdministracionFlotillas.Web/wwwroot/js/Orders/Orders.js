@@ -51,7 +51,7 @@ window.ordersGridActionBegin = function(args) {
 if (!window.ordersGridActionButtonHandler) {
     window.ordersGridActionButtonHandler = function(event) {
         var target = event.target;
-        var button = target.closest('.btn-ver-detalle, .btn-editar-orden');
+        var button = target.closest('.btn-cabecera-orden, .btn-comercial-orden, .btn-detalles-orden');
         
         if (button) {
             // Obtener ID directamente del atributo data
@@ -83,21 +83,17 @@ if (!window.ordersGridActionButtonHandler) {
                 
                 if (idOrden && !isNaN(idOrden) && idOrden > 0) {
                     console.log('Abriendo modal para orden ID:', idOrden);
-                    if (button.classList.contains('btn-ver-detalle')) {
+                    if (button.classList.contains('btn-cabecera-orden')) {
                         if (window.Orders && window.Orders.Modal) {
-                            window.Orders.Modal.Abrir(idOrden, 'ver');
-                        } else if (window.Orders && window.Orders.Detalles) {
-                            window.Orders.Detalles.Ver(idOrden);
-                        } else {
-                            console.error('Orders.Modal y Orders.Detalles no están disponibles');
+                            window.Orders.Modal.AbrirCabecera(idOrden);
                         }
-                    } else if (button.classList.contains('btn-editar-orden')) {
+                    } else if (button.classList.contains('btn-comercial-orden')) {
                         if (window.Orders && window.Orders.Modal) {
-                            window.Orders.Modal.Abrir(idOrden, 'editar');
-                        } else if (window.Orders && window.Orders.Edicion) {
-                            window.Orders.Edicion.Editar(idOrden);
-                        } else {
-                            console.error('Orders.Modal y Orders.Edicion no están disponibles');
+                            window.Orders.Modal.AbrirComercial(idOrden);
+                        }
+                    } else if (button.classList.contains('btn-detalles-orden')) {
+                        if (window.Orders && window.Orders.Modal) {
+                            window.Orders.Modal.AbrirDetalles(idOrden);
                         }
                     }
                 } else {
@@ -864,6 +860,36 @@ var modalOrdenModo = 'ver';
     
     // Sub-namespace para Modal
     window.Orders.Modal = {
+        AbrirCabecera: function(idOrden) {
+            var id = parseInt(idOrden, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'ID de orden no válido.');
+                return;
+            }
+            window.modalCabeceraOrdenId = id;
+            this.CargarDatosOrden(id, 'cabecera');
+        },
+        
+        AbrirComercial: function(idOrden) {
+            var id = parseInt(idOrden, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'ID de orden no válido.');
+                return;
+            }
+            window.modalComercialOrdenId = id;
+            this.CargarDatosOrden(id, 'comercial');
+        },
+        
+        AbrirDetalles: function(idOrden) {
+            var id = parseInt(idOrden, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'ID de orden no válido.');
+                return;
+            }
+            window.modalDetallesOrdenId = id;
+            this.CargarDatosOrden(id, 'detalles');
+        },
+        
         Abrir: function(idOrden, modo) {
             // Convertir a número si viene como string
             var id = parseInt(idOrden, 10);
@@ -881,12 +907,12 @@ var modalOrdenModo = 'ver';
             this.CargarDatosOrden(id);
         },
         
-        CargarDatosOrden: function(idOrden) {
+        CargarDatosOrden: function(idOrden, tipo) {
             var cacheKey = 'orden_' + idOrden;
             var self = this;
             
             // Verificar caché (5 minutos de expiración)
-            if (window.Orders.Cache.EsValido(cacheKey)) {
+            if (window.Orders.Cache.EsValido(cacheKey) && !tipo) {
                 var datosCache = window.Orders.Cache.Obtener(cacheKey);
                 self.MostrarDatos(datosCache);
                 // Abrir el modal después de mostrar los datos
@@ -896,6 +922,8 @@ var modalOrdenModo = 'ver';
                 }, 100);
                 return;
             }
+            
+            // Si hay tipo específico, no usar caché (siempre cargar datos frescos)
             
             // Si no está en caché, cargar desde servidor
             var xhr = new XMLHttpRequest();
@@ -909,13 +937,24 @@ var modalOrdenModo = 'ver';
                             if (respuesta.exito && respuesta.datos) {
                                 // Guardar en caché (5 minutos = 300000 ms)
                                 window.Orders.Cache.Guardar(cacheKey, respuesta.datos, 5 * 60 * 1000);
-                                self.MostrarDatos(respuesta.datos);
-                                // Abrir el modal después de mostrar los datos
-                                setTimeout(function() {
-                                    self.AbrirDialog();
-                                    // Cargar items de factura
-                                    self.CargarItemsFactura(idOrden);
-                                }, 100);
+                                if (tipo === 'cabecera') {
+                                    self.MostrarDatosCabecera(respuesta.datos);
+                                    self.AbrirDialogCabecera();
+                                } else if (tipo === 'comercial') {
+                                    self.MostrarDatosComercial(respuesta.datos);
+                                    self.AbrirDialogComercial();
+                                } else if (tipo === 'detalles') {
+                                    self.MostrarDatosDetalles(respuesta.datos);
+                                    self.AbrirDialogDetalles();
+                                } else {
+                                    self.MostrarDatos(respuesta.datos);
+                                    // Abrir el modal después de mostrar los datos
+                                    setTimeout(function() {
+                                        self.AbrirDialog();
+                                        // Cargar items de factura
+                                        self.CargarItemsFactura(idOrden);
+                                    }, 100);
+                                }
                             } else {
                                 window.Orders.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar la orden.');
                             }
@@ -967,6 +1006,15 @@ var modalOrdenModo = 'ver';
                 estadoHtml = '<span class="badge bg-secondary info-tooltip-orden" data-field="EstadoOrden" data-tooltip="Orden pendiente de procesamiento">' + (orden.EstadoOrden || 'PENDING') + '</span>';
             }
             setHtml('modalEstadoOrden', estadoHtml);
+            
+            // Actualizar ChipList de estado
+            this.ActualizarChipEstado(orden.EstadoOrden || orden.Estado || 'PENDING');
+            
+            // Actualizar ProgressBar de estado
+            this.ActualizarProgressEstado(orden.EstadoOrden || orden.Estado || 'PENDING');
+            
+            // Actualizar Timeline
+            this.ActualizarTimeline(orden.EstadoOrden || orden.Estado || 'PENDING');
             
             setText('modalIdCliente', orden.IdCliente || '-');
             setText('modalNombreCliente', orden.NombreCliente || '-');
@@ -1050,33 +1098,6 @@ var modalOrdenModo = 'ver';
             });
             
             chart.appendTo('#chartTotalesOrden');
-        },
-        
-        CargarItemsFactura: function(idOrden) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '/Orders/ObtenerItemsFactura', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        try {
-                            var respuesta = JSON.parse(xhr.responseText);
-                            if (respuesta.exito && respuesta.datos) {
-                                var gridElement = document.getElementById('gridItemsModalOrden');
-                                if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
-                                    gridElement.ej2_instances[0].dataSource = respuesta.datos;
-                                    gridElement.ej2_instances[0].refresh();
-                                }
-                            }
-                        } catch (e) {
-                            console.error('Error al parsear respuesta de items de factura:', e);
-                        }
-                    } else {
-                        console.error('Error al cargar items de factura: HTTP ' + xhr.status);
-                    }
-                }
-            };
-            xhr.send(JSON.stringify(idOrden));
         },
         
         AbrirDialog: function() {
@@ -1471,6 +1492,256 @@ var modalOrdenModo = 'ver';
             
             // Desactivar modo edición
             this.DesactivarModoEdicion();
+        },
+        
+        MostrarDatosCabecera: function(orden) {
+            document.getElementById('modalCabeceraOrdenTitulo').textContent = orden.IdOrden;
+            document.getElementById('modalCabeceraIdOrden').value = orden.IdOrden;
+            
+            if (orden.FechaOrden) {
+                var fecha = new Date(orden.FechaOrden);
+                var fechaStr = fecha.toISOString().slice(0, 16);
+                document.getElementById('modalCabeceraFechaOrden').value = fechaStr;
+            }
+            
+            document.getElementById('modalCabeceraEstadoOrden').value = orden.EstadoOrden || 'PENDING';
+            document.getElementById('modalCabeceraIdCliente').value = orden.IdCliente || '';
+            document.getElementById('modalCabeceraNombreCliente').value = orden.NombreCliente || '';
+            document.getElementById('modalCabeceraIdTienda').value = orden.IdTienda || '';
+            document.getElementById('modalCabeceraNombreTienda').value = orden.NombreTienda || '';
+        },
+        
+        MostrarDatosComercial: function(orden) {
+            document.getElementById('modalComercialOrdenTitulo').textContent = orden.IdOrden;
+            document.getElementById('modalComercialSubtotal').value = '$' + (orden.Subtotal || 0).toFixed(2);
+            document.getElementById('modalComercialDescuentos').value = '-$' + (orden.Descuentos || 0).toFixed(2);
+            document.getElementById('modalComercialImpuestos').value = '$' + (orden.Impuestos || 0).toFixed(2);
+            document.getElementById('modalComercialTotal').value = '$' + (orden.Total || 0).toFixed(2);
+            document.getElementById('modalComercialTotalItems').value = (orden.Items && orden.Items.length) || 0;
+            
+            // Actualizar gráfica
+            setTimeout(function() {
+                if (window.Orders && window.Orders.Modal) {
+                    window.Orders.Modal.ActualizarGraficaTotalesComercial(orden);
+                }
+            }, 300);
+        },
+        
+        ActualizarGraficaTotalesComercial: function(orden) {
+            var container = document.getElementById('chartTotalesComercialOrden');
+            if (!container || typeof ej === 'undefined' || !ej.charts) return;
+            
+            if (container.ej2_instances && container.ej2_instances[0]) {
+                container.ej2_instances[0].destroy();
+            }
+            
+            var chart = new ej.charts.Chart({
+                primaryXAxis: { valueType: 'Category' },
+                primaryYAxis: { title: 'Monto ($)' },
+                series: [{
+                    type: 'Column',
+                    dataSource: [
+                        { concepto: 'Subtotal', valor: orden.Subtotal || 0 },
+                        { concepto: 'Descuentos', valor: orden.Descuentos || 0 },
+                        { concepto: 'Impuestos', valor: orden.Impuestos || 0 },
+                        { concepto: 'Total', valor: orden.Total || 0 }
+                    ],
+                    xName: 'concepto',
+                    yName: 'valor'
+                }],
+                height: '200px',
+                width: '100%'
+            });
+            chart.appendTo('#chartTotalesComercialOrden');
+        },
+        
+        MostrarDatosDetalles: function(orden) {
+            document.getElementById('modalDetallesOrdenTitulo').textContent = orden.IdOrden;
+            // Cargar items
+            if (orden.IdOrden) {
+                this.CargarItemsFactura(orden.IdOrden, 'detalles');
+            }
+        },
+        
+        CargarItemsFactura: function(idOrden, tipo) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Orders/ObtenerItemsFactura', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            var self = this;
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito && respuesta.datos) {
+                                if (tipo === 'detalles') {
+                                    self.MostrarItemsDetalles(respuesta.datos);
+                                } else {
+                                    // Para el modal original, usar el grid
+                                    var gridElement = document.getElementById('gridItemsModalOrden');
+                                    if (gridElement && gridElement.ej2_instances && gridElement.ej2_instances[0]) {
+                                        gridElement.ej2_instances[0].dataSource = respuesta.datos;
+                                        gridElement.ej2_instances[0].refresh();
+                                    } else {
+                                        self.MostrarItems(respuesta.datos);
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear items:', e);
+                        }
+                    } else {
+                        console.error('Error al cargar items de factura: HTTP ' + xhr.status);
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(idOrden));
+        },
+        
+        MostrarItems: function(items) {
+            // Función helper para mostrar items en formato de lista
+            // Se puede usar cuando no hay grid disponible
+            var container = document.getElementById('tablaItemsDetallesOrden');
+            if (!container) return;
+            
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay items en esta orden.</p>';
+                return;
+            }
+            
+            var html = '<table class="table table-striped"><thead><tr><th>Producto</th><th>Cantidad</th><th>Precio Unit.</th><th>Descuento</th><th>Subtotal</th><th>Impuesto</th><th>Total</th></tr></thead><tbody>';
+            items.forEach(function(item) {
+                html += '<tr>';
+                html += '<td>' + (item.NombreProducto || 'Producto ' + item.IdProducto) + '</td>';
+                html += '<td>' + (item.Cantidad || 0) + '</td>';
+                html += '<td>$' + (item.PrecioUnitario || 0).toFixed(2) + '</td>';
+                html += '<td>$' + (item.Descuento || 0).toFixed(2) + '</td>';
+                html += '<td>$' + (item.Subtotal || 0).toFixed(2) + '</td>';
+                html += '<td>$' + (item.Impuesto || 0).toFixed(2) + '</td>';
+                html += '<td class="fw-bold">$' + (item.Total || 0).toFixed(2) + '</td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        },
+        
+        MostrarItemsDetalles: function(items) {
+            // Alias para MostrarItems - misma funcionalidad
+            this.MostrarItems(items);
+        },
+        
+        AbrirDialogCabecera: function() {
+            if (typeof window.mostrarModalCabeceraOrden === 'function') {
+                window.mostrarModalCabeceraOrden();
+            }
+        },
+        
+        AbrirDialogComercial: function() {
+            if (typeof window.mostrarModalComercialOrden === 'function') {
+                window.mostrarModalComercialOrden();
+            }
+        },
+        
+        AbrirDialogDetalles: function() {
+            if (typeof window.mostrarModalDetallesOrden === 'function') {
+                window.mostrarModalDetallesOrden();
+            }
+        },
+        
+        GuardarCabecera: function() {
+            var id = (typeof window.modalCabeceraOrdenId !== 'undefined' && window.modalCabeceraOrdenId) 
+                ? window.modalCabeceraOrdenId 
+                : (typeof modalCabeceraOrdenId !== 'undefined' ? modalCabeceraOrdenId : null);
+            if (!id || id <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'No hay orden seleccionada.');
+                return;
+            }
+            
+            var fechaStr = document.getElementById('modalCabeceraFechaOrden').value;
+            var fecha = fechaStr ? new Date(fechaStr) : null;
+            
+            var datos = {
+                IdOrden: id,
+                FechaOrden: fecha ? fecha.toISOString() : null,
+                EstadoOrden: document.getElementById('modalCabeceraEstadoOrden').value,
+                IdCliente: parseInt(document.getElementById('modalCabeceraIdCliente').value, 10),
+                IdTienda: parseInt(document.getElementById('modalCabeceraIdTienda').value, 10)
+            };
+            
+            if (!datos.IdCliente || datos.IdCliente <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'El ID de cliente es requerido.');
+                return;
+            }
+            
+            if (!datos.IdTienda || datos.IdTienda <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'El ID de tienda es requerido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalCabeceraOrden', '#ordersGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Orders/ActualizarOrder', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Orders.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalCabeceraOrden();
+                                    if (window.Orders && window.Orders.Grid) {
+                                        window.Orders.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalCabeceraOrden', '#ordersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Orders.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalCabeceraOrden', '#ordersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Orders.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalCabeceraOrden', '#ordersGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Orders.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalCabeceraOrden', '#ordersGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarComercial: function() {
+            var id = (typeof window.modalComercialOrdenId !== 'undefined' && window.modalComercialOrdenId) 
+                ? window.modalComercialOrdenId 
+                : (typeof modalComercialOrdenId !== 'undefined' ? modalComercialOrdenId : null);
+            if (!id || id <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'No hay orden seleccionada.');
+                return;
+            }
+            
+            // Los totales comerciales generalmente se calculan automáticamente
+            // pero se pueden ajustar manualmente si es necesario
+            window.Orders.Utilidades.MostrarError('Info', 'Los totales comerciales se calculan automáticamente desde los items de la orden.');
+        },
+        
+        GuardarDetalles: function() {
+            var id = (typeof window.modalDetallesOrdenId !== 'undefined' && window.modalDetallesOrdenId) 
+                ? window.modalDetallesOrdenId 
+                : (typeof modalDetallesOrdenId !== 'undefined' ? modalDetallesOrdenId : null);
+            if (!id || id <= 0) {
+                window.Orders.Utilidades.MostrarError('Error', 'No hay orden seleccionada.');
+                return;
+            }
+            
+            // Los detalles generalmente son solo de lectura
+            window.Orders.Utilidades.MostrarError('Info', 'Los detalles de la orden son informativos y no se pueden modificar directamente.');
         }
     };
     

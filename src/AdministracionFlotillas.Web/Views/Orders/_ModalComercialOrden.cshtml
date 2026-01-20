@@ -1,0 +1,191 @@
+@* Modal de Información Comercial de la Orden - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalComercialOrden" 
+             target=".info-tooltip-comercial-orden" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalComercialOrdenBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentComercialOrden"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalComercialOrden" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="700px" 
+            height="auto"
+            visible="false"
+            header="Información Comercial - Orden #<span id='modalComercialOrdenTitulo'>0</span>"
+            created="modalComercialOrdenCreated"
+            open="modalComercialOrdenOpen"
+            close="modalComercialOrdenClose">
+    <e-content-template>
+        <div id="modalComercialOrdenContenido" class="p-3">
+            <div class="alert alert-success mb-3">
+                <h6 class="alert-heading"><i class="fas fa-chart-line me-2"></i>¿Qué es la Información Comercial?</h6>
+                <p class="mb-0 small">
+                    La información comercial contiene datos financieros y de facturación de la orden: 
+                    subtotal, descuentos, impuestos, total y número de items. Esta información se calcula automáticamente desde los items de la orden.
+                </p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-calculator me-2"></i>Totales de la Orden</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Subtotal ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-orden" 
+                                       data-field="Subtotal" 
+                                       data-tooltip="Suma de todos los items antes de descuentos e impuestos. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialSubtotal" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Descuentos ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-orden" 
+                                       data-field="Descuentos" 
+                                       data-tooltip="Total de descuentos aplicados a la orden. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialDescuentos" class="form-control text-danger" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Impuestos ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-orden" 
+                                       data-field="Impuestos" 
+                                       data-tooltip="Total de impuestos calculados sobre el subtotal (16% IVA en México). Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialImpuestos" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-orden" 
+                                       data-field="Total" 
+                                       data-tooltip="Monto total de la orden (Subtotal - Descuentos + Impuestos). Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialTotal" class="form-control fw-bold fs-5 text-primary" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total Items
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-orden" 
+                                       data-field="TotalItems" 
+                                       data-tooltip="Número total de items (productos) en la orden. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="number" id="modalComercialTotalItems" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div id="chartTotalesComercialOrden" style="height: 200px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalComercialOrdenCerrar" content="Cerrar" isPrimary="true" cssClass="e-flat" click="modalComercialOrdenCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalComercialOrdenId === 'undefined') {
+        window.modalComercialOrdenId = null;
+    }
+    if (typeof modalComercialOrdenId === 'undefined') {
+        var modalComercialOrdenId = null;
+    }
+    var tooltipModalComercialOrdenObj = null;
+    window.modalComercialOrdenInstance = null;
+    
+    window.mostrarModalComercialOrden = function() {
+        if (window.modalComercialOrdenInstance) {
+            try {
+                window.modalComercialOrdenInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalComercialOrden');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalComercialOrdenInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalComercialOrden = function() {
+        if (window.modalComercialOrdenInstance) {
+            try {
+                window.modalComercialOrdenInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalComercialOrdenCreated = function(args) {
+        if (args && args.component) {
+            window.modalComercialOrdenInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalComercialOrden');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalComercialOrdenInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalComercialOrdenOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalComercialOrden');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalComercialOrdenObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalComercialOrdenClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalComercialOrdenCerrar = function() {
+        window.ocultarModalComercialOrden();
+    };
+    
+    window.tooltipModalComercialOrdenBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentComercialOrden');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

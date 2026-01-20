@@ -1,0 +1,139 @@
+@* Modal de Información de Detalles de la Orden - Solo lectura *@
+<ejs-tooltip id="tooltipModalDetallesOrden" 
+             target=".info-tooltip-detalles-orden" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalDetallesOrdenBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentDetallesOrden"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalDetallesOrden" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="900px" 
+            height="auto"
+            visible="false"
+            header="Información de Detalles - Orden #<span id='modalDetallesOrdenTitulo'>0</span>"
+            created="modalDetallesOrdenCreated"
+            open="modalDetallesOrdenOpen"
+            close="modalDetallesOrdenClose">
+    <e-content-template>
+        <div id="modalDetallesOrdenContenido" class="p-3">
+            <div class="alert alert-warning mb-3">
+                <h6 class="alert-heading"><i class="fas fa-list me-2"></i>¿Qué es la Información de Detalles?</h6>
+                <p class="mb-0 small">
+                    La información de detalles contiene los items (productos) de la orden, historial de cambios y notas. 
+                    Esta información es de solo lectura y muestra el desglose completo de la orden.
+                </p>
+            </div>
+            
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-shopping-cart me-2"></i>Items de la Orden</h5>
+                </div>
+                <div class="card-body">
+                    <div id="tablaItemsDetallesOrden">
+                        <p class="text-muted">Cargando items...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Historial de la Orden</h5>
+                </div>
+                <div class="card-body">
+                    <div id="timelineHistorialDetallesOrden" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalDetallesOrdenCerrar" content="Cerrar" isPrimary="true" cssClass="e-flat" click="modalDetallesOrdenCerrar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalDetallesOrdenId === 'undefined') {
+        window.modalDetallesOrdenId = null;
+    }
+    if (typeof modalDetallesOrdenId === 'undefined') {
+        var modalDetallesOrdenId = null;
+    }
+    var tooltipModalDetallesOrdenObj = null;
+    window.modalDetallesOrdenInstance = null;
+    
+    window.mostrarModalDetallesOrden = function() {
+        if (window.modalDetallesOrdenInstance) {
+            try {
+                window.modalDetallesOrdenInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalDetallesOrden');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalDetallesOrdenInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalDetallesOrden = function() {
+        if (window.modalDetallesOrdenInstance) {
+            try {
+                window.modalDetallesOrdenInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalDetallesOrdenCreated = function(args) {
+        if (args && args.component) {
+            window.modalDetallesOrdenInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalDetallesOrden');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalDetallesOrdenInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalDetallesOrdenOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalDetallesOrden');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalDetallesOrdenObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalDetallesOrdenClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalDetallesOrdenCerrar = function() {
+        window.ocultarModalDetallesOrden();
+    };
+    
+    window.tooltipModalDetallesOrdenBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentDetallesOrden');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>
