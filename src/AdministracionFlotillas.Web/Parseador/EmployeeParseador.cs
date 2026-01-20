@@ -26,11 +26,11 @@ public static class EmployeeParseador
 
         if (employeeService == null)
             throw new ArgumentNullException(nameof(employeeService));
-        
-            var salarioAnual = employeeService.CalcularSalarioAnualEstimado(empleado);
-        
 
-            return new EmployeeViewModel
+        var salarioAnual = employeeService.CalcularSalarioAnualEstimado(empleado);
+
+
+        return new EmployeeViewModel
         {
             IdEmpleado = empleado.EmployeeId,
             PrimerNombre = empleado.FirstName,
@@ -42,9 +42,9 @@ public static class EmployeeParseador
             IdPuesto = empleado.JobId,
             Salario = empleado.Salary.HasValue ? empleado.Salary.Value.ToString("C") : null,
             SalarioAnual = salarioAnual.ToString("C"),
-            PorcentajeComision = empleado.CommissionPct.HasValue 
-                ? (empleado.CommissionPct.Value * 100).ToString("F2") + "%" 
-                : null,
+            PorcentajeComision = empleado.CommissionPct.HasValue
+            ? (empleado.CommissionPct.Value * 100).ToString("F2") + "%"
+            : null,
             IdGerente = empleado.ManagerId,
             IdDepartamento = empleado.DepartmentId,
             NombreCompleto = $"{empleado.FirstName} {empleado.LastName}".Trim(),
@@ -88,11 +88,11 @@ public static class EmployeeParseador
             PhoneNumber = modeloVista.NumeroTelefono,
             HireDate = DateTime.Parse(modeloVista.FechaContratacion),
             JobId = modeloVista.IdPuesto,
-            Salary = !string.IsNullOrEmpty(modeloVista.Salario) 
-                ? decimal.Parse(modeloVista.Salario.Replace("$", "").Replace(",", "")) 
+            Salary = !string.IsNullOrEmpty(modeloVista.Salario)
+                ? decimal.Parse(modeloVista.Salario.Replace("$", "").Replace(",", ""))
                 : null,
-            CommissionPct = !string.IsNullOrEmpty(modeloVista.PorcentajeComision) 
-                ? decimal.Parse(modeloVista.PorcentajeComision.Replace("%", "")) / 100 
+            CommissionPct = !string.IsNullOrEmpty(modeloVista.PorcentajeComision)
+                ? decimal.Parse(modeloVista.PorcentajeComision.Replace("%", "")) / 100
                 : null,
             ManagerId = modeloVista.IdGerente,
             DepartmentId = modeloVista.IdDepartamento
