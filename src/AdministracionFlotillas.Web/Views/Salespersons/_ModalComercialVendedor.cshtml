@@ -1,0 +1,205 @@
+@* Modal de Información Comercial del Vendedor - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalComercialVendedor" 
+             target=".info-tooltip-comercial-vendedor" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalComercialVendedorBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentComercialVendedor"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalComercialVendedor" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="700px" 
+            height="auto"
+            visible="false"
+            header="Información Comercial - Vendedor #<span id='modalComercialVendedorTitulo'>0</span>"
+            created="modalComercialVendedorCreated"
+            open="modalComercialVendedorOpen"
+            close="modalComercialVendedorClose">
+    <e-content-template>
+        <div id="modalComercialVendedorContenido" class="p-3">
+            <div class="alert alert-success mb-3">
+                <h6 class="alert-heading"><i class="fas fa-chart-line me-2"></i>¿Qué es la Información Comercial?</h6>
+                <p class="mb-0 small">
+                    La información comercial contiene datos financieros y de desempeño del vendedor: 
+                    comisiones base y variable, total de ventas, órdenes gestionadas y métricas de rendimiento. 
+                    Esta información se usa para calcular pagos, evaluar desempeño y tomar decisiones comerciales.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-percent me-2"></i>Comisiones</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Comisión Base (%)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-vendedor" 
+                                       data-field="ComisionBase" 
+                                       data-tooltip="Comisión base fija que se aplica a todas las ventas del vendedor. Valor típico: 3-6%. Se calcula sobre el monto total de cada venta."></i>
+                                </label>
+                                <input type="number" id="modalComercialComisionBase" class="form-control" 
+                                       step="0.01" min="0" max="100" placeholder="0.00">
+                                <small class="text-muted">Porcentaje fijo aplicado a todas las ventas</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Comisión Variable (%)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-vendedor" 
+                                       data-field="ComisionVariable" 
+                                       data-tooltip="Comisión variable adicional que se aplica cuando se superan metas de ventas. Valor típico: 1-3%. Incentiva mayores volúmenes de venta."></i>
+                                </label>
+                                <input type="number" id="modalComercialComisionVariable" class="form-control" 
+                                       step="0.01" min="0" max="100" placeholder="0.00">
+                                <small class="text-muted">Porcentaje adicional por superar metas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Métricas de Rendimiento</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total Órdenes
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-vendedor" 
+                                       data-field="TotalOrdenes" 
+                                       data-tooltip="Número total de órdenes gestionadas por el vendedor. Indica el nivel de actividad comercial. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="number" id="modalComercialTotalOrdenes" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total Ventas ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-vendedor" 
+                                       data-field="TotalVentas" 
+                                       data-tooltip="Monto total de ventas generadas por el vendedor. Suma de todos los totales de órdenes completadas. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialTotalVentas" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total Comisiones ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-vendedor" 
+                                       data-field="TotalComisiones" 
+                                       data-tooltip="Monto total de comisiones ganadas por el vendedor. Se calcula como: (Total Ventas × Comisión Base) + (Ventas Excedentes × Comisión Variable). Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialTotalComisiones" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalComercialGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalComercialVendedorGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalComercialCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalComercialVendedorCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    // Variables globales para el modal comercial
+    if (typeof window.modalComercialVendedorId === 'undefined') {
+        window.modalComercialVendedorId = null;
+    }
+    if (typeof modalComercialVendedorId === 'undefined') {
+        var modalComercialVendedorId = null;
+    }
+    var tooltipModalComercialVendedorObj = null;
+    window.modalComercialVendedorInstance = null;
+    
+    window.mostrarModalComercialVendedor = function() {
+        if (window.modalComercialVendedorInstance) {
+            try {
+                window.modalComercialVendedorInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalComercialVendedor');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalComercialVendedorInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalComercialVendedor = function() {
+        if (window.modalComercialVendedorInstance) {
+            try {
+                window.modalComercialVendedorInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalComercialVendedorCreated = function(args) {
+        if (args && args.component) {
+            window.modalComercialVendedorInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalComercialVendedor');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalComercialVendedorInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalComercialVendedorOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalComercialVendedor');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalComercialVendedorObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalComercialVendedorClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalComercialVendedorGuardar = function() {
+        if (window.Salespersons && window.Salespersons.Modal) {
+            window.Salespersons.Modal.GuardarComercial();
+        }
+    };
+    
+    window.modalComercialVendedorCancelar = function() {
+        window.ocultarModalComercialVendedor();
+    };
+    
+    window.tooltipModalComercialVendedorBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentComercialVendedor');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

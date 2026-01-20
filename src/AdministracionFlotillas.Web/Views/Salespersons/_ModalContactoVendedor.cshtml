@@ -1,0 +1,176 @@
+@* Modal de Información de Contacto del Vendedor - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalContactoVendedor" 
+             target=".info-tooltip-contacto-vendedor" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalContactoVendedorBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentContactoVendedor"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalContactoVendedor" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="600px" 
+            height="auto"
+            visible="false"
+            header="Información de Contacto - Vendedor #<span id='modalContactoVendedorTitulo'>0</span>"
+            created="modalContactoVendedorCreated"
+            open="modalContactoVendedorOpen"
+            close="modalContactoVendedorClose">
+    <e-content-template>
+        <div id="modalContactoVendedorContenido" class="p-3">
+            <div class="alert alert-warning mb-3">
+                <h6 class="alert-heading"><i class="fas fa-address-book me-2"></i>¿Qué es la Información de Contacto?</h6>
+                <p class="mb-0 small">
+                    La información de contacto contiene los datos para comunicarse con el vendedor: 
+                    correo electrónico, teléfono y zona geográfica de cobertura. 
+                    Esta información se usa para asignar clientes, enviar notificaciones y coordinar actividades comerciales.
+                </p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-phone-alt me-2"></i>Datos de Contacto</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Email
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-vendedor" 
+                               data-field="Email" 
+                               data-tooltip="Correo electrónico oficial del vendedor. Se usa para enviar notificaciones, reportes y comunicaciones importantes. Debe ser un email válido y activo."></i>
+                        </label>
+                        <input type="email" id="modalContactoEmail" class="form-control" placeholder="vendedor@empresa.com">
+                        <small class="text-muted">Email oficial para comunicaciones</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Teléfono
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-vendedor" 
+                               data-field="Telefono" 
+                               data-tooltip="Número de teléfono de contacto directo del vendedor. Incluya código de país y área si aplica. Se usa para contacto urgente y coordinación de actividades."></i>
+                        </label>
+                        <input type="tel" id="modalContactoTelefono" class="form-control" placeholder="+52 33 1234 5678">
+                        <small class="text-muted">Teléfono para contacto directo</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Zona de Cobertura
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-vendedor" 
+                               data-field="ZonaCobertura" 
+                               data-tooltip="Zona geográfica asignada al vendedor (ej: Norte, Sur, Centro, Este, Oeste, Nacional). Define el área de operación y determina qué clientes pueden ser asignados a este vendedor."></i>
+                        </label>
+                        <select id="modalContactoZonaCobertura" class="form-select">
+                            <option value="">Seleccione una zona</option>
+                            <option value="Norte">Norte</option>
+                            <option value="Sur">Sur</option>
+                            <option value="Centro">Centro</option>
+                            <option value="Este">Este</option>
+                            <option value="Oeste">Oeste</option>
+                            <option value="Nacional">Nacional</option>
+                        </select>
+                        <small class="text-muted">Zona geográfica de operación del vendedor</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalContactoGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalContactoVendedorGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalContactoCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalContactoVendedorCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    // Variables globales para el modal de contacto
+    if (typeof window.modalContactoVendedorId === 'undefined') {
+        window.modalContactoVendedorId = null;
+    }
+    if (typeof modalContactoVendedorId === 'undefined') {
+        var modalContactoVendedorId = null;
+    }
+    var tooltipModalContactoVendedorObj = null;
+    window.modalContactoVendedorInstance = null;
+    
+    window.mostrarModalContactoVendedor = function() {
+        if (window.modalContactoVendedorInstance) {
+            try {
+                window.modalContactoVendedorInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalContactoVendedor');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalContactoVendedorInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalContactoVendedor = function() {
+        if (window.modalContactoVendedorInstance) {
+            try {
+                window.modalContactoVendedorInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalContactoVendedorCreated = function(args) {
+        if (args && args.component) {
+            window.modalContactoVendedorInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalContactoVendedor');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalContactoVendedorInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalContactoVendedorOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalContactoVendedor');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalContactoVendedorObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalContactoVendedorClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalContactoVendedorGuardar = function() {
+        if (window.Salespersons && window.Salespersons.Modal) {
+            window.Salespersons.Modal.GuardarContacto();
+        }
+    };
+    
+    window.modalContactoVendedorCancelar = function() {
+        window.ocultarModalContactoVendedor();
+    };
+    
+    window.tooltipModalContactoVendedorBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentContactoVendedor');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

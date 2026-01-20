@@ -1,0 +1,185 @@
+@* Modal de Información de Cabecera del Vendedor - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalCabeceraVendedor" 
+             target=".info-tooltip-cabecera-vendedor" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalCabeceraVendedorBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentCabeceraVendedor"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalCabeceraVendedor" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="600px" 
+            height="auto"
+            visible="false"
+            header="Información de Cabecera - Vendedor #<span id='modalCabeceraVendedorTitulo'>0</span>"
+            created="modalCabeceraVendedorCreated"
+            open="modalCabeceraVendedorOpen"
+            close="modalCabeceraVendedorClose">
+    <e-content-template>
+        <div id="modalCabeceraVendedorContenido" class="p-3">
+            <div class="alert alert-info mb-3">
+                <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>¿Qué es la Información de Cabecera?</h6>
+                <p class="mb-0 small">
+                    La información de cabecera contiene los datos básicos e identificadores del vendedor: 
+                    ID único, nombre completo, estado operativo y fecha de contratación. 
+                    Estos campos son fundamentales para identificar y gestionar al vendedor en el sistema.
+                </p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-id-card me-2"></i>Datos de Identificación</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            ID Vendedor
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-vendedor" 
+                               data-field="IdVendedor" 
+                               data-tooltip="Identificador único del vendedor en el sistema. No se puede modificar."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraIdVendedor" class="form-control" readonly>
+                        <small class="text-muted">Este campo no se puede modificar</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Nombre Completo
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-vendedor" 
+                               data-field="NombreCompleto" 
+                               data-tooltip="Nombre completo del vendedor. Debe incluir nombre y apellidos. Este nombre aparecerá en reportes y documentos oficiales."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraNombreCompleto" class="form-control" placeholder="Ingrese el nombre completo">
+                        <small class="text-muted">Nombre que aparecerá en reportes y documentos</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Estado
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-vendedor" 
+                               data-field="Estado" 
+                               data-tooltip="Estado operativo del vendedor: ACTIVE (activo y puede recibir órdenes), INACTIVE (inactivo, no puede recibir órdenes), ON_LEAVE (en licencia, temporalmente no disponible)."></i>
+                        </label>
+                        <select id="modalCabeceraEstado" class="form-select">
+                            <option value="ACTIVE">ACTIVE - Activo y operativo</option>
+                            <option value="INACTIVE">INACTIVE - Inactivo</option>
+                            <option value="ON_LEAVE">ON_LEAVE - En licencia</option>
+                        </select>
+                        <small class="text-muted">El estado determina si el vendedor puede recibir órdenes nuevas</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Fecha de Contratación
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-vendedor" 
+                               data-field="FechaContratacion" 
+                               data-tooltip="Fecha en que el vendedor fue contratado. Se usa para calcular antigüedad y beneficios."></i>
+                        </label>
+                        <input type="date" id="modalCabeceraFechaContratacion" class="form-control">
+                        <small class="text-muted">Fecha oficial de inicio de labores</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalCabeceraGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalCabeceraVendedorGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCabeceraCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalCabeceraVendedorCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    // Variables globales para el modal de cabecera
+    if (typeof window.modalCabeceraVendedorId === 'undefined') {
+        window.modalCabeceraVendedorId = null;
+    }
+    if (typeof modalCabeceraVendedorId === 'undefined') {
+        var modalCabeceraVendedorId = null;
+    }
+    var tooltipModalCabeceraVendedorObj = null;
+    window.modalCabeceraVendedorInstance = null;
+    
+    window.mostrarModalCabeceraVendedor = function() {
+        if (window.modalCabeceraVendedorInstance) {
+            try {
+                window.modalCabeceraVendedorInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalCabeceraVendedor');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalCabeceraVendedorInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalCabeceraVendedor = function() {
+        if (window.modalCabeceraVendedorInstance) {
+            try {
+                window.modalCabeceraVendedorInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalCabeceraVendedorCreated = function(args) {
+        if (args && args.component) {
+            window.modalCabeceraVendedorInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalCabeceraVendedor');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalCabeceraVendedorInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalCabeceraVendedorOpen = function() {
+        // Reinicializar tooltip
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalCabeceraVendedor');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalCabeceraVendedorObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalCabeceraVendedorClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalCabeceraVendedorGuardar = function() {
+        if (window.Salespersons && window.Salespersons.Modal) {
+            window.Salespersons.Modal.GuardarCabecera();
+        }
+    };
+    
+    window.modalCabeceraVendedorCancelar = function() {
+        window.ocultarModalCabeceraVendedor();
+    };
+    
+    window.tooltipModalCabeceraVendedorBeforeRender = function(args) {
+        var field = args.target.getAttribute('data-field');
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentCabeceraVendedor');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

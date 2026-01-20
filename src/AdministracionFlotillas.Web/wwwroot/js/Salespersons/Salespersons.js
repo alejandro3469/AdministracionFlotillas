@@ -16,31 +16,37 @@ window.Salespersons = window.Salespersons || {};
     
     window.Salespersons.Utilidades = {
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         }
     };
     
@@ -218,6 +224,45 @@ window.Salespersons = window.Salespersons || {};
     };
     
     window.Salespersons.Modal = {
+        AbrirCabecera: function(idVendedor) {
+            var id = parseInt(idVendedor, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'ID de vendedor no válido.');
+                return;
+            }
+            window.modalCabeceraVendedorId = id;
+            if (typeof modalCabeceraVendedorId !== 'undefined') {
+                modalCabeceraVendedorId = id;
+            }
+            this.CargarDatosVendedor(id, 'cabecera');
+        },
+        
+        AbrirComercial: function(idVendedor) {
+            var id = parseInt(idVendedor, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'ID de vendedor no válido.');
+                return;
+            }
+            window.modalComercialVendedorId = id;
+            if (typeof modalComercialVendedorId !== 'undefined') {
+                modalComercialVendedorId = id;
+            }
+            this.CargarDatosVendedor(id, 'comercial');
+        },
+        
+        AbrirContacto: function(idVendedor) {
+            var id = parseInt(idVendedor, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'ID de vendedor no válido.');
+                return;
+            }
+            window.modalContactoVendedorId = id;
+            if (typeof modalContactoVendedorId !== 'undefined') {
+                modalContactoVendedorId = id;
+            }
+            this.CargarDatosVendedor(id, 'contacto');
+        },
+        
         Abrir: function(idVendedor, modo) {
             var id = parseInt(idVendedor, 10);
 
@@ -232,18 +277,30 @@ window.Salespersons = window.Salespersons || {};
             this.CargarDatosVendedor(id);
         },
         
-        CargarDatosVendedor: function(idVendedor) {
+        CargarDatosVendedor: function(idVendedor, tipo) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/Salespersons/ObtenerSalespersonPorId', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
+            var self = this;
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         try {
                             var respuesta = JSON.parse(xhr.responseText);
                             if (respuesta.exito && respuesta.datos) {
-                                window.Salespersons.Modal.MostrarDatos(respuesta.datos);
-                                window.Salespersons.Modal.AbrirDialog();
+                                if (tipo === 'cabecera') {
+                                    self.MostrarDatosCabecera(respuesta.datos);
+                                    self.AbrirDialogCabecera();
+                                } else if (tipo === 'comercial') {
+                                    self.MostrarDatosComercial(respuesta.datos);
+                                    self.AbrirDialogComercial();
+                                } else if (tipo === 'contacto') {
+                                    self.MostrarDatosContacto(respuesta.datos);
+                                    self.AbrirDialogContacto();
+                                } else {
+                                    self.MostrarDatos(respuesta.datos);
+                                    self.AbrirDialog();
+                                }
                             } else {
                                 window.Salespersons.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el vendedor.');
                             }
@@ -259,6 +316,240 @@ window.Salespersons = window.Salespersons || {};
                 }
             };
             xhr.send(JSON.stringify(idVendedor));
+        },
+        
+        MostrarDatosCabecera: function(vendedor) {
+            document.getElementById('modalCabeceraVendedorTitulo').textContent = vendedor.IdVendedor;
+            document.getElementById('modalCabeceraIdVendedor').value = vendedor.IdVendedor;
+            document.getElementById('modalCabeceraNombreCompleto').value = vendedor.NombreCompleto || '';
+            document.getElementById('modalCabeceraEstado').value = vendedor.Estado || 'ACTIVE';
+            
+            if (vendedor.FechaContratacion) {
+                var fecha = new Date(vendedor.FechaContratacion);
+                var fechaStr = fecha.toISOString().split('T')[0];
+                document.getElementById('modalCabeceraFechaContratacion').value = fechaStr;
+            }
+        },
+        
+        MostrarDatosComercial: function(vendedor) {
+            document.getElementById('modalComercialVendedorTitulo').textContent = vendedor.IdVendedor;
+            document.getElementById('modalComercialComisionBase').value = vendedor.ComisionBase || 0;
+            document.getElementById('modalComercialComisionVariable').value = vendedor.ComisionVariable || 0;
+            document.getElementById('modalComercialTotalOrdenes').value = vendedor.TotalOrdenes || 0;
+            document.getElementById('modalComercialTotalVentas').value = '$' + (vendedor.TotalVentas || 0).toFixed(2);
+            document.getElementById('modalComercialTotalComisiones').value = '$' + (vendedor.TotalComisiones || 0).toFixed(2);
+        },
+        
+        MostrarDatosContacto: function(vendedor) {
+            document.getElementById('modalContactoVendedorTitulo').textContent = vendedor.IdVendedor;
+            document.getElementById('modalContactoEmail').value = vendedor.Email || '';
+            document.getElementById('modalContactoTelefono').value = vendedor.Telefono || '';
+            document.getElementById('modalContactoZonaCobertura').value = vendedor.ZonaCobertura || '';
+        },
+        
+        AbrirDialogCabecera: function() {
+            if (typeof window.mostrarModalCabeceraVendedor === 'function') {
+                window.mostrarModalCabeceraVendedor();
+            }
+        },
+        
+        AbrirDialogComercial: function() {
+            if (typeof window.mostrarModalComercialVendedor === 'function') {
+                window.mostrarModalComercialVendedor();
+            }
+        },
+        
+        AbrirDialogContacto: function() {
+            if (typeof window.mostrarModalContactoVendedor === 'function') {
+                window.mostrarModalContactoVendedor();
+            }
+        },
+        
+        GuardarCabecera: function() {
+            var id = (typeof window.modalCabeceraVendedorId !== 'undefined' && window.modalCabeceraVendedorId) 
+                ? window.modalCabeceraVendedorId 
+                : (typeof modalCabeceraVendedorId !== 'undefined' ? modalCabeceraVendedorId : null);
+            if (!id || id <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'No hay vendedor seleccionado.');
+                return;
+            }
+            
+            var datos = {
+                IdVendedor: id,
+                NombreCompleto: document.getElementById('modalCabeceraNombreCompleto').value.trim(),
+                Estado: document.getElementById('modalCabeceraEstado').value,
+                FechaContratacion: document.getElementById('modalCabeceraFechaContratacion').value
+            };
+            
+            if (!datos.NombreCompleto) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'El nombre completo es requerido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalCabeceraVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Salespersons/ActualizarSalesperson', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Salespersons.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalCabeceraVendedor();
+                                    if (window.Salespersons && window.Salespersons.Grid) {
+                                        window.Salespersons.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalCabeceraVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Salespersons.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalCabeceraVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Salespersons.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalCabeceraVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Salespersons.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalCabeceraVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarComercial: function() {
+            var id = typeof modalComercialVendedorId !== 'undefined' ? modalComercialVendedorId : null;
+            if (!id || id <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'No hay vendedor seleccionado.');
+                return;
+            }
+            
+            var comisionBase = parseFloat(document.getElementById('modalComercialComisionBase').value);
+            var comisionVar = parseFloat(document.getElementById('modalComercialComisionVariable').value);
+            
+            if (isNaN(comisionBase) || comisionBase < 0 || comisionBase > 100) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'La comisión base debe ser un número entre 0 y 100.');
+                return;
+            }
+            
+            if (isNaN(comisionVar) || comisionVar < 0 || comisionVar > 100) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'La comisión variable debe ser un número entre 0 y 100.');
+                return;
+            }
+            
+            var datos = {
+                IdVendedor: id,
+                ComisionBase: comisionBase,
+                ComisionVariable: comisionVar
+            };
+            
+            window.ModalButtons.Deshabilitar('modalComercialVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Salespersons/ActualizarSalesperson', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Salespersons.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalComercialVendedor();
+                                    if (window.Salespersons && window.Salespersons.Grid) {
+                                        window.Salespersons.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalComercialVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Salespersons.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalComercialVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Salespersons.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalComercialVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Salespersons.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalComercialVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarContacto: function() {
+            var id = typeof modalContactoVendedorId !== 'undefined' ? modalContactoVendedorId : null;
+            if (!id || id <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'No hay vendedor seleccionado.');
+                return;
+            }
+            
+            var email = document.getElementById('modalContactoEmail').value.trim();
+            var telefono = document.getElementById('modalContactoTelefono').value.trim();
+            var zona = document.getElementById('modalContactoZonaCobertura').value;
+            
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'El email no es válido.');
+                return;
+            }
+            
+            var datos = {
+                IdVendedor: id,
+                Email: email,
+                Telefono: telefono,
+                ZonaCobertura: zona
+            };
+            
+            window.ModalButtons.Deshabilitar('modalContactoVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Salespersons/ActualizarSalesperson', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Salespersons.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalContactoVendedor();
+                                    if (window.Salespersons && window.Salespersons.Grid) {
+                                        window.Salespersons.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalContactoVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Salespersons.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalContactoVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Salespersons.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalContactoVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Salespersons.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalContactoVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
         },
         
         MostrarDatos: function(vendedor) {
@@ -518,7 +809,326 @@ window.Salespersons = window.Salespersons || {};
         },
         
         CambiarAModoEdicion: function(idVendedor) {
-            window.Salespersons.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idVendedor || idVendedor <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'ID de vendedor no válido.');
+                return;
+            }
+            
+            if (typeof modalVendedorId !== 'undefined') {
+                modalVendedorId = idVendedor;
+            }
+            if (typeof modalVendedorModo !== 'undefined') {
+                modalVendedorModo = 'editar';
+            }
+            
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            this.ConvertirCamposAEditables();
+            this.ActualizarBotonesModal();
+            
+            var titulo = document.getElementById('modalVendedorTitulo');
+            if (titulo && typeof modalVendedorId !== 'undefined') {
+                titulo.textContent = modalVendedorId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            this.ConvertirCamposASoloLectura();
+            this.RestaurarBotonesModal();
+            
+            var titulo = document.getElementById('modalVendedorTitulo');
+            if (titulo && typeof modalVendedorId !== 'undefined') {
+                titulo.textContent = modalVendedorId;
+            }
+            
+            if (typeof modalVendedorModo !== 'undefined') {
+                modalVendedorModo = 'ver';
+            }
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoVendedor');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoVendedor" class="form-select form-select-sm">' +
+                    '<option value="ACTIVE"' + (estadoActual === 'ACTIVE' ? ' selected' : '') + '>ACTIVE</option>' +
+                    '<option value="INACTIVE"' + (estadoActual === 'INACTIVE' ? ' selected' : '') + '>INACTIVE</option>' +
+                    '<option value="ON_LEAVE"' + (estadoActual === 'ON_LEAVE' ? ' selected' : '') + '>ON_LEAVE</option>' +
+                    '</select>';
+            }
+            
+            // Nombre Completo - convertir a input
+            var nombreContainer = document.getElementById('modalNombreCompleto');
+            if (nombreContainer) {
+                var nombreActual = nombreContainer.textContent.trim();
+                nombreContainer.innerHTML = '<input type="text" id="editNombreCompleto" class="form-control form-control-sm" value="' + nombreActual + '">';
+            }
+            
+            // Email - convertir a input
+            var emailContainer = document.getElementById('modalEmail');
+            if (emailContainer) {
+                var emailActual = emailContainer.textContent.trim();
+                emailContainer.innerHTML = '<input type="email" id="editEmail" class="form-control form-control-sm" value="' + emailActual + '">';
+            }
+            
+            // Teléfono - convertir a input
+            var telefonoContainer = document.getElementById('modalTelefono');
+            if (telefonoContainer) {
+                var telefonoActual = telefonoContainer.textContent.trim();
+                telefonoContainer.innerHTML = '<input type="tel" id="editTelefono" class="form-control form-control-sm" value="' + telefonoActual + '">';
+            }
+            
+            // Zona de Cobertura - convertir a input
+            var zonaContainer = document.getElementById('modalZonaCobertura');
+            if (zonaContainer) {
+                var zonaActual = zonaContainer.textContent.trim();
+                zonaContainer.innerHTML = '<input type="text" id="editZonaCobertura" class="form-control form-control-sm" value="' + zonaActual + '">';
+            }
+            
+            // Comisión Base - convertir a input numérico
+            var comisionBaseContainer = document.getElementById('modalComisionBase');
+            if (comisionBaseContainer) {
+                var comisionBaseActual = comisionBaseContainer.textContent.trim().replace('%', '').trim();
+                comisionBaseContainer.innerHTML = '<input type="number" id="editComisionBase" class="form-control form-control-sm" step="0.01" min="0" max="100" value="' + comisionBaseActual + '">';
+            }
+            
+            // Comisión Variable - convertir a input numérico
+            var comisionVarContainer = document.getElementById('modalComisionVariable');
+            if (comisionVarContainer) {
+                var comisionVarActual = comisionVarContainer.textContent.trim().replace('%', '').trim();
+                comisionVarContainer.innerHTML = '<input type="number" id="editComisionVariable" class="form-control form-control-sm" step="0.01" min="0" max="100" value="' + comisionVarActual + '">';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoVendedor');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoVendedor');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'ACTIVE') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-vendedor" data-field="Estado" data-tooltip="✅ Vendedor activo y operativo. Puede recibir órdenes, generar comisiones y está disponible para asignación de clientes.">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'INACTIVE') {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-vendedor" data-field="Estado" data-tooltip="❌ Vendedor inactivo. No puede recibir órdenes nuevas ni generar comisiones. Contactar con recursos humanos para reactivación.">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'ON_LEAVE') {
+                        estadoHtml = '<span class="badge bg-warning text-dark info-tooltip-vendedor" data-field="Estado" data-tooltip="⏸️ Vendedor en licencia. Temporalmente no disponible. Las órdenes existentes se mantienen, pero no se asignan nuevas.">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-vendedor" data-field="Estado" data-tooltip="Estado desconocido. Verificar con administración.">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Nombre Completo
+            var nombreContainer = document.getElementById('modalNombreCompleto');
+            if (nombreContainer) {
+                var inputNombre = document.getElementById('editNombreCompleto');
+                if (inputNombre) {
+                    nombreContainer.textContent = inputNombre.value || '-';
+                }
+            }
+            
+            // Email
+            var emailContainer = document.getElementById('modalEmail');
+            if (emailContainer) {
+                var inputEmail = document.getElementById('editEmail');
+                if (inputEmail) {
+                    emailContainer.textContent = inputEmail.value || '-';
+                }
+            }
+            
+            // Teléfono
+            var telefonoContainer = document.getElementById('modalTelefono');
+            if (telefonoContainer) {
+                var inputTelefono = document.getElementById('editTelefono');
+                if (inputTelefono) {
+                    telefonoContainer.textContent = inputTelefono.value || '-';
+                }
+            }
+            
+            // Zona de Cobertura
+            var zonaContainer = document.getElementById('modalZonaCobertura');
+            if (zonaContainer) {
+                var inputZona = document.getElementById('editZonaCobertura');
+                if (inputZona) {
+                    zonaContainer.textContent = inputZona.value || '-';
+                }
+            }
+            
+            // Comisión Base
+            var comisionBaseContainer = document.getElementById('modalComisionBase');
+            if (comisionBaseContainer) {
+                var inputComisionBase = document.getElementById('editComisionBase');
+                if (inputComisionBase) {
+                    comisionBaseContainer.textContent = parseFloat(inputComisionBase.value || 0).toFixed(2) + '%';
+                }
+            }
+            
+            // Comisión Variable
+            var comisionVarContainer = document.getElementById('modalComisionVariable');
+            if (comisionVarContainer) {
+                var inputComisionVar = document.getElementById('editComisionVariable');
+                if (inputComisionVar) {
+                    comisionVarContainer.textContent = parseFloat(inputComisionVar.value || 0).toFixed(2) + '%';
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (typeof modalVendedorId === 'undefined' || !modalVendedorId || modalVendedorId <= 0) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'No hay vendedor seleccionado para guardar.');
+                return;
+            }
+            
+            var selectEstado = document.getElementById('editEstadoVendedor');
+            var inputNombre = document.getElementById('editNombreCompleto');
+            var inputEmail = document.getElementById('editEmail');
+            var inputTelefono = document.getElementById('editTelefono');
+            var inputZona = document.getElementById('editZonaCobertura');
+            var inputComisionBase = document.getElementById('editComisionBase');
+            var inputComisionVar = document.getElementById('editComisionVariable');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoNombre = inputNombre ? inputNombre.value.trim() : null;
+            var nuevoEmail = inputEmail ? inputEmail.value.trim() : null;
+            var nuevoTelefono = inputTelefono ? inputTelefono.value.trim() : null;
+            var nuevaZona = inputZona ? inputZona.value.trim() : null;
+            var nuevaComisionBase = inputComisionBase ? parseFloat(inputComisionBase.value) : null;
+            var nuevaComisionVar = inputComisionVar ? parseFloat(inputComisionVar.value) : null;
+            
+            // Validaciones
+            if (nuevoEstado && nuevoEstado !== 'ACTIVE' && nuevoEstado !== 'INACTIVE' && nuevoEstado !== 'ON_LEAVE') {
+                window.Salespersons.Utilidades.MostrarError('Error', 'Estado inválido.');
+                return;
+            }
+            
+            if (nuevoEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nuevoEmail)) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'Email inválido.');
+                return;
+            }
+            
+            if (nuevaComisionBase !== null && (isNaN(nuevaComisionBase) || nuevaComisionBase < 0 || nuevaComisionBase > 100)) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'Comisión base debe ser un número entre 0 y 100.');
+                return;
+            }
+            
+            if (nuevaComisionVar !== null && (isNaN(nuevaComisionVar) || nuevaComisionVar < 0 || nuevaComisionVar > 100)) {
+                window.Salespersons.Utilidades.MostrarError('Error', 'Comisión variable debe ser un número entre 0 y 100.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var datosActualizacion = {
+                IdVendedor: modalVendedorId,
+                Estado: nuevoEstado,
+                NombreCompleto: nuevoNombre,
+                Email: nuevoEmail,
+                Telefono: nuevoTelefono,
+                ZonaCobertura: nuevaZona,
+                ComisionBase: nuevaComisionBase,
+                ComisionVariable: nuevaComisionVar
+            };
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Salespersons/ActualizarSalesperson', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Salespersons.Utilidades.MostrarExito(
+                                    'Vendedor actualizado',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    if (window.Salespersons && window.Salespersons.Modal) {
+                                        window.Salespersons.Modal.DesactivarModoEdicion();
+                                        
+                                        if (typeof modalVendedorId !== 'undefined' && modalVendedorId) {
+                                            window.Salespersons.Modal.CargarDatosVendedor(modalVendedorId);
+                                        }
+                                        
+                                        if (window.Salespersons && window.Salespersons.Grid) {
+                                            window.Salespersons.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    window.ModalButtons.Habilitar('modalVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Salespersons.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Salespersons.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Salespersons.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar vendedor:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.Salespersons.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalVendedor', '#salespersonsGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            if (typeof modalVendedorId !== 'undefined' && modalVendedorId) {
+                this.CargarDatosVendedor(modalVendedorId);
+            }
+            
+            this.DesactivarModoEdicion();
         }
     };
     
