@@ -1,0 +1,181 @@
+@* Modal de Información de Cabecera del Cliente - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalCabeceraCliente" 
+             target=".info-tooltip-cabecera-cliente" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalCabeceraClienteBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentCabeceraCliente"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalCabeceraCliente" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="600px" 
+            height="auto"
+            visible="false"
+            header="Información de Cabecera - Cliente #<span id='modalCabeceraClienteTitulo'>0</span>"
+            created="modalCabeceraClienteCreated"
+            open="modalCabeceraClienteOpen"
+            close="modalCabeceraClienteClose">
+    <e-content-template>
+        <div id="modalCabeceraClienteContenido" class="p-3">
+            <div class="alert alert-info mb-3">
+                <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>¿Qué es la Información de Cabecera?</h6>
+                <p class="mb-0 small">
+                    La información de cabecera contiene los datos básicos e identificadores del cliente: 
+                    ID único, nombre completo o razón social, estado operativo y fecha de registro. 
+                    Estos campos son fundamentales para identificar y gestionar al cliente en el sistema.
+                </p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-id-card me-2"></i>Datos de Identificación</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            ID Cliente
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-cliente" 
+                               data-field="IdCliente" 
+                               data-tooltip="Identificador único del cliente en el sistema. No se puede modificar."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraIdCliente" class="form-control" readonly>
+                        <small class="text-muted">Este campo no se puede modificar</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Nombre / Razón Social
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-cliente" 
+                               data-field="NombreCliente" 
+                               data-tooltip="Nombre completo del cliente o razón social de la empresa. Este nombre aparecerá en facturas, órdenes y documentos oficiales."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraNombreCliente" class="form-control" placeholder="Ingrese el nombre o razón social">
+                        <small class="text-muted">Nombre que aparecerá en documentos oficiales</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Estado
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-cliente" 
+                               data-field="EstadoCliente" 
+                               data-tooltip="Estado operativo del cliente: ACTIVE (activo y puede realizar compras), INACTIVE (inactivo, bloqueado y no puede realizar compras)."></i>
+                        </label>
+                        <select id="modalCabeceraEstadoCliente" class="form-select">
+                            <option value="ACTIVE">ACTIVE - Activo y puede comprar</option>
+                            <option value="INACTIVE">INACTIVE - Inactivo y bloqueado</option>
+                        </select>
+                        <small class="text-muted">El estado determina si el cliente puede realizar compras</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Fecha de Registro
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-cliente" 
+                               data-field="FechaRegistro" 
+                               data-tooltip="Fecha en que el cliente fue registrado en el sistema. Se usa para calcular antigüedad y beneficios."></i>
+                        </label>
+                        <input type="date" id="modalCabeceraFechaRegistro" class="form-control">
+                        <small class="text-muted">Fecha oficial de registro del cliente</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalCabeceraClienteGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalCabeceraClienteGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCabeceraClienteCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalCabeceraClienteCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalCabeceraClienteId === 'undefined') {
+        window.modalCabeceraClienteId = null;
+    }
+    if (typeof modalCabeceraClienteId === 'undefined') {
+        var modalCabeceraClienteId = null;
+    }
+    var tooltipModalCabeceraClienteObj = null;
+    window.modalCabeceraClienteInstance = null;
+    
+    window.mostrarModalCabeceraCliente = function() {
+        if (window.modalCabeceraClienteInstance) {
+            try {
+                window.modalCabeceraClienteInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalCabeceraCliente');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalCabeceraClienteInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalCabeceraCliente = function() {
+        if (window.modalCabeceraClienteInstance) {
+            try {
+                window.modalCabeceraClienteInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalCabeceraClienteCreated = function(args) {
+        if (args && args.component) {
+            window.modalCabeceraClienteInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalCabeceraCliente');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalCabeceraClienteInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalCabeceraClienteOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalCabeceraCliente');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalCabeceraClienteObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalCabeceraClienteClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalCabeceraClienteGuardar = function() {
+        if (window.Customers && window.Customers.Modal) {
+            window.Customers.Modal.GuardarCabecera();
+        }
+    };
+    
+    window.modalCabeceraClienteCancelar = function() {
+        window.ocultarModalCabeceraCliente();
+    };
+    
+    window.tooltipModalCabeceraClienteBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentCabeceraCliente');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

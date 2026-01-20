@@ -59,11 +59,17 @@
 <!-- Template para acciones -->
 <script id="accionesTemplate" type="text/x-template">
     <div class="d-flex gap-1">
-        <button class="btn btn-sm btn-info btn-ver-cliente" data-id-cliente="${IdCliente}" title="Ver detalles">
-            <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+        <button class="btn btn-sm btn-info btn-cabecera-cliente" data-id-cliente="${IdCliente}" 
+                title="Información de Cabecera: ID, Nombre, Estado, Fecha de Registro. Información básica e identificadores del cliente.">
+            <i class="fas fa-id-card"></i> <span class="d-none d-sm-inline">Cabecera</span>
         </button>
-        <button class="btn btn-sm btn-primary btn-editar-cliente" data-id-cliente="${IdCliente}" title="Editar cliente">
-            <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+        <button class="btn btn-sm btn-success btn-comercial-cliente" data-id-cliente="${IdCliente}" 
+                title="Información Comercial: Límite de Crédito, Total de Órdenes, Total de Compras, Métricas de actividad. Datos financieros y de relación comercial.">
+            <i class="fas fa-chart-line"></i> <span class="d-none d-sm-inline">Comercial</span>
+        </button>
+        <button class="btn btn-sm btn-warning btn-contacto-cliente" data-id-cliente="${IdCliente}" 
+                title="Información de Contacto: Email, Teléfono, Dirección completa. Datos de contacto y ubicación del cliente.">
+            <i class="fas fa-address-book"></i> <span class="d-none d-sm-inline">Contacto</span>
         </button>
     </div>
 </script>

@@ -1,0 +1,229 @@
+@* Modal de Información de Contacto del Cliente - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalContactoCliente" 
+             target=".info-tooltip-contacto-cliente" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalContactoClienteBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentContactoCliente"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalContactoCliente" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="700px" 
+            height="auto"
+            visible="false"
+            header="Información de Contacto - Cliente #<span id='modalContactoClienteTitulo'>0</span>"
+            created="modalContactoClienteCreated"
+            open="modalContactoClienteOpen"
+            close="modalContactoClienteClose">
+    <e-content-template>
+        <div id="modalContactoClienteContenido" class="p-3">
+            <div class="alert alert-warning mb-3">
+                <h6 class="alert-heading"><i class="fas fa-address-book me-2"></i>¿Qué es la Información de Contacto?</h6>
+                <p class="mb-0 small">
+                    La información de contacto contiene los datos para comunicarse con el cliente y su ubicación: 
+                    correo electrónico, teléfono y dirección completa (dirección, ciudad, estado, código postal, país). 
+                    Esta información se usa para envíos, facturación, notificaciones y coordinación de entregas.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-phone-alt me-2"></i>Datos de Contacto</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Email
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                       data-field="Email" 
+                                       data-tooltip="Correo electrónico oficial del cliente. Se usa para enviar facturas electrónicas, notificaciones y comunicaciones importantes. Debe ser un email válido y activo."></i>
+                                </label>
+                                <input type="email" id="modalContactoEmailCliente" class="form-control" placeholder="cliente@empresa.com">
+                                <small class="text-muted">Email oficial para comunicaciones</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Teléfono
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                       data-field="Telefono" 
+                                       data-tooltip="Número de teléfono de contacto del cliente. Incluya código de país y área si aplica. Se usa para contacto urgente y coordinación de entregas."></i>
+                                </label>
+                                <input type="tel" id="modalContactoTelefonoCliente" class="form-control" placeholder="+52 33 1234 5678">
+                                <small class="text-muted">Teléfono para contacto directo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-map-marker-alt me-2"></i>Dirección</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Dirección
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                       data-field="Direccion" 
+                                       data-tooltip="Dirección completa del cliente (calle, número, colonia). Se usa para envíos y facturación física."></i>
+                                </label>
+                                <input type="text" id="modalContactoDireccion" class="form-control" placeholder="Calle y número">
+                                <small class="text-muted">Calle, número y colonia</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Ciudad
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                       data-field="Ciudad" 
+                                       data-tooltip="Ciudad donde se encuentra el cliente. Se usa para agrupar clientes por ubicación y planificar rutas de entrega."></i>
+                                </label>
+                                <input type="text" id="modalContactoCiudad" class="form-control" placeholder="Ciudad">
+                                <small class="text-muted">Ciudad de ubicación</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Estado / Provincia
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                       data-field="Estado" 
+                                       data-tooltip="Estado o provincia del cliente. Se usa para cálculos de impuestos y agrupación regional."></i>
+                                </label>
+                                <input type="text" id="modalContactoEstado" class="form-control" placeholder="Estado">
+                                <small class="text-muted">Estado o provincia</small>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            Código Postal
+                                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                               data-field="CodigoPostal" 
+                                               data-tooltip="Código postal de la dirección. Se usa para validación de direcciones y cálculo de zonas de entrega."></i>
+                                        </label>
+                                        <input type="text" id="modalContactoCodigoPostal" class="form-control" placeholder="00000" maxlength="10">
+                                        <small class="text-muted">Código postal</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            País
+                                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-contacto-cliente" 
+                                               data-field="Pais" 
+                                               data-tooltip="País del cliente. Se usa para cálculos de envío internacional y cumplimiento fiscal."></i>
+                                        </label>
+                                        <input type="text" id="modalContactoPais" class="form-control" placeholder="México" value="México">
+                                        <small class="text-muted">País</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalContactoClienteGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalContactoClienteGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalContactoClienteCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalContactoClienteCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalContactoClienteId === 'undefined') {
+        window.modalContactoClienteId = null;
+    }
+    if (typeof modalContactoClienteId === 'undefined') {
+        var modalContactoClienteId = null;
+    }
+    var tooltipModalContactoClienteObj = null;
+    window.modalContactoClienteInstance = null;
+    
+    window.mostrarModalContactoCliente = function() {
+        if (window.modalContactoClienteInstance) {
+            try {
+                window.modalContactoClienteInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalContactoCliente');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalContactoClienteInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalContactoCliente = function() {
+        if (window.modalContactoClienteInstance) {
+            try {
+                window.modalContactoClienteInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalContactoClienteCreated = function(args) {
+        if (args && args.component) {
+            window.modalContactoClienteInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalContactoCliente');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalContactoClienteInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalContactoClienteOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalContactoCliente');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalContactoClienteObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalContactoClienteClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalContactoClienteGuardar = function() {
+        if (window.Customers && window.Customers.Modal) {
+            window.Customers.Modal.GuardarContacto();
+        }
+    };
+    
+    window.modalContactoClienteCancelar = function() {
+        window.ocultarModalContactoCliente();
+    };
+    
+    window.tooltipModalContactoClienteBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentContactoCliente');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

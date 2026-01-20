@@ -1,0 +1,191 @@
+@* Modal de Información Comercial del Cliente - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalComercialCliente" 
+             target=".info-tooltip-comercial-cliente" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalComercialClienteBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentComercialCliente"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalComercialCliente" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="700px" 
+            height="auto"
+            visible="false"
+            header="Información Comercial - Cliente #<span id='modalComercialClienteTitulo'>0</span>"
+            created="modalComercialClienteCreated"
+            open="modalComercialClienteOpen"
+            close="modalComercialClienteClose">
+    <e-content-template>
+        <div id="modalComercialClienteContenido" class="p-3">
+            <div class="alert alert-success mb-3">
+                <h6 class="alert-heading"><i class="fas fa-chart-line me-2"></i>¿Qué es la Información Comercial?</h6>
+                <p class="mb-0 small">
+                    La información comercial contiene datos financieros y de relación comercial con el cliente: 
+                    límite de crédito autorizado, total de órdenes realizadas, total de compras acumuladas y métricas de actividad. 
+                    Esta información se usa para evaluar riesgo crediticio, establecer límites y tomar decisiones comerciales.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-credit-card me-2"></i>Crédito y Finanzas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Límite de Crédito ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-cliente" 
+                                       data-field="LimiteCredito" 
+                                       data-tooltip="Monto máximo de crédito autorizado para el cliente. El cliente puede realizar compras hasta este límite sin pago inmediato. Se revisa periódicamente según historial de pagos."></i>
+                                </label>
+                                <input type="number" id="modalComercialLimiteCredito" class="form-control" 
+                                       step="0.01" min="0" placeholder="0.00">
+                                <small class="text-muted">Monto máximo de crédito autorizado</small>
+                                <div id="progressLimiteCreditoComercial" style="margin-top: 5px; height: 8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Métricas de Actividad</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total Órdenes
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-cliente" 
+                                       data-field="TotalOrdenes" 
+                                       data-tooltip="Número total de órdenes realizadas por el cliente. Indica el nivel de actividad comercial. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="number" id="modalComercialTotalOrdenes" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Total Compras ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-cliente" 
+                                       data-field="TotalCompras" 
+                                       data-tooltip="Monto total acumulado de todas las compras realizadas por el cliente. Suma de todos los totales de órdenes completadas. Se calcula automáticamente."></i>
+                                </label>
+                                <input type="text" id="modalComercialTotalCompras" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-area me-2"></i>Gráfica de Actividad Comercial</h5>
+                </div>
+                <div class="card-body">
+                    <div id="chartActividadComercialCliente" style="height: 200px;"></div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalComercialClienteGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalComercialClienteGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalComercialClienteCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalComercialClienteCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalComercialClienteId === 'undefined') {
+        window.modalComercialClienteId = null;
+    }
+    if (typeof modalComercialClienteId === 'undefined') {
+        var modalComercialClienteId = null;
+    }
+    var tooltipModalComercialClienteObj = null;
+    window.modalComercialClienteInstance = null;
+    
+    window.mostrarModalComercialCliente = function() {
+        if (window.modalComercialClienteInstance) {
+            try {
+                window.modalComercialClienteInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalComercialCliente');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalComercialClienteInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalComercialCliente = function() {
+        if (window.modalComercialClienteInstance) {
+            try {
+                window.modalComercialClienteInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalComercialClienteCreated = function(args) {
+        if (args && args.component) {
+            window.modalComercialClienteInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalComercialCliente');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalComercialClienteInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalComercialClienteOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalComercialCliente');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalComercialClienteObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalComercialClienteClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalComercialClienteGuardar = function() {
+        if (window.Customers && window.Customers.Modal) {
+            window.Customers.Modal.GuardarComercial();
+        }
+    };
+    
+    window.modalComercialClienteCancelar = function() {
+        window.ocultarModalComercialCliente();
+    };
+    
+    window.tooltipModalComercialClienteBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentComercialCliente');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

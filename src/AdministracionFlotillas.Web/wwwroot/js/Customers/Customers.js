@@ -28,7 +28,7 @@ window.customersGridDataBound = function(args) {
 };
 
 function handleCustomerActionButtonsClick(event) {
-    var target = event.target.closest('.btn-ver-cliente, .btn-editar-cliente');
+    var target = event.target.closest('.btn-cabecera-cliente, .btn-comercial-cliente, .btn-contacto-cliente');
     if (target) {
         var idCliente = target.getAttribute('data-id-cliente');
         
@@ -36,17 +36,17 @@ function handleCustomerActionButtonsClick(event) {
             idCliente = parseInt(idCliente, 10);
             
             if (idCliente && !isNaN(idCliente) && idCliente > 0) {
-                if (target.classList.contains('btn-ver-cliente')) {
+                if (target.classList.contains('btn-cabecera-cliente')) {
                     if (window.Customers && window.Customers.Modal) {
-                        window.Customers.Modal.Abrir(idCliente, 'ver');
-                    } else {
-                        console.error('Customers.Modal no está disponible');
+                        window.Customers.Modal.AbrirCabecera(idCliente);
                     }
-                } else if (target.classList.contains('btn-editar-cliente')) {
+                } else if (target.classList.contains('btn-comercial-cliente')) {
                     if (window.Customers && window.Customers.Modal) {
-                        window.Customers.Modal.Abrir(idCliente, 'editar');
-                    } else {
-                        console.error('Customers.Modal no está disponible');
+                        window.Customers.Modal.AbrirComercial(idCliente);
+                    }
+                } else if (target.classList.contains('btn-contacto-cliente')) {
+                    if (window.Customers && window.Customers.Modal) {
+                        window.Customers.Modal.AbrirContacto(idCliente);
                     }
                 }
             } else {
@@ -329,6 +329,36 @@ var modalClienteModo = 'ver';
     
     // Sub-namespace para Modal
     window.Customers.Modal = {
+        AbrirCabecera: function(idCliente) {
+            var id = parseInt(idCliente, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'ID de cliente no válido.');
+                return;
+            }
+            window.modalCabeceraClienteId = id;
+            this.CargarDatosCliente(id, 'cabecera');
+        },
+        
+        AbrirComercial: function(idCliente) {
+            var id = parseInt(idCliente, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'ID de cliente no válido.');
+                return;
+            }
+            window.modalComercialClienteId = id;
+            this.CargarDatosCliente(id, 'comercial');
+        },
+        
+        AbrirContacto: function(idCliente) {
+            var id = parseInt(idCliente, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'ID de cliente no válido.');
+                return;
+            }
+            window.modalContactoClienteId = id;
+            this.CargarDatosCliente(id, 'contacto');
+        },
+        
         Abrir: function(idCliente, modo) {
             var id = parseInt(idCliente, 10);
             
@@ -343,7 +373,7 @@ var modalClienteModo = 'ver';
             this.CargarDatosCliente(id);
         },
         
-        CargarDatosCliente: function(idCliente) {
+        CargarDatosCliente: function(idCliente, tipo) {
             var self = this;
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/Customers/ObtenerCustomerPorId', true);
@@ -354,8 +384,19 @@ var modalClienteModo = 'ver';
                         try {
                             var respuesta = JSON.parse(xhr.responseText);
                             if (respuesta.exito && respuesta.datos) {
-                                self.MostrarDatos(respuesta.datos);
-                                self.AbrirDialog();
+                                if (tipo === 'cabecera') {
+                                    self.MostrarDatosCabecera(respuesta.datos);
+                                    self.AbrirDialogCabecera();
+                                } else if (tipo === 'comercial') {
+                                    self.MostrarDatosComercial(respuesta.datos);
+                                    self.AbrirDialogComercial();
+                                } else if (tipo === 'contacto') {
+                                    self.MostrarDatosContacto(respuesta.datos);
+                                    self.AbrirDialogContacto();
+                                } else {
+                                    self.MostrarDatos(respuesta.datos);
+                                    self.AbrirDialog();
+                                }
                             } else {
                                 window.Customers.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el cliente.');
                             }
@@ -946,6 +987,190 @@ var modalClienteModo = 'ver';
             
             // Desactivar modo edición
             this.DesactivarModoEdicion();
+        },
+        
+        GuardarCabecera: function() {
+            var id = (typeof window.modalCabeceraClienteId !== 'undefined' && window.modalCabeceraClienteId) 
+                ? window.modalCabeceraClienteId 
+                : (typeof modalCabeceraClienteId !== 'undefined' ? modalCabeceraClienteId : null);
+            if (!id || id <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'No hay cliente seleccionado.');
+                return;
+            }
+            
+            var datos = {
+                IdCliente: id,
+                NombreCliente: document.getElementById('modalCabeceraNombreCliente').value.trim(),
+                EstadoCliente: document.getElementById('modalCabeceraEstadoCliente').value,
+                FechaRegistro: document.getElementById('modalCabeceraFechaRegistro').value
+            };
+            
+            if (!datos.NombreCliente) {
+                window.Customers.Utilidades.MostrarError('Error', 'El nombre del cliente es requerido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalCabeceraCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ActualizarCustomer', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Customers.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalCabeceraCliente();
+                                    if (window.Customers && window.Customers.Grid) {
+                                        window.Customers.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalCabeceraCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Customers.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalCabeceraCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalCabeceraCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Customers.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalCabeceraCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarComercial: function() {
+            var id = (typeof window.modalComercialClienteId !== 'undefined' && window.modalComercialClienteId) 
+                ? window.modalComercialClienteId 
+                : (typeof modalComercialClienteId !== 'undefined' ? modalComercialClienteId : null);
+            if (!id || id <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'No hay cliente seleccionado.');
+                return;
+            }
+            
+            var limiteCredito = parseFloat(document.getElementById('modalComercialLimiteCredito').value);
+            if (isNaN(limiteCredito) || limiteCredito < 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'El límite de crédito debe ser un número válido mayor o igual a 0.');
+                return;
+            }
+            
+            var datos = {
+                IdCliente: id,
+                LimiteCredito: limiteCredito
+            };
+            
+            window.ModalButtons.Deshabilitar('modalComercialCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ActualizarCustomer', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Customers.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalComercialCliente();
+                                    if (window.Customers && window.Customers.Grid) {
+                                        window.Customers.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalComercialCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Customers.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalComercialCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalComercialCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Customers.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalComercialCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarContacto: function() {
+            var id = (typeof window.modalContactoClienteId !== 'undefined' && window.modalContactoClienteId) 
+                ? window.modalContactoClienteId 
+                : (typeof modalContactoClienteId !== 'undefined' ? modalContactoClienteId : null);
+            if (!id || id <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'No hay cliente seleccionado.');
+                return;
+            }
+            
+            var email = document.getElementById('modalContactoEmailCliente').value.trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                window.Customers.Utilidades.MostrarError('Error', 'El email no es válido.');
+                return;
+            }
+            
+            var datos = {
+                IdCliente: id,
+                Email: email,
+                Telefono: document.getElementById('modalContactoTelefonoCliente').value.trim(),
+                Direccion: document.getElementById('modalContactoDireccion').value.trim(),
+                Ciudad: document.getElementById('modalContactoCiudad').value.trim(),
+                Estado: document.getElementById('modalContactoEstado').value.trim(),
+                CodigoPostal: document.getElementById('modalContactoCodigoPostal').value.trim(),
+                Pais: document.getElementById('modalContactoPais').value.trim()
+            };
+            
+            window.ModalButtons.Deshabilitar('modalContactoCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ActualizarCustomer', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Customers.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalContactoCliente();
+                                    if (window.Customers && window.Customers.Grid) {
+                                        window.Customers.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalContactoCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Customers.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalContactoCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalContactoCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Customers.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalContactoCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
         }
     };
     
