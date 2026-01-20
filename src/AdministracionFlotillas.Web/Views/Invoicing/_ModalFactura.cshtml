@@ -155,8 +155,10 @@
         </div>
     </e-content-template>
     <e-dialog-buttons>
-        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalFacturaEditar"></e-dialog-dialogbutton>
-        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalFacturaCerrar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalEditar" content="Editar" isPrimary="false" cssClass="e-flat" click="modalFacturaEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalGuardar" content="Guardar" isPrimary="true" cssClass="e-flat d-none" click="modalFacturaGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat d-none" click="modalFacturaCancelar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCerrar" content="Cerrar" isPrimary="true" click="modalFacturaCerrar"></e-dialog-dialogbutton>
     </e-dialog-buttons>
 </ejs-dialog>
 
@@ -390,8 +392,26 @@
             }
         }
     };
+
+    window.modalFacturaGuardar = function() {
+        if (window.Invoicing && window.Invoicing.Modal) {
+            window.Invoicing.Modal.GuardarCambios();
+        }
+    };
+
+    window.modalFacturaCancelar = function() {
+        if (window.Invoicing && window.Invoicing.Modal) {
+            window.Invoicing.Modal.CancelarEdicion();
+        }
+    };
     
     window.modalFacturaCerrar = function() {
+        if (modalFacturaModo === 'editar') {
+            if (window.Invoicing && window.Invoicing.Modal) {
+                window.Invoicing.Modal.CancelarEdicion();
+            }
+        }
+        
         if (typeof window.ocultarModalFactura === 'function') {
             window.ocultarModalFactura();
         } else {

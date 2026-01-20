@@ -16,31 +16,37 @@ window.Invoicing = window.Invoicing || {};
     
     window.Invoicing.Utilidades = {
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         }
     };
     
@@ -393,7 +399,265 @@ window.Invoicing = window.Invoicing || {};
         },
         
         CambiarAModoEdicion: function(idFactura) {
-            window.Invoicing.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idFactura || idFactura <= 0) {
+                window.Invoicing.Utilidades.MostrarError('Error', 'ID de factura no válido.');
+                return;
+            }
+            
+            if (typeof modalFacturaId !== 'undefined') {
+                modalFacturaId = idFactura;
+            }
+            if (typeof modalFacturaModo !== 'undefined') {
+                modalFacturaModo = 'editar';
+            }
+            
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            this.ConvertirCamposAEditables();
+            this.ActualizarBotonesModal();
+            
+            var titulo = document.getElementById('modalFacturaTitulo');
+            if (titulo && typeof modalFacturaId !== 'undefined') {
+                titulo.textContent = modalFacturaId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            this.ConvertirCamposASoloLectura();
+            this.RestaurarBotonesModal();
+            
+            var titulo = document.getElementById('modalFacturaTitulo');
+            if (titulo && typeof modalFacturaId !== 'undefined') {
+                titulo.textContent = modalFacturaId;
+            }
+            
+            if (typeof modalFacturaModo !== 'undefined') {
+                modalFacturaModo = 'ver';
+            }
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown (solo si no está timbrada)
+            var estadoContainer = document.getElementById('modalEstadoFactura');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                var puedeEditar = estadoActual !== 'STAMPED';
+                
+                if (puedeEditar) {
+                    estadoContainer.innerHTML = '<select id="editEstadoFactura" class="form-select form-select-sm">' +
+                        '<option value="DRAFT"' + (estadoActual === 'DRAFT' ? ' selected' : '') + '>DRAFT</option>' +
+                        '<option value="STAMPED"' + (estadoActual === 'STAMPED' ? ' selected' : '') + '>STAMPED</option>' +
+                        '<option value="CANCELLED"' + (estadoActual === 'CANCELLED' ? ' selected' : '') + '>CANCELLED</option>' +
+                        '<option value="PAID"' + (estadoActual === 'PAID' ? ' selected' : '') + '>PAID</option>' +
+                        '</select>';
+                }
+            }
+            
+            // Método de Pago - convertir a dropdown
+            var metodoPagoContainer = document.getElementById('modalMetodoPago');
+            if (metodoPagoContainer) {
+                var metodoActual = metodoPagoContainer.textContent.trim();
+                metodoPagoContainer.innerHTML = '<select id="editMetodoPago" class="form-select form-select-sm">' +
+                    '<option value="PUE"' + (metodoActual === 'PUE' ? ' selected' : '') + '>PUE (Pago en una exhibición)</option>' +
+                    '<option value="PPD"' + (metodoActual === 'PPD' ? ' selected' : '') + '>PPD (Pago en parcialidades o diferido)</option>' +
+                    '</select>';
+            }
+            
+            // Forma de Pago - convertir a input
+            var formaPagoContainer = document.getElementById('modalFormaPago');
+            if (formaPagoContainer) {
+                var formaActual = formaPagoContainer.textContent.trim();
+                formaPagoContainer.innerHTML = '<input type="text" id="editFormaPago" class="form-control form-control-sm" value="' + formaActual + '" placeholder="Código SAT (ej: 03)">';
+            }
+            
+            // Motivo Cancelación - convertir a textarea
+            var motivoContainer = document.getElementById('modalMotivoCancelacion');
+            if (motivoContainer) {
+                var motivoActual = motivoContainer.textContent.trim();
+                motivoContainer.innerHTML = '<textarea id="editMotivoCancelacion" class="form-control form-control-sm" rows="2">' + motivoActual + '</textarea>';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoFactura');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoFactura');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'STAMPED') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-factura" data-field="Estado" data-tooltip="Factura timbrada y válida">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'DRAFT') {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-factura" data-field="Estado" data-tooltip="Factura en borrador">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'CANCELLED') {
+                        estadoHtml = '<span class="badge bg-danger info-tooltip-factura" data-field="Estado" data-tooltip="Factura cancelada">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'PAID') {
+                        estadoHtml = '<span class="badge bg-info info-tooltip-factura" data-field="Estado" data-tooltip="Factura pagada">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-factura" data-field="Estado" data-tooltip="Estado desconocido">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Método de Pago
+            var metodoPagoContainer = document.getElementById('modalMetodoPago');
+            if (metodoPagoContainer) {
+                var selectMetodo = document.getElementById('editMetodoPago');
+                if (selectMetodo) {
+                    metodoPagoContainer.textContent = selectMetodo.value || '-';
+                }
+            }
+            
+            // Forma de Pago
+            var formaPagoContainer = document.getElementById('modalFormaPago');
+            if (formaPagoContainer) {
+                var inputForma = document.getElementById('editFormaPago');
+                if (inputForma) {
+                    formaPagoContainer.textContent = inputForma.value || '-';
+                }
+            }
+            
+            // Motivo Cancelación
+            var motivoContainer = document.getElementById('modalMotivoCancelacion');
+            if (motivoContainer) {
+                var textareaMotivo = document.getElementById('editMotivoCancelacion');
+                if (textareaMotivo) {
+                    motivoContainer.textContent = textareaMotivo.value || '-';
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (typeof modalFacturaId === 'undefined' || !modalFacturaId || modalFacturaId <= 0) {
+                window.Invoicing.Utilidades.MostrarError('Error', 'No hay factura seleccionada para guardar.');
+                return;
+            }
+            
+            var selectEstado = document.getElementById('editEstadoFactura');
+            var selectMetodo = document.getElementById('editMetodoPago');
+            var inputForma = document.getElementById('editFormaPago');
+            var textareaMotivo = document.getElementById('editMotivoCancelacion');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoMetodo = selectMetodo ? selectMetodo.value : null;
+            var nuevaForma = inputForma ? inputForma.value.trim() : null;
+            var nuevoMotivo = textareaMotivo ? textareaMotivo.value.trim() : null;
+            
+            // Validaciones
+            if (nuevoEstado && nuevoEstado !== 'DRAFT' && nuevoEstado !== 'STAMPED' && 
+                nuevoEstado !== 'CANCELLED' && nuevoEstado !== 'PAID' && nuevoEstado !== 'PENDING') {
+                window.Invoicing.Utilidades.MostrarError('Error', 'Estado inválido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalFactura', '#invoicesGrid .e-gridcontent .e-rowcell .btn');
+            
+            var datosActualizacion = {
+                IdFactura: modalFacturaId,
+                Estado: nuevoEstado,
+                MetodoPago: nuevoMetodo,
+                FormaPago: nuevaForma,
+                MotivoCancelacion: nuevoMotivo
+            };
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Invoicing/ActualizarInvoice', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Invoicing.Utilidades.MostrarExito(
+                                    'Factura actualizada',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    if (window.Invoicing && window.Invoicing.Modal) {
+                                        window.Invoicing.Modal.DesactivarModoEdicion();
+                                        
+                                        if (typeof modalFacturaId !== 'undefined' && modalFacturaId) {
+                                            window.Invoicing.Modal.CargarDatosFactura(modalFacturaId);
+                                        }
+                                        
+                                        if (window.Invoicing && window.Invoicing.Grid) {
+                                            window.Invoicing.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    window.ModalButtons.Habilitar('modalFactura', '#invoicesGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Invoicing.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalFactura', '#invoicesGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Invoicing.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalFactura', '#invoicesGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Invoicing.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalFactura', '#invoicesGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar factura:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.Invoicing.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalFactura', '#invoicesGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            if (typeof modalFacturaId !== 'undefined' && modalFacturaId) {
+                this.CargarDatosFactura(modalFacturaId);
+            }
+            
+            this.DesactivarModoEdicion();
         }
     };
     

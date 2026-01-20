@@ -107,8 +107,10 @@
         </div>
     </e-content-template>
     <e-dialog-buttons>
-        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalCanalEditar"></e-dialog-dialogbutton>
-        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalCanalCerrar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalEditar" content="Editar" isPrimary="false" cssClass="e-flat" click="modalCanalEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalGuardar" content="Guardar" isPrimary="true" cssClass="e-flat d-none" click="modalCanalGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat d-none" click="modalCanalCancelar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCerrar" content="Cerrar" isPrimary="true" click="modalCanalCerrar"></e-dialog-dialogbutton>
     </e-dialog-buttons>
 </ejs-dialog>
 
@@ -342,8 +344,26 @@
             }
         }
     };
+
+    window.modalCanalGuardar = function() {
+        if (window.OrderChannels && window.OrderChannels.Modal) {
+            window.OrderChannels.Modal.GuardarCambios();
+        }
+    };
+
+    window.modalCanalCancelar = function() {
+        if (window.OrderChannels && window.OrderChannels.Modal) {
+            window.OrderChannels.Modal.CancelarEdicion();
+        }
+    };
     
     window.modalCanalCerrar = function() {
+        if (modalCanalModo === 'editar') {
+            if (window.OrderChannels && window.OrderChannels.Modal) {
+                window.OrderChannels.Modal.CancelarEdicion();
+            }
+        }
+        
         if (typeof window.ocultarModalCanal === 'function') {
             window.ocultarModalCanal();
         } else {

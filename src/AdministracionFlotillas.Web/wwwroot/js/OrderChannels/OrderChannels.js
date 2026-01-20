@@ -16,31 +16,37 @@ window.OrderChannels = window.OrderChannels || {};
     
     window.OrderChannels.Utilidades = {
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         }
     };
     
@@ -366,7 +372,272 @@ window.OrderChannels = window.OrderChannels || {};
         },
         
         CambiarAModoEdicion: function(idCanal) {
-            window.OrderChannels.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idCanal || idCanal <= 0) {
+                window.OrderChannels.Utilidades.MostrarError('Error', 'ID de canal no válido.');
+                return;
+            }
+            
+            if (typeof modalCanalId !== 'undefined') {
+                modalCanalId = idCanal;
+            }
+            if (typeof modalCanalModo !== 'undefined') {
+                modalCanalModo = 'editar';
+            }
+            
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            this.ConvertirCamposAEditables();
+            this.ActualizarBotonesModal();
+            
+            var titulo = document.getElementById('modalCanalTitulo');
+            if (titulo && typeof modalCanalId !== 'undefined') {
+                titulo.textContent = modalCanalId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            this.ConvertirCamposASoloLectura();
+            this.RestaurarBotonesModal();
+            
+            var titulo = document.getElementById('modalCanalTitulo');
+            if (titulo && typeof modalCanalId !== 'undefined') {
+                titulo.textContent = modalCanalId;
+            }
+            
+            if (typeof modalCanalModo !== 'undefined') {
+                modalCanalModo = 'ver';
+            }
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoCanal');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoCanal" class="form-select form-select-sm">' +
+                    '<option value="ACTIVE"' + (estadoActual === 'ACTIVE' ? ' selected' : '') + '>ACTIVE</option>' +
+                    '<option value="INACTIVE"' + (estadoActual === 'INACTIVE' ? ' selected' : '') + '>INACTIVE</option>' +
+                    '<option value="MAINTENANCE"' + (estadoActual === 'MAINTENANCE' ? ' selected' : '') + '>MAINTENANCE</option>' +
+                    '</select>';
+            }
+            
+            // Nombre - convertir a input
+            var nombreContainer = document.getElementById('modalNombreCanal');
+            if (nombreContainer) {
+                var nombreActual = nombreContainer.textContent.trim();
+                nombreContainer.innerHTML = '<input type="text" id="editNombreCanal" class="form-control form-control-sm" value="' + nombreActual + '">';
+            }
+            
+            // Tipo - convertir a dropdown
+            var tipoContainer = document.getElementById('modalTipoCanal');
+            if (tipoContainer) {
+                var tipoActual = tipoContainer.textContent.trim();
+                tipoContainer.innerHTML = '<select id="editTipoCanal" class="form-select form-select-sm">' +
+                    '<option value="MOBILE"' + (tipoActual === 'MOBILE' ? ' selected' : '') + '>MOBILE</option>' +
+                    '<option value="CALL_CENTER"' + (tipoActual === 'CALL_CENTER' ? ' selected' : '') + '>CALL_CENTER</option>' +
+                    '<option value="EMAIL"' + (tipoActual === 'EMAIL' ? ' selected' : '') + '>EMAIL</option>' +
+                    '<option value="WEB"' + (tipoActual === 'WEB' ? ' selected' : '') + '>WEB</option>' +
+                    '</select>';
+            }
+            
+            // Descripción - convertir a textarea
+            var descripcionContainer = document.getElementById('modalDescripcion');
+            if (descripcionContainer) {
+                var descripcionActual = descripcionContainer.textContent.trim();
+                descripcionContainer.innerHTML = '<textarea id="editDescripcion" class="form-control form-control-sm" rows="3">' + descripcionActual + '</textarea>';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoCanal');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoCanal');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'ACTIVE') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-canal" data-field="Estado" data-tooltip="Canal activo y operativo">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'INACTIVE') {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-canal" data-field="Estado" data-tooltip="Canal inactivo">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'MAINTENANCE') {
+                        estadoHtml = '<span class="badge bg-warning text-dark info-tooltip-canal" data-field="Estado" data-tooltip="Canal en mantenimiento">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-canal" data-field="Estado" data-tooltip="Estado desconocido">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Nombre
+            var nombreContainer = document.getElementById('modalNombreCanal');
+            if (nombreContainer) {
+                var inputNombre = document.getElementById('editNombreCanal');
+                if (inputNombre) {
+                    nombreContainer.textContent = inputNombre.value || '-';
+                }
+            }
+            
+            // Tipo - restaurar badge
+            var tipoContainer = document.getElementById('modalTipoCanal');
+            if (tipoContainer) {
+                var selectTipo = document.getElementById('editTipoCanal');
+                if (selectTipo) {
+                    var tipoSeleccionado = selectTipo.value;
+                    var tipoHtml = '';
+                    if (tipoSeleccionado === 'MOBILE') {
+                        tipoHtml = '<span class="badge bg-primary info-tooltip-canal" data-field="TipoCanal" data-tooltip="Canal móvil (aplicación)">MOBILE</span>';
+                    } else if (tipoSeleccionado === 'CALL_CENTER') {
+                        tipoHtml = '<span class="badge bg-info info-tooltip-canal" data-field="TipoCanal" data-tooltip="Call center telefónico">CALL_CENTER</span>';
+                    } else if (tipoSeleccionado === 'EMAIL') {
+                        tipoHtml = '<span class="badge bg-secondary info-tooltip-canal" data-field="TipoCanal" data-tooltip="Correo electrónico">EMAIL</span>';
+                    } else if (tipoSeleccionado === 'WEB') {
+                        tipoHtml = '<span class="badge bg-success info-tooltip-canal" data-field="TipoCanal" data-tooltip="Portal web">WEB</span>';
+                    } else {
+                        tipoHtml = '<span class="badge bg-secondary info-tooltip-canal" data-field="TipoCanal" data-tooltip="Tipo desconocido">' + tipoSeleccionado + '</span>';
+                    }
+                    tipoContainer.innerHTML = tipoHtml;
+                }
+            }
+            
+            // Descripción
+            var descripcionContainer = document.getElementById('modalDescripcion');
+            if (descripcionContainer) {
+                var textareaDescripcion = document.getElementById('editDescripcion');
+                if (textareaDescripcion) {
+                    descripcionContainer.textContent = textareaDescripcion.value || '-';
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (typeof modalCanalId === 'undefined' || !modalCanalId || modalCanalId <= 0) {
+                window.OrderChannels.Utilidades.MostrarError('Error', 'No hay canal seleccionado para guardar.');
+                return;
+            }
+            
+            var selectEstado = document.getElementById('editEstadoCanal');
+            var inputNombre = document.getElementById('editNombreCanal');
+            var selectTipo = document.getElementById('editTipoCanal');
+            var textareaDescripcion = document.getElementById('editDescripcion');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoNombre = inputNombre ? inputNombre.value.trim() : null;
+            var nuevoTipo = selectTipo ? selectTipo.value : null;
+            var nuevaDescripcion = textareaDescripcion ? textareaDescripcion.value.trim() : null;
+            
+            // Validaciones
+            if (nuevoEstado && nuevoEstado !== 'ACTIVE' && nuevoEstado !== 'INACTIVE') {
+                window.OrderChannels.Utilidades.MostrarError('Error', 'Estado inválido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalCanal', '#orderChannelsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var datosActualizacion = {
+                IdCanal: modalCanalId,
+                Estado: nuevoEstado,
+                NombreCanal: nuevoNombre,
+                TipoCanal: nuevoTipo,
+                Descripcion: nuevaDescripcion
+            };
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/OrderChannels/ActualizarOrderChannel', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.OrderChannels.Utilidades.MostrarExito(
+                                    'Canal actualizado',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    if (window.OrderChannels && window.OrderChannels.Modal) {
+                                        window.OrderChannels.Modal.DesactivarModoEdicion();
+                                        
+                                        if (typeof modalCanalId !== 'undefined' && modalCanalId) {
+                                            window.OrderChannels.Modal.CargarDatosCanal(modalCanalId);
+                                        }
+                                        
+                                        if (window.OrderChannels && window.OrderChannels.Grid) {
+                                            window.OrderChannels.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    window.ModalButtons.Habilitar('modalCanal', '#orderChannelsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.OrderChannels.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalCanal', '#orderChannelsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.OrderChannels.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalCanal', '#orderChannelsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.OrderChannels.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalCanal', '#orderChannelsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar canal:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.OrderChannels.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalCanal', '#orderChannelsGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            if (typeof modalCanalId !== 'undefined' && modalCanalId) {
+                this.CargarDatosCanal(modalCanalId);
+            }
+            
+            this.DesactivarModoEdicion();
         }
     };
     

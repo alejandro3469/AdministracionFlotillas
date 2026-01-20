@@ -16,31 +16,37 @@ window.Routes = window.Routes || {};
     
     window.Routes.Utilidades = {
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         }
     };
     
@@ -360,7 +366,254 @@ window.Routes = window.Routes || {};
         },
         
         CambiarAModoEdicion: function(idRuta) {
-            window.Routes.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idRuta || idRuta <= 0) {
+                window.Routes.Utilidades.MostrarError('Error', 'ID de ruta no válido.');
+                return;
+            }
+            
+            if (typeof modalRutaId !== 'undefined') {
+                modalRutaId = idRuta;
+            }
+            if (typeof modalRutaModo !== 'undefined') {
+                modalRutaModo = 'editar';
+            }
+            
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            this.ConvertirCamposAEditables();
+            this.ActualizarBotonesModal();
+            
+            var titulo = document.getElementById('modalRutaTitulo');
+            if (titulo && typeof modalRutaId !== 'undefined') {
+                titulo.textContent = modalRutaId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            this.ConvertirCamposASoloLectura();
+            this.RestaurarBotonesModal();
+            
+            var titulo = document.getElementById('modalRutaTitulo');
+            if (titulo && typeof modalRutaId !== 'undefined') {
+                titulo.textContent = modalRutaId;
+            }
+            
+            if (typeof modalRutaModo !== 'undefined') {
+                modalRutaModo = 'ver';
+            }
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoRuta');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoRuta" class="form-select form-select-sm">' +
+                    '<option value="ACTIVE"' + (estadoActual === 'ACTIVE' ? ' selected' : '') + '>ACTIVE</option>' +
+                    '<option value="INACTIVE"' + (estadoActual === 'INACTIVE' ? ' selected' : '') + '>INACTIVE</option>' +
+                    '<option value="MAINTENANCE"' + (estadoActual === 'MAINTENANCE' ? ' selected' : '') + '>MAINTENANCE</option>' +
+                    '</select>';
+            }
+            
+            // Nombre - convertir a input
+            var nombreContainer = document.getElementById('modalNombreRuta');
+            if (nombreContainer) {
+                var nombreActual = nombreContainer.textContent.trim();
+                nombreContainer.innerHTML = '<input type="text" id="editNombreRuta" class="form-control form-control-sm" value="' + nombreActual + '">';
+            }
+            
+            // Descripción - convertir a textarea
+            var descripcionContainer = document.getElementById('modalDescripcion');
+            if (descripcionContainer) {
+                var descripcionActual = descripcionContainer.textContent.trim();
+                descripcionContainer.innerHTML = '<textarea id="editDescripcion" class="form-control form-control-sm" rows="3">' + descripcionActual + '</textarea>';
+            }
+            
+            // Zona Geográfica - convertir a input
+            var zonaContainer = document.getElementById('modalZonaGeografica');
+            if (zonaContainer) {
+                var zonaActual = zonaContainer.textContent.trim();
+                zonaContainer.innerHTML = '<input type="text" id="editZonaGeografica" class="form-control form-control-sm" value="' + zonaActual + '">';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoRuta');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoRuta');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'ACTIVE') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-ruta" data-field="Estado" data-tooltip="Ruta activa y operativa">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'INACTIVE') {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-ruta" data-field="Estado" data-tooltip="Ruta inactiva">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'MAINTENANCE') {
+                        estadoHtml = '<span class="badge bg-warning text-dark info-tooltip-ruta" data-field="Estado" data-tooltip="Ruta en mantenimiento">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-ruta" data-field="Estado" data-tooltip="Estado desconocido">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Nombre
+            var nombreContainer = document.getElementById('modalNombreRuta');
+            if (nombreContainer) {
+                var inputNombre = document.getElementById('editNombreRuta');
+                if (inputNombre) {
+                    nombreContainer.textContent = inputNombre.value || '-';
+                }
+            }
+            
+            // Descripción
+            var descripcionContainer = document.getElementById('modalDescripcion');
+            if (descripcionContainer) {
+                var textareaDescripcion = document.getElementById('editDescripcion');
+                if (textareaDescripcion) {
+                    descripcionContainer.textContent = textareaDescripcion.value || '-';
+                }
+            }
+            
+            // Zona Geográfica
+            var zonaContainer = document.getElementById('modalZonaGeografica');
+            if (zonaContainer) {
+                var inputZona = document.getElementById('editZonaGeografica');
+                if (inputZona) {
+                    zonaContainer.textContent = inputZona.value || '-';
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (typeof modalRutaId === 'undefined' || !modalRutaId || modalRutaId <= 0) {
+                window.Routes.Utilidades.MostrarError('Error', 'No hay ruta seleccionada para guardar.');
+                return;
+            }
+            
+            var selectEstado = document.getElementById('editEstadoRuta');
+            var inputNombre = document.getElementById('editNombreRuta');
+            var textareaDescripcion = document.getElementById('editDescripcion');
+            var inputZona = document.getElementById('editZonaGeografica');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoNombre = inputNombre ? inputNombre.value.trim() : null;
+            var nuevaDescripcion = textareaDescripcion ? textareaDescripcion.value.trim() : null;
+            var nuevaZona = inputZona ? inputZona.value.trim() : null;
+            
+            // Validaciones
+            if (nuevoEstado && nuevoEstado !== 'ACTIVE' && nuevoEstado !== 'INACTIVE' && nuevoEstado !== 'MAINTENANCE') {
+                window.Routes.Utilidades.MostrarError('Error', 'Estado inválido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalRuta', '#routesGrid .e-gridcontent .e-rowcell .btn');
+            
+            var datosActualizacion = {
+                IdRuta: modalRutaId,
+                Estado: nuevoEstado,
+                NombreRuta: nuevoNombre,
+                Descripcion: nuevaDescripcion,
+                ZonaGeografica: nuevaZona
+            };
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Routes/ActualizarRoute', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Routes.Utilidades.MostrarExito(
+                                    'Ruta actualizada',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    if (window.Routes && window.Routes.Modal) {
+                                        window.Routes.Modal.DesactivarModoEdicion();
+                                        
+                                        if (typeof modalRutaId !== 'undefined' && modalRutaId) {
+                                            window.Routes.Modal.CargarDatosRuta(modalRutaId);
+                                        }
+                                        
+                                        if (window.Routes && window.Routes.Grid) {
+                                            window.Routes.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    window.ModalButtons.Habilitar('modalRuta', '#routesGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Routes.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalRuta', '#routesGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Routes.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalRuta', '#routesGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Routes.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalRuta', '#routesGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar ruta:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.Routes.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalRuta', '#routesGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            if (typeof modalRutaId !== 'undefined' && modalRutaId) {
+                this.CargarDatosRuta(modalRutaId);
+            }
+            
+            this.DesactivarModoEdicion();
         }
     };
     

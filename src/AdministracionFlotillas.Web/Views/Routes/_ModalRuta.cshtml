@@ -103,8 +103,10 @@
         </div>
     </e-content-template>
     <e-dialog-buttons>
-        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalRutaEditar"></e-dialog-dialogbutton>
-        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalRutaCerrar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalEditar" content="Editar" isPrimary="false" cssClass="e-flat" click="modalRutaEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalGuardar" content="Guardar" isPrimary="true" cssClass="e-flat d-none" click="modalRutaGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat d-none" click="modalRutaCancelar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCerrar" content="Cerrar" isPrimary="true" click="modalRutaCerrar"></e-dialog-dialogbutton>
     </e-dialog-buttons>
 </ejs-dialog>
 
@@ -338,8 +340,26 @@
             }
         }
     };
+
+    window.modalRutaGuardar = function() {
+        if (window.Routes && window.Routes.Modal) {
+            window.Routes.Modal.GuardarCambios();
+        }
+    };
+
+    window.modalRutaCancelar = function() {
+        if (window.Routes && window.Routes.Modal) {
+            window.Routes.Modal.CancelarEdicion();
+        }
+    };
     
     window.modalRutaCerrar = function() {
+        if (modalRutaModo === 'editar') {
+            if (window.Routes && window.Routes.Modal) {
+                window.Routes.Modal.CancelarEdicion();
+            }
+        }
+        
         if (typeof window.ocultarModalRuta === 'function') {
             window.ocultarModalRuta();
         } else {
