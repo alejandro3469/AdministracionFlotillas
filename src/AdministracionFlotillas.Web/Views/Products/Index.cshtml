@@ -17,6 +17,18 @@
         </div>
     </div>
 
+    <!-- Tooltip para métricas -->
+    <ejs-tooltip id="tooltipMetricasProductos" 
+                 target=".metric-tooltip-producto" 
+                 opensOn="Hover" 
+                 width="300px"
+                 position="TopCenter"
+                 beforeRender="tooltipMetricasProductosBeforeRender">
+        <e-content-template>
+            <div id="tooltipContentMetricasProductos"></div>
+        </e-content-template>
+    </ejs-tooltip>
+
     <!-- Indicadores Compactos -->
     <div class="row mb-3">
         <div class="col-12">
@@ -26,25 +38,25 @@
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-box text-primary"></i>
                             <span class="text-muted small">Total:</span>
-                            <strong class="text-primary" id="totalProductos">0</strong>
+                            <strong class="text-primary metric-tooltip-producto" id="totalProductos" data-metric="total">0</strong>
                         </div>
                         <div class="vr"></div>
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-check-circle text-success"></i>
                             <span class="text-muted small">Activos:</span>
-                            <strong class="text-success" id="productosActivos">0</strong>
+                            <strong class="text-success metric-tooltip-producto" id="productosActivos" data-metric="activos">0</strong>
                         </div>
                         <div class="vr"></div>
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-exclamation-triangle text-warning"></i>
                             <span class="text-muted small">Stock Bajo:</span>
-                            <strong class="text-warning" id="stockBajo">0</strong>
+                            <strong class="text-warning metric-tooltip-producto" id="stockBajo" data-metric="stockBajo">0</strong>
                         </div>
                         <div class="vr"></div>
                         <div class="d-flex align-items-center gap-2">
                             <i class="fas fa-dollar-sign text-info"></i>
                             <span class="text-muted small">Valor Inventario:</span>
-                            <strong class="text-info" id="valorInventario">$0.00</strong>
+                            <strong class="text-info metric-tooltip-producto" id="valorInventario" data-metric="valorInventario">$0.00</strong>
                         </div>
                     </div>
                 </div>
@@ -69,8 +81,10 @@
         </div>
     </div>
     
-    <!-- Modal Ver/Editar Producto -->
-    @await Html.PartialAsync("_ModalProducto")
+    <!-- Modales Especializados -->
+    @await Html.PartialAsync("_ModalCabeceraProducto")
+    @await Html.PartialAsync("_ModalComercialProducto")
+    @await Html.PartialAsync("_ModalDetallesProducto")
 </div>
 
 @section Scripts {
@@ -98,5 +112,76 @@
                 }, 500);
             }
         }
+
+        // Tooltip para métricas de productos
+        var tooltipMetricasProductosObj = null;
+        
+        window.tooltipMetricasProductosBeforeRender = function(args) {
+            var metricType = args.target.getAttribute('data-metric');
+            var contentDiv = document.getElementById('tooltipContentMetricasProductos');
+            
+            if (!contentDiv) return;
+            
+            var tooltipTexts = {
+                'total': 'Total de productos registrados en el sistema. Incluye todos los productos activos e inactivos. Este valor se obtiene del conteo total de registros en la tabla PRODUCTOS.',
+                'activos': 'Productos con estado ACTIVE. Son productos disponibles para venta y que están activos en el catálogo. Se calcula contando los productos con Estado = "ACTIVE" en la base de datos.',
+                'stockBajo': 'Productos con cantidad en stock menor al umbral mínimo definido. Indica productos que requieren reposición urgente. Se calcula comparando CantidadStock con el umbral mínimo configurado.',
+                'valorInventario': 'Valor total del inventario calculado como la suma de (CantidadStock × PrecioUnitario) para todos los productos activos. Representa el valor monetario total del inventario disponible.'
+            };
+            
+            contentDiv.innerHTML = '<div style="padding: 8px; font-size: 13px; line-height: 1.4;">' + 
+                (tooltipTexts[metricType] || 'Información de la métrica') + 
+                '</div>';
+        };
+        
+        // Inicializar tooltip después de que Syncfusion esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    var tooltipElement = document.getElementById('tooltipMetricasProductos');
+                    if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                        tooltipMetricasProductosObj = tooltipElement.ej2_instances[0];
+                    }
+                }, 500);
+            });
+        } else {
+            setTimeout(function() {
+                var tooltipElement = document.getElementById('tooltipMetricasProductos');
+                if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                    tooltipMetricasProductosObj = tooltipElement.ej2_instances[0];
+                }
+            }, 500);
+        }
     </script>
+    
+    <style>
+        /* Estilos personalizados para tooltips de métricas - Fondo negro, texto blanco, bordes redondeados 2px */
+        .e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"],
+        .e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-tooltip-content,
+        .e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-tooltip-content * {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border-radius: 2px !important;
+        }
+        
+        .e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-arrow-tip {
+            border-top-color: #000000 !important;
+        }
+        
+        .e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-arrow-tip-inner {
+            border-top-color: #000000 !important;
+        }
+        
+        /* Estilos para el contenido del tooltip */
+        #tooltipContentMetricasProductos,
+        #tooltipContentMetricasProductos * {
+            color: #ffffff !important;
+            background-color: transparent !important;
+        }
+        
+        /* Asegurar que todos los elementos del tooltip tengan el estilo correcto */
+        .e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] * {
+            color: #ffffff !important;
+        }
+    </style>
 }

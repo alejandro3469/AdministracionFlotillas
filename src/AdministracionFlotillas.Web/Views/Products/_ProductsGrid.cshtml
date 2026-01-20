@@ -85,11 +85,17 @@
 <!-- Template para acciones -->
 <script id="accionesTemplate" type="text/x-template">
     <div class="d-flex gap-1">
-        <button class="btn btn-sm btn-info btn-ver-producto" data-id-producto="${IdProducto}" title="Ver detalles">
-            <i class="fas fa-eye"></i> <span class="d-none d-sm-inline">Ver</span>
+        <button class="btn btn-sm btn-info btn-cabecera-producto" data-id-producto="${IdProducto}" 
+                title="Información de Cabecera: ID, Nombre, Categoría, Estado. Información básica e identificadores del producto.">
+            <i class="fas fa-id-card"></i> <span class="d-none d-sm-inline">Cabecera</span>
         </button>
-        <button class="btn btn-sm btn-primary btn-editar-producto" data-id-producto="${IdProducto}" title="Editar producto">
-            <i class="fas fa-edit"></i> <span class="d-none d-sm-inline">Editar</span>
+        <button class="btn btn-sm btn-success btn-comercial-producto" data-id-producto="${IdProducto}" 
+                title="Información Comercial: Precio, Margen, Stock, Métricas de inventario. Datos financieros y de disponibilidad del producto.">
+            <i class="fas fa-chart-line"></i> <span class="d-none d-sm-inline">Comercial</span>
+        </button>
+        <button class="btn btn-sm btn-warning btn-detalles-producto" data-id-producto="${IdProducto}" 
+                title="Información de Detalles: Descripción, Especificaciones, Imagen. Datos descriptivos y técnicos del producto.">
+            <i class="fas fa-info-circle"></i> <span class="d-none d-sm-inline">Detalles</span>
         </button>
     </div>
 </script>

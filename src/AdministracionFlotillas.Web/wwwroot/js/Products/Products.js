@@ -28,7 +28,7 @@ window.productsGridDataBound = function(args) {
 };
 
 function handleProductActionButtonsClick(event) {
-    var target = event.target.closest('.btn-ver-producto, .btn-editar-producto');
+    var target = event.target.closest('.btn-cabecera-producto, .btn-comercial-producto, .btn-detalles-producto');
     if (target) {
         var idProducto = target.getAttribute('data-id-producto');
         
@@ -36,17 +36,17 @@ function handleProductActionButtonsClick(event) {
             idProducto = parseInt(idProducto, 10);
             
             if (idProducto && !isNaN(idProducto) && idProducto > 0) {
-                if (target.classList.contains('btn-ver-producto')) {
+                if (target.classList.contains('btn-cabecera-producto')) {
                     if (window.Products && window.Products.Modal) {
-                        window.Products.Modal.Abrir(idProducto, 'ver');
-                    } else {
-                        console.error('Products.Modal no está disponible');
+                        window.Products.Modal.AbrirCabecera(idProducto);
                     }
-                } else if (target.classList.contains('btn-editar-producto')) {
+                } else if (target.classList.contains('btn-comercial-producto')) {
                     if (window.Products && window.Products.Modal) {
-                        window.Products.Modal.Abrir(idProducto, 'editar');
-                    } else {
-                        console.error('Products.Modal no está disponible');
+                        window.Products.Modal.AbrirComercial(idProducto);
+                    }
+                } else if (target.classList.contains('btn-detalles-producto')) {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.AbrirDetalles(idProducto);
                     }
                 }
             } else {
@@ -372,6 +372,36 @@ var modalProductoModo = 'ver';
     
     // Sub-namespace para Modal
     window.Products.Modal = {
+        AbrirCabecera: function(idProducto) {
+            var id = parseInt(idProducto, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'ID de producto no válido.');
+                return;
+            }
+            window.modalCabeceraProductoId = id;
+            this.CargarDatosProducto(id, 'cabecera');
+        },
+        
+        AbrirComercial: function(idProducto) {
+            var id = parseInt(idProducto, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'ID de producto no válido.');
+                return;
+            }
+            window.modalComercialProductoId = id;
+            this.CargarDatosProducto(id, 'comercial');
+        },
+        
+        AbrirDetalles: function(idProducto) {
+            var id = parseInt(idProducto, 10);
+            if (!id || isNaN(id) || id <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'ID de producto no válido.');
+                return;
+            }
+            window.modalDetallesProductoId = id;
+            this.CargarDatosProducto(id, 'detalles');
+        },
+        
         Abrir: function(idProducto, modo) {
             var id = parseInt(idProducto, 10);
             
@@ -386,7 +416,7 @@ var modalProductoModo = 'ver';
             this.CargarDatosProducto(id);
         },
         
-        CargarDatosProducto: function(idProducto) {
+        CargarDatosProducto: function(idProducto, tipo) {
             var self = this;
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/Products/ObtenerProductPorId', true);
@@ -397,8 +427,19 @@ var modalProductoModo = 'ver';
                         try {
                             var respuesta = JSON.parse(xhr.responseText);
                             if (respuesta.exito && respuesta.datos) {
-                                self.MostrarDatos(respuesta.datos);
-                                self.AbrirDialog();
+                                if (tipo === 'cabecera') {
+                                    self.MostrarDatosCabecera(respuesta.datos);
+                                    self.AbrirDialogCabecera();
+                                } else if (tipo === 'comercial') {
+                                    self.MostrarDatosComercial(respuesta.datos);
+                                    self.AbrirDialogComercial();
+                                } else if (tipo === 'detalles') {
+                                    self.MostrarDatosDetalles(respuesta.datos);
+                                    self.AbrirDialogDetalles();
+                                } else {
+                                    self.MostrarDatos(respuesta.datos);
+                                    self.AbrirDialog();
+                                }
                             } else {
                                 window.Products.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudo cargar el producto.');
                             }
@@ -432,7 +473,9 @@ var modalProductoModo = 'ver';
             setText('modalProductoTitulo', producto.IdProducto);
             setText('modalIdProducto', producto.IdProducto);
             setText('modalNombreProducto', producto.NombreProducto || '-');
-            setText('modalCategoria', producto.Categoria || '-');
+            
+            // Actualizar ChipList de categoría
+            this.ActualizarChipCategoria(producto.Categoria || '-');
             
             // Estado con badge y tooltip mejorado
             var estadoHtml = '';
@@ -459,6 +502,9 @@ var modalProductoModo = 'ver';
             setHtml('modalPrecioCosto', '<i class="fas fa-coins me-1"></i>$' + precioCosto.toFixed(2));
             setHtml('modalMargenGanancia', '<i class="fas fa-chart-line me-1"></i>$' + margenGanancia.toFixed(2));
             
+            // Actualizar Sparkline de margen
+            this.ActualizarSparklineMargen(producto);
+            
             // Stock con indicador visual mejorado
             var stock = producto.CantidadStock || 0;
             var stockHtml = '';
@@ -479,16 +525,11 @@ var modalProductoModo = 'ver';
             }
             setHtml('modalCantidadStock', '<i class="' + stockIcon + ' me-1"></i>' + stock);
             
-            // Actualizar ProgressBar de stock
-            var progressBarStock = document.getElementById('progressBarStock');
-            if (progressBarStock && progressBarStock.ej2_instances && progressBarStock.ej2_instances[0]) {
-                var maxStock = 100; // Valor máximo para el cálculo de porcentaje
-                var stockPercent = Math.min((stock / maxStock) * 100, 100);
-                var progressColor = stock < 20 ? '#dc3545' : (stock < 50 ? '#ffc107' : '#28a745');
-                progressBarStock.ej2_instances[0].value = stockPercent;
-                progressBarStock.ej2_instances[0].progressColor = progressColor;
-                progressBarStock.ej2_instances[0].dataBind();
-            }
+            // Actualizar LinearGauge de stock
+            this.ActualizarGaugeStock(stock);
+            
+            // Actualizar Rating de calidad (basado en margen de ganancia)
+            this.ActualizarRatingCalidad(margenGanancia);
             
             setText('modalDescripcion', producto.Descripcion || '-');
             
@@ -496,6 +537,77 @@ var modalProductoModo = 'ver';
             setTimeout(function() {
                 window.Products.Modal.ActualizarGraficaPrecios(producto);
             }, 300);
+        },
+        
+        MostrarDatosCabecera: function(producto) {
+            document.getElementById('modalCabeceraProductoTitulo').textContent = producto.IdProducto;
+            document.getElementById('modalCabeceraIdProducto').value = producto.IdProducto;
+            document.getElementById('modalCabeceraNombreProducto').value = producto.NombreProducto || '';
+            document.getElementById('modalCabeceraCategoria').value = producto.Categoria || '';
+            document.getElementById('modalCabeceraEstado').value = producto.Estado || 'ACTIVE';
+            document.getElementById('modalCabeceraCodigoBarras').value = producto.CodigoBarras || '';
+        },
+        
+        MostrarDatosComercial: function(producto) {
+            document.getElementById('modalComercialProductoTitulo').textContent = producto.IdProducto;
+            document.getElementById('modalComercialPrecioUnitario').value = producto.PrecioUnitario || 0;
+            document.getElementById('modalComercialPrecioCosto').value = producto.PrecioCosto || 0;
+            
+            var margen = (producto.PrecioUnitario || 0) - (producto.PrecioCosto || 0);
+            document.getElementById('modalComercialMargenGanancia').value = '$' + margen.toFixed(2);
+            document.getElementById('modalComercialCantidadStock').value = producto.CantidadStock || 0;
+            
+            // Actualizar Sparkline y Gauge
+            setTimeout(function() {
+                if (window.Products && window.Products.Modal) {
+                    window.Products.Modal.ActualizarSparklineMargenComercial(margen);
+                    window.Products.Modal.ActualizarGaugeStockComercial(producto.CantidadStock || 0);
+                    window.Products.Modal.ActualizarGraficaPreciosComercial(producto);
+                }
+            }, 300);
+        },
+        
+        MostrarDatosDetalles: function(producto) {
+            document.getElementById('modalDetallesProductoTitulo').textContent = producto.IdProducto;
+            document.getElementById('modalDetallesDescripcion').value = producto.Descripcion || '';
+            document.getElementById('modalDetallesEspecificaciones').value = producto.Especificaciones || '';
+            document.getElementById('modalDetallesNotas').value = producto.Notas || '';
+            
+            // Actualizar Rating
+            setTimeout(function() {
+                var ratingElement = document.getElementById('ratingCalidadDetalles');
+                if (ratingElement && ratingElement.ej2_instances && ratingElement.ej2_instances[0]) {
+                    var calidad = producto.Calidad || 0;
+                    ratingElement.ej2_instances[0].value = calidad;
+                    ratingElement.ej2_instances[0].dataBind();
+                } else if (typeof ej !== 'undefined' && ej.inputs) {
+                    var rating = new ej.inputs.Rating({
+                        value: producto.Calidad || 0,
+                        precision: 'Half',
+                        showLabel: true,
+                        labelTemplate: '<span>Calidad: ${value}/5</span>'
+                    });
+                    rating.appendTo('#ratingCalidadDetalles');
+                }
+            }, 100);
+        },
+        
+        AbrirDialogCabecera: function() {
+            if (typeof window.mostrarModalCabeceraProducto === 'function') {
+                window.mostrarModalCabeceraProducto();
+            }
+        },
+        
+        AbrirDialogComercial: function() {
+            if (typeof window.mostrarModalComercialProducto === 'function') {
+                window.mostrarModalComercialProducto();
+            }
+        },
+        
+        AbrirDialogDetalles: function() {
+            if (typeof window.mostrarModalDetallesProducto === 'function') {
+                window.mostrarModalDetallesProducto();
+            }
         },
         
         AbrirDialog: function() {
@@ -924,6 +1036,203 @@ var modalProductoModo = 'ver';
             this.DesactivarModoEdicion();
         },
         
+        GuardarCabecera: function() {
+            var id = (typeof window.modalCabeceraProductoId !== 'undefined' && window.modalCabeceraProductoId) 
+                ? window.modalCabeceraProductoId 
+                : (typeof modalCabeceraProductoId !== 'undefined' ? modalCabeceraProductoId : null);
+            if (!id || id <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'No hay producto seleccionado.');
+                return;
+            }
+            
+            var datos = {
+                IdProducto: id,
+                NombreProducto: document.getElementById('modalCabeceraNombreProducto').value.trim(),
+                Categoria: document.getElementById('modalCabeceraCategoria').value,
+                Estado: document.getElementById('modalCabeceraEstado').value,
+                CodigoBarras: document.getElementById('modalCabeceraCodigoBarras').value.trim()
+            };
+            
+            if (!datos.NombreProducto) {
+                window.Products.Utilidades.MostrarError('Error', 'El nombre del producto es requerido.');
+                return;
+            }
+            
+            window.ModalButtons.Deshabilitar('modalCabeceraProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ActualizarProduct', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Products.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalCabeceraProducto();
+                                    if (window.Products && window.Products.Grid) {
+                                        window.Products.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalCabeceraProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Products.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalCabeceraProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalCabeceraProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Products.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalCabeceraProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarComercial: function() {
+            var id = (typeof window.modalComercialProductoId !== 'undefined' && window.modalComercialProductoId) 
+                ? window.modalComercialProductoId 
+                : (typeof modalComercialProductoId !== 'undefined' ? modalComercialProductoId : null);
+            if (!id || id <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'No hay producto seleccionado.');
+                return;
+            }
+            
+            var precioUnitario = parseFloat(document.getElementById('modalComercialPrecioUnitario').value);
+            var precioCosto = parseFloat(document.getElementById('modalComercialPrecioCosto').value);
+            var cantidadStock = parseInt(document.getElementById('modalComercialCantidadStock').value, 10);
+            
+            if (isNaN(precioUnitario) || precioUnitario < 0) {
+                window.Products.Utilidades.MostrarError('Error', 'El precio unitario debe ser un número válido mayor o igual a 0.');
+                return;
+            }
+            
+            if (isNaN(precioCosto) || precioCosto < 0) {
+                window.Products.Utilidades.MostrarError('Error', 'El precio de costo debe ser un número válido mayor o igual a 0.');
+                return;
+            }
+            
+            if (isNaN(cantidadStock) || cantidadStock < 0) {
+                window.Products.Utilidades.MostrarError('Error', 'La cantidad en stock debe ser un número válido mayor o igual a 0.');
+                return;
+            }
+            
+            var datos = {
+                IdProducto: id,
+                PrecioUnitario: precioUnitario,
+                PrecioCosto: precioCosto,
+                CantidadStock: cantidadStock
+            };
+            
+            window.ModalButtons.Deshabilitar('modalComercialProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ActualizarProduct', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Products.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalComercialProducto();
+                                    if (window.Products && window.Products.Grid) {
+                                        window.Products.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalComercialProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Products.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalComercialProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalComercialProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Products.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalComercialProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
+        GuardarDetalles: function() {
+            var id = (typeof window.modalDetallesProductoId !== 'undefined' && window.modalDetallesProductoId) 
+                ? window.modalDetallesProductoId 
+                : (typeof modalDetallesProductoId !== 'undefined' ? modalDetallesProductoId : null);
+            if (!id || id <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'No hay producto seleccionado.');
+                return;
+            }
+            
+            var calidad = 0;
+            var ratingElement = document.getElementById('ratingCalidadDetalles');
+            if (ratingElement && ratingElement.ej2_instances && ratingElement.ej2_instances[0]) {
+                calidad = ratingElement.ej2_instances[0].value || 0;
+            }
+            
+            var datos = {
+                IdProducto: id,
+                Descripcion: document.getElementById('modalDetallesDescripcion').value.trim(),
+                Especificaciones: document.getElementById('modalDetallesEspecificaciones').value.trim(),
+                Notas: document.getElementById('modalDetallesNotas').value.trim(),
+                Calidad: calidad
+            };
+            
+            window.ModalButtons.Deshabilitar('modalDetallesProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ActualizarProduct', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                window.Products.Utilidades.MostrarExito('Información actualizada', 'Los cambios se guardaron correctamente.').then(function() {
+                                    window.ocultarModalDetallesProducto();
+                                    if (window.Products && window.Products.Grid) {
+                                        window.Products.Grid.Recargar();
+                                    }
+                                    window.ModalButtons.Habilitar('modalDetallesProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Products.Utilidades.MostrarError('Error', respuesta.mensaje || 'No se pudieron guardar los cambios.').then(function() {
+                                    window.ModalButtons.Habilitar('modalDetallesProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta.').then(function() {
+                                window.ModalButtons.Habilitar('modalDetallesProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        window.Products.Utilidades.MostrarError('Error', 'Error de conexión.').then(function() {
+                            window.ModalButtons.Habilitar('modalDetallesProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(datos));
+        },
+        
         ActualizarGraficaPrecios: function(producto) {
             var chartContainer = document.getElementById('chartPrecios');
             if (!chartContainer) return;
@@ -986,6 +1295,177 @@ var modalProductoModo = 'ver';
             });
             
             chart.appendTo('#chartPrecios');
+        },
+        
+        ActualizarSparklineMargen: function(producto) {
+            if (typeof ej === 'undefined' || !ej.charts) {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.ActualizarSparklineMargen(producto);
+                    }
+                }, 500);
+                return;
+            }
+            
+            var sparklineElement = document.getElementById('sparklineMargen');
+            if (!sparklineElement) return;
+            
+            // Datos simulados de tendencia (en producción vendrían del backend)
+            var margen = parseFloat(producto.PrecioUnitario || 0) - parseFloat(producto.PrecioCosto || 0);
+            var datosTendencia = [
+                margen * 0.85, margen * 0.90, margen * 0.95, margen, margen * 1.05, margen * 1.02, margen
+            ];
+            
+            // Destruir instancia anterior si existe
+            if (sparklineElement.ej2_instances && sparklineElement.ej2_instances[0]) {
+                sparklineElement.ej2_instances[0].destroy();
+            }
+            
+            var sparkline = new ej.charts.Sparkline({
+                height: '60px',
+                width: '100%',
+                lineWidth: 2,
+                dataSource: datosTendencia,
+                type: 'Line',
+                fill: '#007bff',
+                valueType: 'Numeric',
+                xName: 'xval',
+                yName: 'yval',
+                tooltipSettings: {
+                    visible: true,
+                    format: '${xval}: $${yval}'
+                }
+            });
+            sparkline.appendTo('#sparklineMargen');
+        },
+        
+        ActualizarGaugeStock: function(cantidadStock) {
+            if (typeof ej === 'undefined' || !ej.lineargauge) {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.ActualizarGaugeStock(cantidadStock);
+                    }
+                }, 500);
+                return;
+            }
+            
+            var gaugeElement = document.getElementById('gaugeStock');
+            if (!gaugeElement) return;
+            
+            // Calcular porcentaje (asumiendo máximo de 100 unidades para visualización)
+            var maxStock = 100;
+            var porcentaje = Math.min((cantidadStock / maxStock) * 100, 100);
+            
+            // Determinar color según nivel de stock
+            var color = '#28a745'; // Verde
+            if (cantidadStock < 20) {
+                color = '#dc3545'; // Rojo
+            } else if (cantidadStock < 50) {
+                color = '#ffc107'; // Amarillo
+            }
+            
+            // Destruir instancia anterior si existe
+            if (gaugeElement.ej2_instances && gaugeElement.ej2_instances[0]) {
+                gaugeElement.ej2_instances[0].destroy();
+            }
+            
+            var linearGauge = new ej.lineargauge.LinearGauge({
+                width: '100%',
+                height: '60px',
+                axes: [{
+                    minimum: 0,
+                    maximum: 100,
+                    line: {
+                        width: 0
+                    },
+                    pointers: [{
+                        value: porcentaje,
+                        height: 15,
+                        width: 15,
+                        color: color,
+                        type: 'Bar',
+                        offset: 0
+                    }],
+                    ranges: [{
+                        start: 0,
+                        end: porcentaje,
+                        startWidth: 10,
+                        endWidth: 10,
+                        color: color,
+                        offset: 0
+                    }],
+                    majorTicks: {
+                        interval: 25,
+                        height: 0
+                    },
+                    minorTicks: {
+                        height: 0
+                    },
+                    labelStyle: {
+                        font: {
+                            size: '0px'
+                        }
+                    }
+                }]
+            });
+            linearGauge.appendTo('#gaugeStock');
+        },
+        
+        ActualizarRatingCalidad: function(calidad) {
+            if (typeof ej === 'undefined' || !ej.inputs) {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.ActualizarRatingCalidad(calidad);
+                    }
+                }, 500);
+                return;
+            }
+            
+            var ratingElement = document.getElementById('ratingCalidad');
+            if (!ratingElement) return;
+            
+            // Calcular calidad basada en margen de ganancia (0-5 estrellas)
+            var margen = parseFloat(calidad || 0);
+            var ratingValue = Math.min(Math.max(margen / 20, 0), 5); // Normalizar a 0-5
+            
+            if (ratingElement.ej2_instances && ratingElement.ej2_instances[0]) {
+                ratingElement.ej2_instances[0].value = ratingValue;
+            } else {
+                var rating = new ej.inputs.Rating({
+                    value: ratingValue,
+                    precision: 'Half',
+                    showLabel: true,
+                    labelTemplate: '<span>Calidad: ${value}/5</span>'
+                });
+                rating.appendTo('#ratingCalidad');
+            }
+        },
+        
+        ActualizarChipCategoria: function(categoria) {
+            if (typeof ej === 'undefined' || !ej.buttons) {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.ActualizarChipCategoria(categoria);
+                    }
+                }, 500);
+                return;
+            }
+            
+            var chipElement = document.getElementById('chipCategoria');
+            if (!chipElement) return;
+            
+            var chips = categoria ? [categoria] : [];
+            
+            if (chipElement.ej2_instances && chipElement.ej2_instances[0]) {
+                chipElement.ej2_instances[0].chips = chips;
+            } else {
+                var chipList = new ej.buttons.ChipList({
+                    chips: chips,
+                    selection: 'Single',
+                    cssClass: 'e-outline'
+                });
+                chipList.appendTo('#chipCategoria');
+            }
         },
         
         ActualizarGaugeEstado: function(valor) {
@@ -1052,6 +1532,183 @@ var modalProductoModo = 'ver';
             });
             
             gauge.appendTo('#gaugeEstado');
+        },
+        
+        ActualizarSparklineMargenComercial: function(margen) {
+            if (typeof ej === 'undefined' || !ej.charts) {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.ActualizarSparklineMargenComercial(margen);
+                    }
+                }, 500);
+                return;
+            }
+            
+            var sparklineElement = document.getElementById('sparklineMargenComercial');
+            if (!sparklineElement) return;
+            
+            // Datos simulados de tendencia
+            var datosTendencia = [
+                margen * 0.85, margen * 0.90, margen * 0.95, margen, margen * 1.05, margen * 1.02, margen
+            ];
+            
+            // Destruir instancia anterior si existe
+            if (sparklineElement.ej2_instances && sparklineElement.ej2_instances[0]) {
+                sparklineElement.ej2_instances[0].destroy();
+            }
+            
+            var sparkline = new ej.charts.Sparkline({
+                height: '60px',
+                width: '100%',
+                lineWidth: 2,
+                dataSource: datosTendencia,
+                type: 'Line',
+                fill: '#007bff',
+                valueType: 'Numeric',
+                xName: 'xval',
+                yName: 'yval',
+                tooltipSettings: {
+                    visible: true,
+                    format: '${xval}: $${yval}'
+                }
+            });
+            sparkline.appendTo('#sparklineMargenComercial');
+        },
+        
+        ActualizarGaugeStockComercial: function(cantidadStock) {
+            if (typeof ej === 'undefined' || !ej.lineargauge) {
+                setTimeout(function() {
+                    if (window.Products && window.Products.Modal) {
+                        window.Products.Modal.ActualizarGaugeStockComercial(cantidadStock);
+                    }
+                }, 500);
+                return;
+            }
+            
+            var gaugeElement = document.getElementById('gaugeStockComercial');
+            if (!gaugeElement) return;
+            
+            // Calcular porcentaje (asumiendo máximo de 100 unidades para visualización)
+            var maxStock = 100;
+            var porcentaje = Math.min((cantidadStock / maxStock) * 100, 100);
+            
+            // Determinar color según nivel de stock
+            var color = '#28a745'; // Verde
+            if (cantidadStock < 20) {
+                color = '#dc3545'; // Rojo
+            } else if (cantidadStock < 50) {
+                color = '#ffc107'; // Amarillo
+            }
+            
+            // Destruir instancia anterior si existe
+            if (gaugeElement.ej2_instances && gaugeElement.ej2_instances[0]) {
+                gaugeElement.ej2_instances[0].destroy();
+            }
+            
+            var linearGauge = new ej.lineargauge.LinearGauge({
+                width: '100%',
+                height: '60px',
+                axes: [{
+                    minimum: 0,
+                    maximum: 100,
+                    line: {
+                        width: 0
+                    },
+                    pointers: [{
+                        value: porcentaje,
+                        height: 15,
+                        width: 15,
+                        color: color,
+                        type: 'Bar',
+                        offset: 0
+                    }],
+                    ranges: [{
+                        start: 0,
+                        end: porcentaje,
+                        startWidth: 10,
+                        endWidth: 10,
+                        color: color,
+                        offset: 0
+                    }],
+                    majorTicks: {
+                        interval: 25,
+                        height: 0
+                    },
+                    minorTicks: {
+                        height: 0
+                    },
+                    labelStyle: {
+                        font: {
+                            size: '0px'
+                        }
+                    }
+                }]
+            });
+            linearGauge.appendTo('#gaugeStockComercial');
+        },
+        
+        ActualizarGraficaPreciosComercial: function(producto) {
+            var chartContainer = document.getElementById('chartPreciosComercial');
+            if (!chartContainer) return;
+            
+            // Verificar que ej esté disponible
+            if (typeof ej === 'undefined' || !ej.charts || !ej.charts.Chart) {
+                console.warn('Syncfusion Charts no está disponible aún, reintentando...');
+                setTimeout(function() {
+                    window.Products.Modal.ActualizarGraficaPreciosComercial(producto);
+                }, 500);
+                return;
+            }
+            
+            var precioUnitario = producto.PrecioUnitario || 0;
+            var precioCosto = producto.PrecioCosto || 0;
+            var margenGanancia = (precioUnitario - precioCosto) || 0;
+            
+            // Destruir gráfica anterior si existe
+            if (chartContainer.ej2_instances && chartContainer.ej2_instances[0]) {
+                chartContainer.ej2_instances[0].destroy();
+            }
+            
+            // Crear nueva gráfica de barras
+            var chart = new ej.charts.Chart({
+                primaryXAxis: {
+                    valueType: 'Category',
+                    title: 'Concepto'
+                },
+                primaryYAxis: {
+                    title: 'Monto ($)',
+                    labelFormat: 'C2'
+                },
+                series: [{
+                    type: 'Column',
+                    dataSource: [
+                        { concepto: 'Precio Unitario', valor: precioUnitario },
+                        { concepto: 'Precio Costo', valor: precioCosto },
+                        { concepto: 'Margen', valor: margenGanancia }
+                    ],
+                    xName: 'concepto',
+                    yName: 'valor',
+                    name: 'Monto',
+                    marker: {
+                        dataLabel: {
+                            visible: true,
+                            position: 'Top',
+                            format: 'C2'
+                        }
+                    }
+                }],
+                tooltip: {
+                    enable: true,
+                    format: '${point.x}: ${point.y}'
+                },
+                legendSettings: {
+                    visible: false
+                },
+                height: '200px',
+                width: '100%'
+            });
+            
+            chart.appendTo('#chartPreciosComercial');
         }
     };
     

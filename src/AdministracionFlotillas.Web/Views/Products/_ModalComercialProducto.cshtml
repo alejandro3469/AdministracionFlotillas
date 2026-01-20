@@ -1,0 +1,205 @@
+@* Modal de Información Comercial del Producto - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalComercialProducto" 
+             target=".info-tooltip-comercial-producto" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalComercialProductoBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentComercialProducto"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalComercialProducto" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="700px" 
+            height="auto"
+            visible="false"
+            header="Información Comercial - Producto #<span id='modalComercialProductoTitulo'>0</span>"
+            created="modalComercialProductoCreated"
+            open="modalComercialProductoOpen"
+            close="modalComercialProductoClose">
+    <e-content-template>
+        <div id="modalComercialProductoContenido" class="p-3">
+            <div class="alert alert-success mb-3">
+                <h6 class="alert-heading"><i class="fas fa-chart-line me-2"></i>¿Qué es la Información Comercial?</h6>
+                <p class="mb-0 small">
+                    La información comercial contiene datos financieros y de inventario del producto: 
+                    precios (unitario y costo), margen de ganancia, cantidad en stock y métricas de rentabilidad. 
+                    Esta información se usa para calcular ganancias, gestionar inventario y tomar decisiones de precios.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-dollar-sign me-2"></i>Precios</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Precio Unitario ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-producto" 
+                                       data-field="PrecioUnitario" 
+                                       data-tooltip="Precio de venta al público por unidad del producto. Este es el precio que verá el cliente y se usará en facturas y órdenes."></i>
+                                </label>
+                                <input type="number" id="modalComercialPrecioUnitario" class="form-control" 
+                                       step="0.01" min="0" placeholder="0.00">
+                                <small class="text-muted">Precio de venta al público</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Precio de Costo ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-producto" 
+                                       data-field="PrecioCosto" 
+                                       data-tooltip="Costo de adquisición del producto para la empresa. Se usa para calcular el margen de ganancia. Incluye costo de compra, transporte y otros gastos directos."></i>
+                                </label>
+                                <input type="number" id="modalComercialPrecioCosto" class="form-control" 
+                                       step="0.01" min="0" placeholder="0.00">
+                                <small class="text-muted">Costo de adquisición</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Margen de Ganancia ($)
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-producto" 
+                                       data-field="MargenGanancia" 
+                                       data-tooltip="Diferencia entre precio de venta y costo (Precio Unitario - Precio de Costo). Se calcula automáticamente. Indica la ganancia por unidad vendida."></i>
+                                </label>
+                                <input type="text" id="modalComercialMargenGanancia" class="form-control" readonly>
+                                <small class="text-muted">Calculado automáticamente - Solo lectura</small>
+                                <div id="sparklineMargenComercial" style="height: 60px; margin-top: 5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-boxes me-2"></i>Inventario</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Cantidad en Stock
+                                    <i class="fas fa-question-circle text-muted ms-1 info-tooltip-comercial-producto" 
+                                       data-field="CantidadStock" 
+                                       data-tooltip="Cantidad disponible en inventario. Stock bajo: menos de 20 unidades (requiere reposición urgente), Stock medio: 20-50 unidades, Stock alto: más de 50 unidades."></i>
+                                </label>
+                                <input type="number" id="modalComercialCantidadStock" class="form-control" 
+                                       min="0" placeholder="0">
+                                <small class="text-muted">Unidades disponibles</small>
+                                <div id="gaugeStockComercial" style="height: 80px; margin-top: 5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-area me-2"></i>Análisis de Precios</h5>
+                </div>
+                <div class="card-body">
+                    <div id="chartPreciosComercial" style="height: 200px;"></div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalComercialProductoGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalComercialProductoGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalComercialProductoCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalComercialProductoCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalComercialProductoId === 'undefined') {
+        window.modalComercialProductoId = null;
+    }
+    if (typeof modalComercialProductoId === 'undefined') {
+        var modalComercialProductoId = null;
+    }
+    var tooltipModalComercialProductoObj = null;
+    window.modalComercialProductoInstance = null;
+    
+    window.mostrarModalComercialProducto = function() {
+        if (window.modalComercialProductoInstance) {
+            try {
+                window.modalComercialProductoInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalComercialProducto');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalComercialProductoInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalComercialProducto = function() {
+        if (window.modalComercialProductoInstance) {
+            try {
+                window.modalComercialProductoInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalComercialProductoCreated = function(args) {
+        if (args && args.component) {
+            window.modalComercialProductoInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalComercialProducto');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalComercialProductoInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalComercialProductoOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalComercialProducto');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalComercialProductoObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalComercialProductoClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalComercialProductoGuardar = function() {
+        if (window.Products && window.Products.Modal) {
+            window.Products.Modal.GuardarComercial();
+        }
+    };
+    
+    window.modalComercialProductoCancelar = function() {
+        window.ocultarModalComercialProducto();
+    };
+    
+    window.tooltipModalComercialProductoBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentComercialProducto');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>

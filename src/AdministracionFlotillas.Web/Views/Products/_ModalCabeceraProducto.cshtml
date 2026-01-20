@@ -1,0 +1,197 @@
+@* Modal de Información de Cabecera del Producto - Campos editables por defecto *@
+<ejs-tooltip id="tooltipModalCabeceraProducto" 
+             target=".info-tooltip-cabecera-producto" 
+             opensOn="Hover" 
+             width="300px"
+             position="TopCenter"
+             beforeRender="tooltipModalCabeceraProductoBeforeRender">
+    <e-content-template>
+        <div id="tooltipContentCabeceraProducto"></div>
+    </e-content-template>
+</ejs-tooltip>
+
+<ejs-dialog id="modalCabeceraProducto" 
+            isModal="true" 
+            showCloseIcon="true" 
+            width="600px" 
+            height="auto"
+            visible="false"
+            header="Información de Cabecera - Producto #<span id='modalCabeceraProductoTitulo'>0</span>"
+            created="modalCabeceraProductoCreated"
+            open="modalCabeceraProductoOpen"
+            close="modalCabeceraProductoClose">
+    <e-content-template>
+        <div id="modalCabeceraProductoContenido" class="p-3">
+            <div class="alert alert-info mb-3">
+                <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>¿Qué es la Información de Cabecera?</h6>
+                <p class="mb-0 small">
+                    La información de cabecera contiene los datos básicos e identificadores del producto: 
+                    ID único, nombre comercial, categoría y estado operativo. 
+                    Estos campos son fundamentales para identificar y gestionar el producto en el sistema.
+                </p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-id-card me-2"></i>Datos de Identificación</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            ID Producto
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-producto" 
+                               data-field="IdProducto" 
+                               data-tooltip="Identificador único del producto en el sistema. No se puede modificar."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraIdProducto" class="form-control" readonly>
+                        <small class="text-muted">Este campo no se puede modificar</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Nombre del Producto
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-producto" 
+                               data-field="NombreProducto" 
+                               data-tooltip="Nombre comercial del producto. Este nombre aparecerá en catálogos, facturas y órdenes. Debe ser descriptivo y único."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraNombreProducto" class="form-control" placeholder="Ingrese el nombre del producto">
+                        <small class="text-muted">Nombre que aparecerá en catálogos y documentos</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Categoría
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-producto" 
+                               data-field="Categoria" 
+                               data-tooltip="Categoría a la que pertenece el producto. Se usa para agrupar productos similares y facilitar la búsqueda y organización del catálogo."></i>
+                        </label>
+                        <select id="modalCabeceraCategoria" class="form-select">
+                            <option value="">Seleccione una categoría</option>
+                            <option value="Categoría 1">Categoría 1</option>
+                            <option value="Categoría 2">Categoría 2</option>
+                            <option value="Categoría 3">Categoría 3</option>
+                        </select>
+                        <small class="text-muted">Categoría para organización del catálogo</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Estado
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-producto" 
+                               data-field="Estado" 
+                               data-tooltip="Estado operativo del producto: ACTIVE (activo y disponible para venta), INACTIVE (inactivo, no disponible para venta)."></i>
+                        </label>
+                        <select id="modalCabeceraEstado" class="form-select">
+                            <option value="ACTIVE">ACTIVE - Activo y disponible</option>
+                            <option value="INACTIVE">INACTIVE - Inactivo y no disponible</option>
+                        </select>
+                        <small class="text-muted">El estado determina si el producto está disponible para venta</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Código de Barras
+                            <i class="fas fa-question-circle text-muted ms-1 info-tooltip-cabecera-producto" 
+                               data-field="CodigoBarras" 
+                               data-tooltip="Código de barras único del producto para identificación en punto de venta y control de inventario."></i>
+                        </label>
+                        <input type="text" id="modalCabeceraCodigoBarras" class="form-control" placeholder="Código de barras">
+                        <small class="text-muted">Código único para identificación</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </e-content-template>
+    <e-dialog-buttons>
+        <e-dialog-dialogbutton id="btnModalCabeceraProductoGuardar" content="Guardar Cambios" isPrimary="true" cssClass="e-flat" click="modalCabeceraProductoGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCabeceraProductoCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat" click="modalCabeceraProductoCancelar"></e-dialog-dialogbutton>
+    </e-dialog-buttons>
+</ejs-dialog>
+
+<script>
+    if (typeof window.modalCabeceraProductoId === 'undefined') {
+        window.modalCabeceraProductoId = null;
+    }
+    if (typeof modalCabeceraProductoId === 'undefined') {
+        var modalCabeceraProductoId = null;
+    }
+    var tooltipModalCabeceraProductoObj = null;
+    window.modalCabeceraProductoInstance = null;
+    
+    window.mostrarModalCabeceraProducto = function() {
+        if (window.modalCabeceraProductoInstance) {
+            try {
+                window.modalCabeceraProductoInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        
+        var elemento = document.getElementById('modalCabeceraProducto');
+        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+            try {
+                elemento.ej2_instances[0].show();
+                window.modalCabeceraProductoInstance = elemento.ej2_instances[0];
+                return true;
+            } catch (e) {
+                console.warn('Error al mostrar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.ocultarModalCabeceraProducto = function() {
+        if (window.modalCabeceraProductoInstance) {
+            try {
+                window.modalCabeceraProductoInstance.hide();
+                return true;
+            } catch (e) {
+                console.warn('Error al ocultar modal:', e);
+            }
+        }
+        return false;
+    };
+    
+    window.modalCabeceraProductoCreated = function(args) {
+        if (args && args.component) {
+            window.modalCabeceraProductoInstance = args.component;
+        } else {
+            var elemento = document.getElementById('modalCabeceraProducto');
+            if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
+                window.modalCabeceraProductoInstance = elemento.ej2_instances[0];
+            }
+        }
+    };
+    
+    window.modalCabeceraProductoOpen = function() {
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalCabeceraProducto');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalCabeceraProductoObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
+    };
+    
+    window.modalCabeceraProductoClose = function() {
+        // Limpiar datos si es necesario
+    };
+    
+    window.modalCabeceraProductoGuardar = function() {
+        if (window.Products && window.Products.Modal) {
+            window.Products.Modal.GuardarCabecera();
+        }
+    };
+    
+    window.modalCabeceraProductoCancelar = function() {
+        window.ocultarModalCabeceraProducto();
+    };
+    
+    window.tooltipModalCabeceraProductoBeforeRender = function(args) {
+        var tooltipText = args.target.getAttribute('data-tooltip') || '';
+        var contentDiv = document.getElementById('tooltipContentCabeceraProducto');
+        if (contentDiv) {
+            contentDiv.innerHTML = '<div style="padding: 8px;">' + tooltipText + '</div>';
+        }
+    };
+</script>
