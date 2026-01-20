@@ -263,3 +263,27 @@ footer {
   /* Sin transformación - solo cambio de background para feedback visual */
   box-shadow: inset 3px 0 0 #ffc107;
 }
+
+/* Estilos para tooltips de métricas - Fondo negro, texto blanco, bordes redondeados 2px */
+.e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"],
+.e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-tooltip-content,
+.e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-tooltip-content * {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 2px !important;
+}
+
+.e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-arrow-tip,
+.e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] .e-arrow-tip-inner {
+  border-top-color: #000000 !important;
+}
+
+#tooltipContentMetricasProductos,
+#tooltipContentMetricasProductos * {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+.e-tooltip-wrap[aria-describedby*="tooltipMetricasProductos"] * {
+  color: #ffffff !important;
+}
