@@ -117,8 +117,10 @@
         </div>
     </e-content-template>
     <e-dialog-buttons>
-        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalProductoEditar"></e-dialog-dialogbutton>
-        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalProductoCerrar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalEditar" content="Editar" isPrimary="false" cssClass="e-flat" click="modalProductoEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalGuardar" content="Guardar" isPrimary="true" cssClass="e-flat d-none" click="modalProductoGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat d-none" click="modalProductoCancelar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCerrar" content="Cerrar" isPrimary="true" click="modalProductoCerrar"></e-dialog-dialogbutton>
     </e-dialog-buttons>
 </ejs-dialog>
 
@@ -395,7 +397,26 @@
         }
     };
 
+    window.modalProductoGuardar = function() {
+        if (window.Products && window.Products.Modal) {
+            window.Products.Modal.GuardarCambios();
+        }
+    };
+
+    window.modalProductoCancelar = function() {
+        if (window.Products && window.Products.Modal) {
+            window.Products.Modal.CancelarEdicion();
+        }
+    };
+
     window.modalProductoCerrar = function() {
+        // Si está en modo edición, cancelar primero
+        if (modalProductoModo === 'editar') {
+            if (window.Products && window.Products.Modal) {
+                window.Products.Modal.CancelarEdicion();
+            }
+        }
+        
         if (typeof window.ocultarModalProducto === 'function') {
             window.ocultarModalProducto();
         } else {

@@ -202,6 +202,44 @@ public class ProductsController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public IActionResult ActualizarProduct([FromBody] SolicitudActualizarProducto solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdProducto <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones de negocio
+            if (solicitud.PrecioUnitario.HasValue && solicitud.PrecioUnitario.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "El precio unitario no puede ser negativo" });
+            }
+            
+            if (solicitud.CantidadStock.HasValue && solicitud.CantidadStock.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "La cantidad en stock no puede ser negativa" });
+            }
+            
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "ACTIVE" && solicitud.Estado != "INACTIVE")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido. Debe ser ACTIVE o INACTIVE" });
+            }
+            
+            // Simular actualización - en producción se actualizaría en Oracle/JDE
+            // Por ahora retornamos éxito para simular la operación
+            return Json(new { exito = true, mensaje = "Producto actualizado correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 // Clase auxiliar para solicitudes
@@ -211,4 +249,13 @@ public class SolicitudBuscarProductos
     public string? Estado { get; set; }
     public decimal? PrecioMinimo { get; set; }
     public decimal? PrecioMaximo { get; set; }
+}
+
+public class SolicitudActualizarProducto
+{
+    public int IdProducto { get; set; }
+    public decimal? PrecioUnitario { get; set; }
+    public int? CantidadStock { get; set; }
+    public string? Estado { get; set; }
+    public string? Categoria { get; set; }
 }

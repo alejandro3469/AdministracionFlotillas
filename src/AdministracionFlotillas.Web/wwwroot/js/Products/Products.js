@@ -135,31 +135,37 @@ var modalProductoModo = 'ver';
         // Funciones de spinner removidas - el Grid maneja el loading con Shimmer
         
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve()); // Resuelve la promesa cuando el SweetAlert se cierra
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve(); // Resuelve inmediatamente si no hay SweetAlert
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve()); // Resuelve la promesa cuando el SweetAlert se cierra
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve(); // Resuelve inmediatamente si no hay SweetAlert
+                }
+            });
         }
     };
     
@@ -604,8 +610,283 @@ var modalProductoModo = 'ver';
         },
         
         CambiarAModoEdicion: function(idProducto) {
-            // TODO: Implementar modo edición
-            window.Products.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idProducto || idProducto <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'ID de producto no válido.');
+                return;
+            }
+            
+            modalProductoId = idProducto;
+            modalProductoModo = 'editar';
+            
+            // Cambiar modo del modal
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            // Cambiar campos de solo lectura a editables
+            this.ConvertirCamposAEditables();
+            
+            // Cambiar botones del modal
+            this.ActualizarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalProductoTitulo');
+            if (titulo) {
+                titulo.textContent = modalProductoId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            // Restaurar campos a solo lectura
+            this.ConvertirCamposASoloLectura();
+            
+            // Restaurar botones del modal
+            this.RestaurarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalProductoTitulo');
+            if (titulo) {
+                titulo.textContent = modalProductoId;
+            }
+            
+            modalProductoModo = 'ver';
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoProducto');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoProducto" class="form-select form-select-sm">' +
+                    '<option value="ACTIVE"' + (estadoActual === 'ACTIVE' ? ' selected' : '') + '>ACTIVE</option>' +
+                    '<option value="INACTIVE"' + (estadoActual === 'INACTIVE' ? ' selected' : '') + '>INACTIVE</option>' +
+                    '</select>';
+            }
+            
+            // Precio Unitario - convertir a input numérico
+            var precioContainer = document.getElementById('modalPrecioUnitario');
+            if (precioContainer) {
+                var precioActual = precioContainer.textContent.replace('$', '').replace(',', '').trim();
+                precioContainer.innerHTML = '<input type="number" id="editPrecioUnitario" class="form-control form-control-sm" step="0.01" min="0" value="' + precioActual + '">';
+            }
+            
+            // Cantidad Stock - convertir a input numérico
+            var stockContainer = document.getElementById('modalCantidadStock');
+            if (stockContainer) {
+                var stockActual = stockContainer.textContent.trim();
+                // Extraer solo el número (puede tener span con clases)
+                var stockMatch = stockActual.match(/\d+/);
+                var stockValue = stockMatch ? stockMatch[0] : '0';
+                stockContainer.innerHTML = '<input type="number" id="editCantidadStock" class="form-control form-control-sm" min="0" value="' + stockValue + '">';
+            }
+            
+            // Categoría - convertir a input de texto
+            var categoriaContainer = document.getElementById('modalCategoria');
+            if (categoriaContainer) {
+                var categoriaActual = categoriaContainer.textContent.trim();
+                categoriaContainer.innerHTML = '<input type="text" id="editCategoria" class="form-control form-control-sm" value="' + categoriaActual + '">';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoProducto');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoProducto');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'ACTIVE') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-producto" data-field="Estado" data-tooltip="Producto activo y disponible para venta">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-producto" data-field="Estado" data-tooltip="Producto inactivo, no disponible para venta">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Precio Unitario - restaurar formato
+            var precioContainer = document.getElementById('modalPrecioUnitario');
+            if (precioContainer) {
+                var inputPrecio = document.getElementById('editPrecioUnitario');
+                if (inputPrecio) {
+                    var precioValue = parseFloat(inputPrecio.value) || 0;
+                    precioContainer.textContent = '$' + precioValue.toFixed(2);
+                }
+            }
+            
+            // Cantidad Stock - restaurar con indicador visual
+            var stockContainer = document.getElementById('modalCantidadStock');
+            if (stockContainer) {
+                var inputStock = document.getElementById('editCantidadStock');
+                if (inputStock) {
+                    var stockValue = parseInt(inputStock.value) || 0;
+                    var stockHtml = '';
+                    if (stockValue < 20) {
+                        stockHtml = '<span class="text-danger fw-bold">' + stockValue + '</span>';
+                    } else if (stockValue < 50) {
+                        stockHtml = '<span class="text-warning">' + stockValue + '</span>';
+                    } else {
+                        stockHtml = '<span class="text-success">' + stockValue + '</span>';
+                    }
+                    stockContainer.innerHTML = stockHtml;
+                }
+            }
+            
+            // Categoría - restaurar texto
+            var categoriaContainer = document.getElementById('modalCategoria');
+            if (categoriaContainer) {
+                var inputCategoria = document.getElementById('editCategoria');
+                if (inputCategoria) {
+                    categoriaContainer.textContent = inputCategoria.value || '-';
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            // Ocultar botones de modo ver
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            // Mostrar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            // Ocultar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            // Mostrar botones de modo ver
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (!modalProductoId || modalProductoId <= 0) {
+                window.Products.Utilidades.MostrarError('Error', 'No hay producto seleccionado para guardar.');
+                return;
+            }
+            
+            // Obtener valores editados
+            var selectEstado = document.getElementById('editEstadoProducto');
+            var inputPrecio = document.getElementById('editPrecioUnitario');
+            var inputStock = document.getElementById('editCantidadStock');
+            var inputCategoria = document.getElementById('editCategoria');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoPrecio = inputPrecio ? parseFloat(inputPrecio.value) : null;
+            var nuevoStock = inputStock ? parseInt(inputStock.value) : null;
+            var nuevaCategoria = inputCategoria ? inputCategoria.value.trim() : null;
+            
+            // Validaciones
+            if (nuevoPrecio !== null && nuevoPrecio < 0) {
+                window.Products.Utilidades.MostrarError('Error', 'El precio unitario no puede ser negativo.');
+                return;
+            }
+            
+            if (nuevoStock !== null && nuevoStock < 0) {
+                window.Products.Utilidades.MostrarError('Error', 'La cantidad en stock no puede ser negativa.');
+                return;
+            }
+            
+            // Deshabilitar botones antes de enviar
+            window.ModalButtons.Deshabilitar('modalProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+            
+            // Preparar datos para enviar
+            var datosActualizacion = {
+                IdProducto: modalProductoId,
+                Estado: nuevoEstado,
+                PrecioUnitario: nuevoPrecio,
+                CantidadStock: nuevoStock,
+                Categoria: nuevaCategoria
+            };
+            
+            // Enviar al servidor
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Products/ActualizarProduct', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                // Mostrar mensaje de éxito y esperar confirmación
+                                window.Products.Utilidades.MostrarExito(
+                                    'Producto actualizado',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    // Desactivar modo edición
+                                    if (window.Products && window.Products.Modal) {
+                                        window.Products.Modal.DesactivarModoEdicion();
+                                        
+                                        // Recargar datos del producto
+                                        window.Products.Modal.CargarDatosProducto(modalProductoId);
+                                        
+                                        // Recargar grid
+                                        if (window.Products && window.Products.Grid) {
+                                            window.Products.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    // Re-habilitar botones después de confirmar éxito
+                                    window.ModalButtons.Habilitar('modalProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Products.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Products.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Products.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar producto:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.Products.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalProducto', '#productsGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            // Recargar datos originales
+            if (modalProductoId) {
+                this.CargarDatosProducto(modalProductoId);
+            }
+            
+            // Desactivar modo edición
+            this.DesactivarModoEdicion();
         }
     };
     
