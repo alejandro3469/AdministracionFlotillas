@@ -380,14 +380,28 @@ var modalOrdenModo = 'ver';
         },
         
         MostrarExito: function(titulo, mensaje) {
-            Swal.fire({
+            return Swal.fire({
                 icon: 'success',
                 title: titulo || 'Éxito',
                 text: mensaje || 'Operación completada correctamente.',
                 confirmButtonText: 'Aceptar',
-                timer: 2000,
-                showConfirmButton: false
+                timer: 3000,
+                showConfirmButton: true
             });
+        },
+        
+        DeshabilitarBotonesModal: function(modalId) {
+            // Usar utilidad compartida
+            if (window.ModalButtons) {
+                window.ModalButtons.Deshabilitar(modalId || 'modalOrden', '.btn-ver-orden, .btn-editar-orden');
+            }
+        },
+        
+        HabilitarBotonesModal: function(modalId) {
+            // Usar utilidad compartida
+            if (window.ModalButtons) {
+                window.ModalButtons.Habilitar(modalId || 'modalOrden', '.btn-ver-orden, .btn-editar-orden');
+            }
         }
     };
     
@@ -1293,6 +1307,9 @@ var modalOrdenModo = 'ver';
                 return;
             }
             
+            // Deshabilitar todos los botones antes de enviar la petición
+            window.Orders.Utilidades.DeshabilitarBotonesModal('modalOrden');
+            
             // Preparar datos para enviar
             var datosActualizacion = {
                 IdOrden: modalOrdenId,
@@ -1310,45 +1327,66 @@ var modalOrdenModo = 'ver';
                         try {
                             var respuesta = JSON.parse(xhr.responseText);
                             if (respuesta.exito) {
+                                // Mostrar mensaje de éxito y esperar confirmación
                                 window.Orders.Utilidades.MostrarExito(
                                     'Orden actualizada',
                                     'Los cambios se guardaron correctamente.'
-                                );
-                                
-                                // Desactivar modo edición
-                                if (window.Orders && window.Orders.Modal) {
-                                    window.Orders.Modal.DesactivarModoEdicion();
-                                    
-                                    // Recargar datos de la orden
-                                    window.Orders.Modal.CargarDatosOrden(modalOrdenId);
-                                    
-                                    // Recargar grid
-                                    if (window.Orders && window.Orders.Grid) {
-                                        window.Orders.Grid.Recargar();
+                                ).then(function() {
+                                    // Desactivar modo edición
+                                    if (window.Orders && window.Orders.Modal) {
+                                        window.Orders.Modal.DesactivarModoEdicion();
+                                        
+                                        // Recargar datos de la orden
+                                        window.Orders.Modal.CargarDatosOrden(modalOrdenId);
+                                        
+                                        // Recargar grid
+                                        if (window.Orders && window.Orders.Grid) {
+                                            window.Orders.Grid.Recargar();
+                                        }
+                                        
+                                        // Actualizar métricas
+                                        if (window.Orders && window.Orders.Dashboard) {
+                                            window.Orders.Dashboard.ActualizarMetricas();
+                                        }
                                     }
                                     
-                                    // Actualizar métricas
-                                    if (window.Orders && window.Orders.Dashboard) {
-                                        window.Orders.Dashboard.ActualizarMetricas();
-                                    }
-                                }
+                                    // Re-habilitar botones después de confirmar éxito
+                                    window.Orders.Utilidades.HabilitarBotonesModal('modalOrden');
+                                });
                             } else {
                                 window.Orders.Utilidades.MostrarError(
                                     'Error al guardar',
                                     respuesta.mensaje || 'No se pudieron guardar los cambios.'
-                                );
+                                ).then(function() {
+                                    // Re-habilitar botones después de mostrar error
+                                    window.Orders.Utilidades.HabilitarBotonesModal('modalOrden');
+                                });
                             }
                         } catch (e) {
                             console.error('Error al parsear respuesta:', e);
-                            window.Orders.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            window.Orders.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                // Re-habilitar botones después de mostrar error
+                                window.Orders.Utilidades.HabilitarBotonesModal('modalOrden');
+                            });
                         }
                     } else {
                         var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
-                        window.Orders.Utilidades.MostrarError('Error de Conexión', mensajeError);
+                        window.Orders.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            // Re-habilitar botones después de mostrar error
+                            window.Orders.Utilidades.HabilitarBotonesModal('modalOrden');
+                        });
                         console.error('Error al guardar orden:', mensajeError);
                     }
                 }
             };
+            
+            xhr.onerror = function() {
+                window.Orders.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    // Re-habilitar botones después de mostrar error
+                    window.Orders.Utilidades.HabilitarBotonesModal('modalOrden');
+                });
+            };
+            
             xhr.send(JSON.stringify(datosActualizacion));
         },
         
@@ -1437,6 +1475,11 @@ var modalOrdenModo = 'ver';
                 return fila.data.IdOrden;
             });
             
+            // Deshabilitar botones del grid y acciones batch
+            if (window.ModalButtons) {
+                window.ModalButtons.Deshabilitar(null, '.btn-ver-orden, .btn-editar-orden, #accionesBatch button');
+            }
+            
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/Orders/CambiarEstadoBatch', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -1449,34 +1492,64 @@ var modalOrdenModo = 'ver';
                                 window.Orders.Utilidades.MostrarExito(
                                     'Estado actualizado',
                                     'Se actualizaron ' + idsOrdenes.length + ' órdenes correctamente.'
-                                );
-                                
-                                // Recargar datos
-                                if (window.Orders && window.Orders.Grid) {
-                                    window.Orders.Grid.Recargar();
-                                }
-                                
-                                // Deseleccionar todas
-                                window.Orders.Batch.DeseleccionarTodas();
+                                ).then(function() {
+                                    // Recargar datos
+                                    if (window.Orders && window.Orders.Grid) {
+                                        window.Orders.Grid.Recargar();
+                                    }
+                                    
+                                    // Deseleccionar todas
+                                    window.Orders.Batch.DeseleccionarTodas();
+                                    
+                                    // Re-habilitar botones después de confirmar éxito
+                                    if (window.ModalButtons) {
+                                        window.ModalButtons.Habilitar(null, '.btn-ver-orden, .btn-editar-orden, #accionesBatch button');
+                                    }
+                                });
                             } else {
                                 window.Orders.Utilidades.MostrarError(
                                     'Error al actualizar estado',
                                     respuesta.mensaje || 'No se pudieron actualizar las órdenes.'
-                                );
+                                ).then(function() {
+                                    // Re-habilitar botones después de mostrar error
+                                    if (window.ModalButtons) {
+                                        window.ModalButtons.Habilitar(null, '.btn-ver-orden, .btn-editar-orden, #accionesBatch button');
+                                    }
+                                });
                             }
                         } catch (e) {
                             console.error('Error al parsear respuesta:', e);
-                            window.Orders.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.');
+                            window.Orders.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                // Re-habilitar botones después de mostrar error
+                                if (window.ModalButtons) {
+                                    window.ModalButtons.Habilitar(null, '.btn-ver-orden, .btn-editar-orden, #accionesBatch button');
+                                }
+                            });
                         }
                     } else {
                         window.Orders.Utilidades.MostrarError(
                             'Error de Conexión',
                             'No se pudo conectar al servidor. Por favor, intenta nuevamente.'
-                        );
+                        ).then(function() {
+                            // Re-habilitar botones después de mostrar error
+                            if (window.ModalButtons) {
+                                window.ModalButtons.Habilitar(null, '.btn-ver-orden, .btn-editar-orden, #accionesBatch button');
+                            }
+                        });
                         console.error('Error al cambiar estado: HTTP ' + xhr.status);
                     }
                 }
             };
+            
+            xhr.onerror = function() {
+                window.Orders.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    // Re-habilitar botones después de mostrar error
+                    if (window.ModalButtons) {
+                        window.ModalButtons.Habilitar(null, '.btn-ver-orden, .btn-editar-orden, #accionesBatch button');
+                    }
+                });
+            };
+            
             xhr.send(JSON.stringify({
                 IdsOrdenes: idsOrdenes,
                 NuevoEstado: nuevoEstado

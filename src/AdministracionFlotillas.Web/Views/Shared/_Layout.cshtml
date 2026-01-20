@@ -197,17 +197,20 @@
     <!-- 9. SweetAlert2 (no depende de jQuery, pero se carga después para evitar conflictos) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
-    <!-- 10. Syncfusion ASP.NET Core controls scripts -->
+    <!-- 10. Utilidades compartidas (antes de módulos específicos) -->
+    <script src="~/js/utils/modal-buttons.js" asp-append-version="true"></script>
+    
+    <!-- 11. Syncfusion ASP.NET Core controls scripts -->
     <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script>
     
-    <!-- 11. Custom scripts (antes de Script Manager para que funciones de eventos estén disponibles) -->
+    <!-- 12. Custom scripts (antes de Script Manager para que funciones de eventos estén disponibles) -->
     <script src="~/js/navigation.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     
-    <!-- 12. Page-specific scripts (se renderizan aquí ANTES de Script Manager) -->
+    <!-- 13. Page-specific scripts (se renderizan aquí ANTES de Script Manager) -->
     @await RenderSectionAsync("Scripts", required: false)
     
-    <!-- 13. Syncfusion ASP.NET Core Script Manager (OBLIGATORIO - debe ir al final) -->
+    <!-- 14. Syncfusion ASP.NET Core Script Manager (OBLIGATORIO - debe ir al final) -->
     <ejs-scripts></ejs-scripts>
 </body>
 </html>

@@ -288,19 +288,99 @@ window.Chains = window.Chains || {};
         },
         
         AbrirDialog: function() {
+            // Prevenir múltiples llamadas simultáneas
+            if (this._abriendoModal) {
+                console.log('⏳ Modal ya se está abriendo, esperando...');
+                return;
+            }
+            this._abriendoModal = true;
+            
             var self = this;
+            
+            // Función para limpiar el flag
+            function limpiarFlag() {
+                self._abriendoModal = false;
+            }
+            
+            // SOLUCIÓN SIMPLE: Usar la función helper global
+            // Primero intentar usar la función helper simple
+            if (typeof window.mostrarModalCadena === 'function') {
+                if (window.mostrarModalCadena()) {
+                    console.log('✅ Modal abierto usando función helper');
+                    
+                    // Reinicializar tooltip después de abrir el modal
+                    setTimeout(function() {
+                        var tooltipElement = document.getElementById('tooltipModalCadena');
+                        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                            if (typeof tooltipModalCadenaObj !== 'undefined') {
+                                tooltipModalCadenaObj = tooltipElement.ej2_instances[0];
+                            }
+                        }
+                        limpiarFlag();
+                    }, 100);
+                    return;
+                }
+            }
+            
+            // Si la función helper no está disponible o falló, usar el método robusto anterior
             var intentos = 0;
             var maxIntentos = 50;
             var intervaloEspera = 100;
             
             function obtenerInstancia() {
+                // Prioridad 1: Instancia guardada en window.modalCadenaInstance
                 if (typeof window.modalCadenaInstance !== 'undefined' && window.modalCadenaInstance !== null) {
                     return window.modalCadenaInstance;
                 }
                 
+                // Prioridad 2: Instancia del DOM usando ej2_instances
                 var dialogElement = document.getElementById('modalCadena');
-                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                    return dialogElement.ej2_instances[0];
+                if (dialogElement) {
+                    // Método 1: ej2_instances directo
+                    if (dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                        var instancia = dialogElement.ej2_instances[0];
+                        if (instancia && typeof instancia.show === 'function') {
+                            window.modalCadenaInstance = instancia; // Guardar para futuro uso
+                            return instancia;
+                        }
+                    }
+                    
+                    // Método 2: Buscar en todos los ej2_instances
+                    if (dialogElement.ej2_instances && dialogElement.ej2_instances.length > 0) {
+                        for (var i = 0; i < dialogElement.ej2_instances.length; i++) {
+                            var inst = dialogElement.ej2_instances[i];
+                            if (inst && typeof inst.show === 'function') {
+                                window.modalCadenaInstance = inst; // Guardar para futuro uso
+                                return inst;
+                            }
+                        }
+                    }
+                    
+                    // Método 3: Intentar obtener usando el método de Syncfusion
+                    try {
+                        if (typeof ej !== 'undefined' && ej.base && typeof ej.base.getComponent === 'function') {
+                            var dialogInstance = ej.base.getComponent(dialogElement, 'dialog');
+                            if (dialogInstance && typeof dialogInstance.show === 'function') {
+                                window.modalCadenaInstance = dialogInstance; // Guardar para futuro uso
+                                return dialogInstance;
+                            }
+                        }
+                    } catch (e) {
+                        // Ignorar error
+                    }
+                    
+                    // Método 4: Buscar en el objeto del elemento directamente
+                    if (dialogElement.ej2_instances) {
+                        for (var key in dialogElement.ej2_instances) {
+                            if (dialogElement.ej2_instances.hasOwnProperty(key)) {
+                                var inst = dialogElement.ej2_instances[key];
+                                if (inst && typeof inst.show === 'function') {
+                                    window.modalCadenaInstance = inst; // Guardar para futuro uso
+                                    return inst;
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 return null;
@@ -321,11 +401,13 @@ window.Chains = window.Chains || {};
                             if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
                                 tooltipModalCadenaObj = tooltipElement.ej2_instances[0];
                             }
+                            limpiarFlag();
                         }, 100);
                         return;
                     } catch (error) {
                         console.error('❌ Error al abrir modal de cadena:', error);
                         window.Chains.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        limpiarFlag();
                         return;
                     }
                 }
@@ -338,10 +420,11 @@ window.Chains = window.Chains || {};
                 } else {
                     console.error('❌ Modal de cadena no inicializado después de ' + maxIntentos + ' intentos');
                     window.Chains.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                    limpiarFlag();
                 }
             }
             
-            setTimeout(intentarAbrir, 50);
+            intentarAbrir();
         },
         
         CambiarAModoEdicion: function(idCadena) {

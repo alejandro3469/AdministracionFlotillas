@@ -9,8 +9,6 @@
     </e-content-template>
 </ejs-tooltip>
 
-<div id="modalAdenda" style="display: none;"></div>
-
 <ejs-dialog id="modalAdenda" 
             isModal="true" 
             showCloseIcon="true" 
@@ -130,15 +128,46 @@
     
     // FUNCIONES HELPER SIMPLES para mostrar/ocultar el modal desde JavaScript
     window.mostrarModalAdenda = function() {
-        var elemento = document.getElementById('modalAdenda');
-        if (elemento && elemento.ej2_instances && elemento.ej2_instances[0]) {
-            elemento.ej2_instances[0].show();
-            return true;
-        }
+        // Prioridad 1: Instancia guardada
         if (window.modalAdendaInstance) {
-            window.modalAdendaInstance.show();
-            return true;
+            try {
+                window.modalAdendaInstance.show();
+                return true;
+            } catch (e) {
+                console.warn('⚠️ Error al mostrar modal usando instancia guardada:', e);
+            }
         }
+        
+        // Prioridad 2: Buscar en el DOM
+        var elemento = document.getElementById('modalAdenda');
+        if (elemento) {
+            // Intentar obtener de ej2_instances
+            if (elemento.ej2_instances && elemento.ej2_instances[0]) {
+                try {
+                    elemento.ej2_instances[0].show();
+                    window.modalAdendaInstance = elemento.ej2_instances[0]; // Guardar para futuro uso
+                    return true;
+                } catch (e) {
+                    console.warn('⚠️ Error al mostrar modal usando ej2_instances:', e);
+                }
+            }
+            
+            // Intentar obtener usando el método de Syncfusion
+            try {
+                if (typeof ej !== 'undefined' && ej.base && typeof ej.base.getComponent === 'function') {
+                    var dialogInstance = ej.base.getComponent(elemento, 'dialog');
+                    if (dialogInstance) {
+                        dialogInstance.show();
+                        window.modalAdendaInstance = dialogInstance; // Guardar para futuro uso
+                        return true;
+                    }
+                }
+            } catch (e) {
+                // Ignorar error
+            }
+        }
+        
+        console.warn('⚠️ Modal no disponible aún, intentando obtener instancia...');
         return false;
     };
     
@@ -156,22 +185,146 @@
     };
     
     window.modalAdendaCreated = function(args) {
-        console.log('✅ Modal de adenda creado');
+        console.log('✅ Modal de adenda creado e inicializado por Syncfusion');
+        console.log('Args recibidos:', args);
+        
+        // Según documentación oficial de Syncfusion:
+        // - args.component: instancia del componente Dialog
+        // - args.element: elemento DOM del Dialog
+        // El evento 'created' se dispara cuando el componente se crea e inserta en el DOM
+        
         if (args && args.component) {
+            // Método 1 (oficial): args.component contiene la instancia del Dialog
             window.modalAdendaInstance = args.component;
+            console.log('✅ Instancia del Dialog guardada correctamente (args.component)');
+        } else if (args && args.element) {
+            // Método 2 (oficial): args.element contiene el elemento DOM, obtener instancia de ej2_instances
+            var dialogElement = args.element;
+            if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                window.modalAdendaInstance = dialogElement.ej2_instances[0];
+                console.log('⚠️ Instancia obtenida del elemento (args.element -> ej2_instances)');
+            } else {
+                // Intentar obtener usando el método oficial de Syncfusion
+                try {
+                    if (typeof ej !== 'undefined' && ej.base && typeof ej.base.getComponent === 'function') {
+                        var dialogInstance = ej.base.getComponent(dialogElement, 'dialog');
+                        if (dialogInstance) {
+                            window.modalAdendaInstance = dialogInstance;
+                            console.log('⚠️ Instancia obtenida usando ej.base.getComponent (args.element)');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error al obtener instancia de args.element:', e);
+                }
+            }
+        } else {
+            // Fallback: intentar obtener del DOM directamente
+            setTimeout(function() {
+                var dialogElement = document.getElementById('modalAdenda');
+                if (dialogElement) {
+                    // Intentar obtener de ej2_instances
+                    if (dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                        window.modalAdendaInstance = dialogElement.ej2_instances[0];
+                        console.log('⚠️ Instancia obtenida del DOM (fallback en created)');
+                    } else {
+                        // Intentar obtener usando el método oficial de Syncfusion
+                        try {
+                            if (typeof ej !== 'undefined' && ej.base && typeof ej.base.getComponent === 'function') {
+                                var dialogInstance = ej.base.getComponent(dialogElement, 'dialog');
+                                if (dialogInstance) {
+                                    window.modalAdendaInstance = dialogInstance;
+                                    console.log('⚠️ Instancia obtenida usando ej.base.getComponent (fallback)');
+                                }
+                            }
+                        } catch (e) {
+                            // Ignorar error
+                        }
+                    }
+                }
+                
+                if (!window.modalAdendaInstance) {
+                    console.warn('⚠️ Instancia aún no disponible, se intentará obtener cuando se abra el modal');
+                }
+            }, 100);
         }
+        
+        // Inicializar tooltip después de que el modal esté creado
+        setTimeout(function() {
+            var tooltipElement = document.getElementById('tooltipModalAdenda');
+            if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
+            }
+        }, 100);
     };
+    
+    // Función para inicializar el modal de forma agresiva
+    function inicializarModalAdenda() {
+        var dialogElement = document.getElementById('modalAdenda');
+        if (!dialogElement) {
+            return false;
+        }
+        
+        // Intentar obtener la instancia de múltiples formas
+        var instancia = null;
+        
+        // Método 1: ej2_instances
+        if (dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+            instancia = dialogElement.ej2_instances[0];
+        }
+        
+        // Método 2: ej.base.getComponent
+        if (!instancia && typeof ej !== 'undefined' && ej.base && typeof ej.base.getComponent === 'function') {
+            try {
+                instancia = ej.base.getComponent(dialogElement, 'dialog');
+            } catch (e) {
+                // Ignorar error
+            }
+        }
+        
+        // Método 3: Buscar en el objeto del elemento
+        if (!instancia && dialogElement.ej2_instances && dialogElement.ej2_instances.length > 0) {
+            for (var i = 0; i < dialogElement.ej2_instances.length; i++) {
+                if (dialogElement.ej2_instances[i] && typeof dialogElement.ej2_instances[i].show === 'function') {
+                    instancia = dialogElement.ej2_instances[i];
+                    break;
+                }
+            }
+        }
+        
+        if (instancia) {
+            window.modalAdendaInstance = instancia;
+            console.log('✅ Instancia del modal de adenda obtenida e inicializada');
+            return true;
+        }
+        
+        return false;
+    }
     
     document.addEventListener("DOMContentLoaded", function() {
         var tooltipElement = document.getElementById('tooltipModalAdenda');
         if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
             tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
         }
+        
+        // Intentar inicializar el modal múltiples veces con diferentes delays
+        var intentos = [500, 1000, 2000, 3000];
+        intentos.forEach(function(delay) {
+            setTimeout(function() {
+                if (!window.modalAdendaInstance) {
+                    if (inicializarModalAdenda()) {
+                        console.log('✅ Modal de adenda inicializado después de ' + delay + 'ms');
+                    }
+                }
+            }, delay);
+        });
+    });
+    
+    // También intentar después de que la ventana se cargue completamente
+    window.addEventListener('load', function() {
         setTimeout(function() {
             if (!window.modalAdendaInstance) {
-                var dialogElement = document.getElementById('modalAdenda');
-                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                    window.modalAdendaInstance = dialogElement.ej2_instances[0];
+                if (inicializarModalAdenda()) {
+                    console.log('✅ Modal de adenda inicializado después de window.load');
                 }
             }
         }, 500);

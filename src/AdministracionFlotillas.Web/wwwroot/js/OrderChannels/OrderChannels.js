@@ -292,6 +292,26 @@ window.OrderChannels = window.OrderChannels || {};
         },
         
         AbrirDialog: function() {
+            // SOLUCIÓN SIMPLE: Usar la función helper global
+            // Primero intentar usar la función helper simple
+            if (typeof window.mostrarModalCanal === 'function') {
+                if (window.mostrarModalCanal()) {
+                    console.log('✅ Modal abierto usando función helper');
+                    
+                    // Reinicializar tooltip después de abrir el modal
+                    setTimeout(function() {
+                        var tooltipElement = document.getElementById('tooltipModalCanal');
+                        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                            if (typeof tooltipModalCanalObj !== 'undefined') {
+                                tooltipModalCanalObj = tooltipElement.ej2_instances[0];
+                            }
+                        }
+                    }, 100);
+                    return;
+                }
+            }
+            
+            // Si la función helper no está disponible o falló, usar el método robusto anterior
             var self = this;
             var intentos = 0;
             var maxIntentos = 50;

@@ -10,10 +10,7 @@
     </e-content-template>
 </ejs-tooltip>
 
-@* IMPORTANTE: El tag helper <ejs-dialog> renderiza un div con el id especificado cuando el Script Manager se ejecuta *@
-@* Pero necesitamos asegurarnos de que el elemento exista en el DOM antes de que Syncfusion lo inicialice *@
-<div id="modalVendedor" style="display: none;"></div>
-
+@* El tag helper <ejs-dialog> crea su propio elemento cuando el Script Manager se ejecuta *@
 <ejs-dialog id="modalVendedor" 
             isModal="true" 
             showCloseIcon="true" 

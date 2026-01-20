@@ -292,19 +292,101 @@ window.Addendums = window.Addendums || {};
         },
         
         AbrirDialog: function() {
+            // Prevenir múltiples llamadas simultáneas
+            if (this._abriendoModal) {
+                console.log('⏳ Modal ya se está abriendo, esperando...');
+                return;
+            }
+            this._abriendoModal = true;
+            
             var self = this;
+            
+            // Función para limpiar el flag
+            function limpiarFlag() {
+                self._abriendoModal = false;
+            }
+            
+            // SOLUCIÓN SIMPLE: Usar la función helper global
+            // Primero intentar usar la función helper simple
+            if (typeof window.mostrarModalAdenda === 'function') {
+                if (window.mostrarModalAdenda()) {
+                    console.log('✅ Modal abierto usando función helper');
+                    
+                    // Reinicializar tooltip después de abrir el modal
+                    setTimeout(function() {
+                        var tooltipElement = document.getElementById('tooltipModalAdenda');
+                        if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
+                            if (typeof tooltipModalAdendaObj !== 'undefined') {
+                                tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
+                            }
+                        }
+                        limpiarFlag();
+                    }, 100);
+                    return;
+                }
+            }
+            
+            // Si la función helper no está disponible o falló, usar el método robusto anterior
             var intentos = 0;
             var maxIntentos = 50;
             var intervaloEspera = 100;
             
             function obtenerInstancia() {
+                // Prioridad 1: Instancia guardada en window.modalAdendaInstance
                 if (typeof window.modalAdendaInstance !== 'undefined' && window.modalAdendaInstance !== null) {
                     return window.modalAdendaInstance;
                 }
+                
+                // Prioridad 2: Instancia del DOM usando ej2_instances
                 var dialogElement = document.getElementById('modalAdenda');
-                if (dialogElement && dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
-                    return dialogElement.ej2_instances[0];
+                if (dialogElement) {
+                    // Método 1: ej2_instances directo
+                    if (dialogElement.ej2_instances && dialogElement.ej2_instances[0]) {
+                        var instancia = dialogElement.ej2_instances[0];
+                        if (instancia && typeof instancia.show === 'function') {
+                            window.modalAdendaInstance = instancia; // Guardar para futuro uso
+                            return instancia;
+                        }
+                    }
+                    
+                    // Método 2: Buscar en todos los ej2_instances
+                    if (dialogElement.ej2_instances && dialogElement.ej2_instances.length > 0) {
+                        for (var i = 0; i < dialogElement.ej2_instances.length; i++) {
+                            var inst = dialogElement.ej2_instances[i];
+                            if (inst && typeof inst.show === 'function') {
+                                window.modalAdendaInstance = inst; // Guardar para futuro uso
+                                return inst;
+                            }
+                        }
+                    }
+                    
+                    // Método 3: Intentar obtener usando el método de Syncfusion
+                    try {
+                        if (typeof ej !== 'undefined' && ej.base && typeof ej.base.getComponent === 'function') {
+                            var dialogInstance = ej.base.getComponent(dialogElement, 'dialog');
+                            if (dialogInstance && typeof dialogInstance.show === 'function') {
+                                window.modalAdendaInstance = dialogInstance; // Guardar para futuro uso
+                                return dialogInstance;
+                            }
+                        }
+                    } catch (e) {
+                        // Ignorar error
+                    }
+                    
+                    // Método 4: Buscar en el objeto del elemento directamente
+                    if (dialogElement.ej2_instances) {
+                        for (var key in dialogElement.ej2_instances) {
+                            if (dialogElement.ej2_instances.hasOwnProperty(key)) {
+                                var inst = dialogElement.ej2_instances[key];
+                                if (inst && typeof inst.show === 'function') {
+                                    window.modalAdendaInstance = inst; // Guardar para futuro uso
+                                    return inst;
+                                }
+                            }
+                        }
+                    }
                 }
+                
                 return null;
             }
             
@@ -322,11 +404,13 @@ window.Addendums = window.Addendums || {};
                             if (tooltipElement && tooltipElement.ej2_instances && tooltipElement.ej2_instances[0]) {
                                 tooltipModalAdendaObj = tooltipElement.ej2_instances[0];
                             }
+                            limpiarFlag();
                         }, 100);
                         return;
                     } catch (error) {
                         console.error('❌ Error al abrir modal de adenda:', error);
                         window.Addendums.Utilidades.MostrarError('Error', 'No se pudo abrir el modal: ' + error.message);
+                        limpiarFlag();
                         return;
                     }
                 }
@@ -339,10 +423,11 @@ window.Addendums = window.Addendums || {};
                 } else {
                     console.error('❌ Modal de adenda no inicializado después de ' + maxIntentos + ' intentos');
                     window.Addendums.Utilidades.MostrarError('Error', 'El modal no está disponible. Por favor, recarga la página.');
+                    limpiarFlag();
                 }
             }
             
-            setTimeout(intentarAbrir, 50);
+            intentarAbrir();
         },
         
         CambiarAModoEdicion: function(idAdenda) {
