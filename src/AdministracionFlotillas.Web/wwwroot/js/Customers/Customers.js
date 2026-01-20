@@ -123,31 +123,37 @@ var modalClienteModo = 'ver';
         // Funciones de spinner removidas - el Grid maneja el loading con Shimmer
         
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve()); // Resuelve la promesa cuando el SweetAlert se cierra
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve(); // Resuelve inmediatamente si no hay SweetAlert
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve()); // Resuelve la promesa cuando el SweetAlert se cierra
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve(); // Resuelve inmediatamente si no hay SweetAlert
+                }
+            });
         }
     };
     
@@ -501,8 +507,366 @@ var modalClienteModo = 'ver';
         },
         
         CambiarAModoEdicion: function(idCliente) {
-            // TODO: Implementar modo edición
-            window.Customers.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idCliente || idCliente <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'ID de cliente no válido.');
+                return;
+            }
+            
+            modalClienteId = idCliente;
+            modalClienteModo = 'editar';
+            
+            // Cambiar modo del modal
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            // Cambiar campos de solo lectura a editables
+            this.ConvertirCamposAEditables();
+            
+            // Cambiar botones del modal
+            this.ActualizarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalClienteTitulo');
+            if (titulo) {
+                titulo.textContent = modalClienteId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            // Restaurar campos a solo lectura
+            this.ConvertirCamposASoloLectura();
+            
+            // Restaurar botones del modal
+            this.RestaurarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalClienteTitulo');
+            if (titulo) {
+                titulo.textContent = modalClienteId;
+            }
+            
+            modalClienteModo = 'ver';
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoCliente');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoCliente" class="form-select form-select-sm">' +
+                    '<option value="ACTIVE"' + (estadoActual === 'ACTIVE' ? ' selected' : '') + '>ACTIVE</option>' +
+                    '<option value="INACTIVE"' + (estadoActual === 'INACTIVE' ? ' selected' : '') + '>INACTIVE</option>' +
+                    '</select>';
+            }
+            
+            // Email - convertir a input
+            var emailContainer = document.getElementById('modalEmailCliente');
+            if (emailContainer) {
+                var emailActual = emailContainer.textContent.trim();
+                emailContainer.innerHTML = '<input type="email" id="editEmailCliente" class="form-control form-control-sm" value="' + emailActual + '">';
+            }
+            
+            // Teléfono - convertir a input
+            var telefonoContainer = document.getElementById('modalTelefonoCliente');
+            if (telefonoContainer) {
+                var telefonoActual = telefonoContainer.textContent.trim();
+                telefonoContainer.innerHTML = '<input type="tel" id="editTelefonoCliente" class="form-control form-control-sm" value="' + telefonoActual + '">';
+            }
+            
+            // Dirección - convertir a input
+            var direccionContainer = document.getElementById('modalDireccionCliente');
+            if (direccionContainer) {
+                var direccionActual = direccionContainer.textContent.trim();
+                direccionContainer.innerHTML = '<input type="text" id="editDireccionCliente" class="form-control form-control-sm" value="' + direccionActual + '">';
+            }
+            
+            // Ciudad - convertir a input
+            var ciudadContainer = document.getElementById('modalCiudadCliente');
+            if (ciudadContainer) {
+                var ciudadActual = ciudadContainer.textContent.trim();
+                ciudadContainer.innerHTML = '<input type="text" id="editCiudadCliente" class="form-control form-control-sm" value="' + ciudadActual + '">';
+            }
+            
+            // Estado (dirección) - convertir a input
+            var estadoDirContainer = document.getElementById('modalEstadoDireccionCliente');
+            if (estadoDirContainer) {
+                var estadoDirActual = estadoDirContainer.textContent.trim();
+                estadoDirContainer.innerHTML = '<input type="text" id="editEstadoDireccionCliente" class="form-control form-control-sm" value="' + estadoDirActual + '">';
+            }
+            
+            // Código Postal - convertir a input
+            var codigoPostalContainer = document.getElementById('modalCodigoPostalCliente');
+            if (codigoPostalContainer) {
+                var codigoPostalActual = codigoPostalContainer.textContent.trim();
+                codigoPostalContainer.innerHTML = '<input type="text" id="editCodigoPostalCliente" class="form-control form-control-sm" value="' + codigoPostalActual + '">';
+            }
+            
+            // País - convertir a input
+            var paisContainer = document.getElementById('modalPaisCliente');
+            if (paisContainer) {
+                var paisActual = paisContainer.textContent.trim();
+                paisContainer.innerHTML = '<input type="text" id="editPaisCliente" class="form-control form-control-sm" value="' + paisActual + '">';
+            }
+            
+            // Límite de Crédito - convertir a input numérico
+            var limiteContainer = document.getElementById('modalLimiteCredito');
+            if (limiteContainer) {
+                var limiteActual = limiteContainer.textContent.replace('$', '').replace(',', '').trim();
+                limiteContainer.innerHTML = '<input type="number" id="editLimiteCredito" class="form-control form-control-sm" step="0.01" min="0" value="' + limiteActual + '">';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoCliente');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoCliente');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'ACTIVE') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-cliente" data-field="EstadoCliente" data-tooltip="Cliente activo, puede realizar compras y operaciones">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-cliente" data-field="EstadoCliente" data-tooltip="Cliente inactivo, bloqueado o suspendido">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Email - restaurar texto
+            var emailContainer = document.getElementById('modalEmailCliente');
+            if (emailContainer) {
+                var inputEmail = document.getElementById('editEmailCliente');
+                if (inputEmail) {
+                    emailContainer.textContent = inputEmail.value || '-';
+                }
+            }
+            
+            // Teléfono - restaurar texto
+            var telefonoContainer = document.getElementById('modalTelefonoCliente');
+            if (telefonoContainer) {
+                var inputTelefono = document.getElementById('editTelefonoCliente');
+                if (inputTelefono) {
+                    telefonoContainer.textContent = inputTelefono.value || '-';
+                }
+            }
+            
+            // Dirección - restaurar texto
+            var direccionContainer = document.getElementById('modalDireccionCliente');
+            if (direccionContainer) {
+                var inputDireccion = document.getElementById('editDireccionCliente');
+                if (inputDireccion) {
+                    direccionContainer.textContent = inputDireccion.value || '-';
+                }
+            }
+            
+            // Ciudad - restaurar texto
+            var ciudadContainer = document.getElementById('modalCiudadCliente');
+            if (ciudadContainer) {
+                var inputCiudad = document.getElementById('editCiudadCliente');
+                if (inputCiudad) {
+                    ciudadContainer.textContent = inputCiudad.value || '-';
+                }
+            }
+            
+            // Estado (dirección) - restaurar texto
+            var estadoDirContainer = document.getElementById('modalEstadoDireccionCliente');
+            if (estadoDirContainer) {
+                var inputEstadoDir = document.getElementById('editEstadoDireccionCliente');
+                if (inputEstadoDir) {
+                    estadoDirContainer.textContent = inputEstadoDir.value || '-';
+                }
+            }
+            
+            // Código Postal - restaurar texto
+            var codigoPostalContainer = document.getElementById('modalCodigoPostalCliente');
+            if (codigoPostalContainer) {
+                var inputCodigoPostal = document.getElementById('editCodigoPostalCliente');
+                if (inputCodigoPostal) {
+                    codigoPostalContainer.textContent = inputCodigoPostal.value || '-';
+                }
+            }
+            
+            // País - restaurar texto
+            var paisContainer = document.getElementById('modalPaisCliente');
+            if (paisContainer) {
+                var inputPais = document.getElementById('editPaisCliente');
+                if (inputPais) {
+                    paisContainer.textContent = inputPais.value || '-';
+                }
+            }
+            
+            // Límite de Crédito - restaurar formato
+            var limiteContainer = document.getElementById('modalLimiteCredito');
+            if (limiteContainer) {
+                var inputLimite = document.getElementById('editLimiteCredito');
+                if (inputLimite) {
+                    var limiteValue = parseFloat(inputLimite.value) || 0;
+                    limiteContainer.textContent = '$' + limiteValue.toFixed(2);
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            // Ocultar botones de modo ver
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            // Mostrar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            // Ocultar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            // Mostrar botones de modo ver
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (!modalClienteId || modalClienteId <= 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'No hay cliente seleccionado para guardar.');
+                return;
+            }
+            
+            // Obtener valores editados
+            var selectEstado = document.getElementById('editEstadoCliente');
+            var inputEmail = document.getElementById('editEmailCliente');
+            var inputTelefono = document.getElementById('editTelefonoCliente');
+            var inputDireccion = document.getElementById('editDireccionCliente');
+            var inputCiudad = document.getElementById('editCiudadCliente');
+            var inputEstadoDir = document.getElementById('editEstadoDireccionCliente');
+            var inputCodigoPostal = document.getElementById('editCodigoPostalCliente');
+            var inputPais = document.getElementById('editPaisCliente');
+            var inputLimite = document.getElementById('editLimiteCredito');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoEmail = inputEmail ? inputEmail.value.trim() : null;
+            var nuevoTelefono = inputTelefono ? inputTelefono.value.trim() : null;
+            var nuevaDireccion = inputDireccion ? inputDireccion.value.trim() : null;
+            var nuevaCiudad = inputCiudad ? inputCiudad.value.trim() : null;
+            var nuevoEstadoDir = inputEstadoDir ? inputEstadoDir.value.trim() : null;
+            var nuevoCodigoPostal = inputCodigoPostal ? inputCodigoPostal.value.trim() : null;
+            var nuevoPais = inputPais ? inputPais.value.trim() : null;
+            var nuevoLimite = inputLimite ? parseFloat(inputLimite.value) : null;
+            
+            // Validaciones
+            if (nuevoEmail && !nuevoEmail.includes('@')) {
+                window.Customers.Utilidades.MostrarError('Error', 'El formato de email no es válido.');
+                return;
+            }
+            
+            if (nuevoLimite !== null && nuevoLimite < 0) {
+                window.Customers.Utilidades.MostrarError('Error', 'El límite de crédito no puede ser negativo.');
+                return;
+            }
+            
+            // Deshabilitar botones antes de enviar
+            window.ModalButtons.Deshabilitar('modalCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+            
+            // Preparar datos para enviar
+            var datosActualizacion = {
+                IdCliente: modalClienteId,
+                EstadoCliente: nuevoEstado,
+                Email: nuevoEmail,
+                Telefono: nuevoTelefono,
+                Direccion: nuevaDireccion,
+                Ciudad: nuevaCiudad,
+                Estado: nuevoEstadoDir,
+                CodigoPostal: nuevoCodigoPostal,
+                Pais: nuevoPais,
+                LimiteCredito: nuevoLimite
+            };
+            
+            // Enviar al servidor
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Customers/ActualizarCustomer', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                // Mostrar mensaje de éxito y esperar confirmación
+                                window.Customers.Utilidades.MostrarExito(
+                                    'Cliente actualizado',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    // Desactivar modo edición
+                                    if (window.Customers && window.Customers.Modal) {
+                                        window.Customers.Modal.DesactivarModoEdicion();
+                                        
+                                        // Recargar datos del cliente
+                                        window.Customers.Modal.CargarDatosCliente(modalClienteId);
+                                        
+                                        // Recargar grid
+                                        if (window.Customers && window.Customers.Grid) {
+                                            window.Customers.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    // Re-habilitar botones después de confirmar éxito
+                                    window.ModalButtons.Habilitar('modalCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Customers.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Customers.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Customers.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar cliente:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.Customers.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalCliente', '#customersGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            // Recargar datos originales
+            if (modalClienteId) {
+                this.CargarDatosCliente(modalClienteId);
+            }
+            
+            // Desactivar modo edición
+            this.DesactivarModoEdicion();
         }
     };
     

@@ -199,6 +199,44 @@ public class CustomersController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public IActionResult ActualizarCustomer([FromBody] SolicitudActualizarCliente solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdCliente <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones de negocio
+            if (solicitud.LimiteCredito.HasValue && solicitud.LimiteCredito.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "El límite de crédito no puede ser negativo" });
+            }
+            
+            if (!string.IsNullOrEmpty(solicitud.EstadoCliente) && 
+                solicitud.EstadoCliente != "ACTIVE" && solicitud.EstadoCliente != "INACTIVE")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido. Debe ser ACTIVE o INACTIVE" });
+            }
+            
+            // Validar formato de email si se proporciona
+            if (!string.IsNullOrEmpty(solicitud.Email) && !solicitud.Email.Contains("@"))
+            {
+                return Json(new { exito = false, mensaje = "El formato de email no es válido" });
+            }
+            
+            // Simular actualización - en producción se actualizaría en Oracle/JDE
+            return Json(new { exito = true, mensaje = "Cliente actualizado correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 // Clase auxiliar para solicitudes
@@ -206,4 +244,18 @@ public class SolicitudBuscarClientes
 {
     public string? Nombre { get; set; }
     public string? Estado { get; set; }
+}
+
+public class SolicitudActualizarCliente
+{
+    public int IdCliente { get; set; }
+    public string? Email { get; set; }
+    public string? Telefono { get; set; }
+    public string? Direccion { get; set; }
+    public string? Ciudad { get; set; }
+    public string? Estado { get; set; }
+    public string? CodigoPostal { get; set; }
+    public string? Pais { get; set; }
+    public string? EstadoCliente { get; set; }
+    public decimal? LimiteCredito { get; set; }
 }
