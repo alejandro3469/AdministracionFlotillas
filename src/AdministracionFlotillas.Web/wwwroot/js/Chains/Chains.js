@@ -279,18 +279,18 @@ window.Chains = window.Chains || {};
             document.getElementById('modalEstadoCadena').innerHTML = estadoHtml;
             
             document.getElementById('modalNumeroSucursales').textContent = cadena.NumeroSucursales || 0;
-            document.getElementById('modalLimiteCredito').textContent = '$' + (cadena.LimiteCredito || 0).toFixed(2);
+            document.getElementById('modalLimiteCredito').innerHTML = '<i class="fas fa-credit-card me-1"></i>$' + (cadena.LimiteCredito || 0).toFixed(2);
             document.getElementById('modalDiasCredito').textContent = cadena.DiasCredito || 0;
-            document.getElementById('modalTotalOrdenes').textContent = cadena.TotalOrdenes || 0;
-            document.getElementById('modalTotalVentas').textContent = '$' + (cadena.TotalVentas || 0).toFixed(2);
+            document.getElementById('modalTotalOrdenes').innerHTML = '<i class="fas fa-shopping-cart me-1"></i>' + (cadena.TotalOrdenes || 0);
+            document.getElementById('modalTotalVentas').innerHTML = '<i class="fas fa-dollar-sign me-1"></i>$' + (cadena.TotalVentas || 0).toFixed(2);
             
-            document.getElementById('modalContactEmail').textContent = cadena.ContactEmail || '-';
-            document.getElementById('modalContactPhone').textContent = cadena.ContactPhone || '-';
-            document.getElementById('modalDireccion').textContent = cadena.Direccion || '-';
-            document.getElementById('modalCiudad').textContent = cadena.Ciudad || '-';
-            document.getElementById('modalEstadoDireccion').textContent = cadena.EstadoDireccion || '-';
-            document.getElementById('modalCodigoPostal').textContent = cadena.CodigoPostal || '-';
-            document.getElementById('modalPais').textContent = cadena.Pais || '-';
+            document.getElementById('modalContactEmail').innerHTML = '<i class="fas fa-envelope me-1"></i>' + (cadena.ContactEmail || '-');
+            document.getElementById('modalContactPhone').innerHTML = '<i class="fas fa-phone me-1"></i>' + (cadena.ContactPhone || '-');
+            document.getElementById('modalDireccion').innerHTML = '<i class="fas fa-map-marker-alt me-1"></i>' + (cadena.Direccion || '-');
+            document.getElementById('modalCiudad').innerHTML = '<i class="fas fa-city me-1"></i>' + (cadena.Ciudad || '-');
+            document.getElementById('modalEstadoDireccion').innerHTML = '<i class="fas fa-map me-1"></i>' + (cadena.EstadoDireccion || '-');
+            document.getElementById('modalCodigoPostal').innerHTML = '<i class="fas fa-mail-bulk me-1"></i>' + (cadena.CodigoPostal || '-');
+            document.getElementById('modalPais').innerHTML = '<i class="fas fa-flag me-1"></i>' + (cadena.Pais || '-');
         },
         
         AbrirDialog: function() {

@@ -434,33 +434,68 @@ var modalProductoModo = 'ver';
             setText('modalNombreProducto', producto.NombreProducto || '-');
             setText('modalCategoria', producto.Categoria || '-');
             
-            // Estado con badge y tooltip
+            // Estado con badge y tooltip mejorado
             var estadoHtml = '';
             if (producto.Estado === 'ACTIVE') {
-                estadoHtml = '<span class="badge bg-success info-tooltip-producto" data-field="Estado" data-tooltip="Producto activo y disponible para venta">' + producto.Estado + '</span>';
+                estadoHtml = '<span class="badge bg-success info-tooltip-producto fs-6 px-3 py-2" data-field="Estado" data-tooltip="Producto activo y disponible para venta">' +
+                    '<i class="fas fa-check-circle me-2"></i>' + producto.Estado + '</span>';
             } else {
-                estadoHtml = '<span class="badge bg-secondary info-tooltip-producto" data-field="Estado" data-tooltip="Producto inactivo, no disponible para venta">' + (producto.Estado || 'INACTIVE') + '</span>';
+                estadoHtml = '<span class="badge bg-secondary info-tooltip-producto fs-6 px-3 py-2" data-field="Estado" data-tooltip="Producto inactivo, no disponible para venta">' +
+                    '<i class="fas fa-times-circle me-2"></i>' + (producto.Estado || 'INACTIVE') + '</span>';
             }
             setHtml('modalEstadoProducto', estadoHtml);
             
-            setText('modalCodigoBarras', producto.CodigoBarras || '-');
-            setText('modalPrecioUnitario', '$' + (producto.PrecioUnitario || 0).toFixed(2));
-            setText('modalPrecioCosto', '$' + (producto.PrecioCosto || 0).toFixed(2));
-            setText('modalMargenGanancia', '$' + (producto.MargenGanancia || 0).toFixed(2));
+            // Actualizar gauge circular de estado
+            this.ActualizarGaugeEstado(producto.Estado === 'ACTIVE' ? 100 : 0);
             
-            // Stock con indicador visual
+            setText('modalCodigoBarras', producto.CodigoBarras || '-');
+            
+            // Precios con iconos mejorados
+            var precioUnitario = producto.PrecioUnitario || 0;
+            var precioCosto = producto.PrecioCosto || 0;
+            var margenGanancia = producto.MargenGanancia || 0;
+            
+            setHtml('modalPrecioUnitario', '<i class="fas fa-dollar-sign me-1"></i>$' + precioUnitario.toFixed(2));
+            setHtml('modalPrecioCosto', '<i class="fas fa-coins me-1"></i>$' + precioCosto.toFixed(2));
+            setHtml('modalMargenGanancia', '<i class="fas fa-chart-line me-1"></i>$' + margenGanancia.toFixed(2));
+            
+            // Stock con indicador visual mejorado
             var stock = producto.CantidadStock || 0;
             var stockHtml = '';
+            var stockClass = '';
+            var stockIcon = '';
             if (stock < 20) {
                 stockHtml = '<span class="text-danger fw-bold">' + stock + '</span>';
+                stockClass = 'text-danger';
+                stockIcon = 'fas fa-exclamation-triangle';
             } else if (stock < 50) {
-                stockHtml = '<span class="text-warning">' + stock + '</span>';
+                stockHtml = '<span class="text-warning fw-bold">' + stock + '</span>';
+                stockClass = 'text-warning';
+                stockIcon = 'fas fa-exclamation-circle';
             } else {
-                stockHtml = '<span class="text-success">' + stock + '</span>';
+                stockHtml = '<span class="text-success fw-bold">' + stock + '</span>';
+                stockClass = 'text-success';
+                stockIcon = 'fas fa-check-circle';
             }
-            setHtml('modalCantidadStock', stockHtml);
+            setHtml('modalCantidadStock', '<i class="' + stockIcon + ' me-1"></i>' + stock);
+            
+            // Actualizar ProgressBar de stock
+            var progressBarStock = document.getElementById('progressBarStock');
+            if (progressBarStock && progressBarStock.ej2_instances && progressBarStock.ej2_instances[0]) {
+                var maxStock = 100; // Valor máximo para el cálculo de porcentaje
+                var stockPercent = Math.min((stock / maxStock) * 100, 100);
+                var progressColor = stock < 20 ? '#dc3545' : (stock < 50 ? '#ffc107' : '#28a745');
+                progressBarStock.ej2_instances[0].value = stockPercent;
+                progressBarStock.ej2_instances[0].progressColor = progressColor;
+                progressBarStock.ej2_instances[0].dataBind();
+            }
             
             setText('modalDescripcion', producto.Descripcion || '-');
+            
+            // Actualizar gráfica de precios y otros componentes visuales
+            setTimeout(function() {
+                window.Products.Modal.ActualizarGraficaPrecios(producto);
+            }, 300);
         },
         
         AbrirDialog: function() {
@@ -887,6 +922,118 @@ var modalProductoModo = 'ver';
             
             // Desactivar modo edición
             this.DesactivarModoEdicion();
+        },
+        
+        ActualizarGraficaPrecios: function(producto) {
+            var chartContainer = document.getElementById('chartPrecios');
+            if (!chartContainer) return;
+            
+            var precioUnitario = producto.PrecioUnitario || 0;
+            var precioCosto = producto.PrecioCosto || 0;
+            var margenGanancia = producto.MargenGanancia || 0;
+            
+            // Destruir gráfica anterior si existe
+            if (chartContainer.ej2_instances && chartContainer.ej2_instances[0]) {
+                chartContainer.ej2_instances[0].destroy();
+            }
+            
+            // Crear nueva gráfica de barras
+            var chart = new ej.charts.Chart({
+                primaryXAxis: {
+                    valueType: 'Category',
+                    title: 'Concepto'
+                },
+                primaryYAxis: {
+                    title: 'Monto ($)',
+                    labelFormat: 'C2'
+                },
+                series: [{
+                    type: 'Column',
+                    dataSource: [
+                        { concepto: 'Precio Unitario', valor: precioUnitario },
+                        { concepto: 'Precio Costo', valor: precioCosto },
+                        { concepto: 'Margen', valor: margenGanancia }
+                    ],
+                    xName: 'concepto',
+                    yName: 'valor',
+                    name: 'Monto',
+                    marker: {
+                        dataLabel: {
+                            visible: true,
+                            position: 'Top',
+                            format: 'C2'
+                        }
+                    }
+                }],
+                tooltip: {
+                    enable: true,
+                    format: '${point.x}: ${point.y}'
+                },
+                legendSettings: {
+                    visible: false
+                },
+                height: '200px',
+                width: '100%'
+            });
+            
+            chart.appendTo('#chartPrecios');
+        },
+        
+        ActualizarGaugeEstado: function(valor) {
+            var gaugeContainer = document.getElementById('gaugeEstado');
+            if (!gaugeContainer) return;
+            
+            // Destruir gauge anterior si existe
+            if (gaugeContainer.ej2_instances && gaugeContainer.ej2_instances[0]) {
+                gaugeContainer.ej2_instances[0].destroy();
+            }
+            
+            // Crear nuevo gauge circular
+            var gauge = new ej.circulargauge.CircularGauge({
+                axes: [{
+                    startAngle: 200,
+                    endAngle: 160,
+                    minimum: 0,
+                    maximum: 100,
+                    radius: '80%',
+                    lineStyle: { width: 0 },
+                    labelStyle: {
+                        position: 'Inside',
+                        font: { size: '12px', fontFamily: 'Roboto', fontStyle: 'Regular' }
+                    },
+                    majorTicks: { height: 10, offset: 5 },
+                    minorTicks: { height: 0 },
+                    pointers: [{
+                        value: valor,
+                        radius: '60%',
+                        pointerWidth: 8,
+                        cap: {
+                            radius: 7,
+                            border: { width: 0 }
+                        },
+                        needleTail: {
+                            length: '0%'
+                        }
+                    }],
+                    ranges: [{
+                        start: 0,
+                        end: 50,
+                        startWidth: 10,
+                        endWidth: 10,
+                        color: '#dc3545'
+                    }, {
+                        start: 50,
+                        end: 100,
+                        startWidth: 10,
+                        endWidth: 10,
+                        color: '#28a745'
+                    }]
+                }],
+                height: '80px',
+                width: '100%'
+            });
+            
+            gauge.appendTo('#gaugeEstado');
         }
     };
     

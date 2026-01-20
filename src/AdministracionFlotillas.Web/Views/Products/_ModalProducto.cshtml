@@ -56,6 +56,7 @@
                                                     <dt class="col-sm-5">Estado:</dt>
                                                     <dd class="col-sm-7" id="modalEstadoProducto">
                                                         <span class="info-tooltip-producto" data-field="Estado" data-tooltip="Estado del producto: ACTIVE (activo, disponible para venta), INACTIVE (inactivo, no disponible)">-</span>
+                                                        <div id="gaugeEstado" style="height: 80px; margin-top: 5px;"></div>
                                                     </dd>
 
                                                     <dt class="col-sm-5">Código de Barras:</dt>
@@ -75,22 +76,38 @@
                                                 <dl class="row">
                                                     <dt class="col-sm-5">Precio Unitario:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalPrecioUnitario" class="info-tooltip-producto" data-field="PrecioUnitario" data-tooltip="Precio de venta al público por unidad del producto">$0.00</span>
+                                                        <span id="modalPrecioUnitario" class="info-tooltip-producto fw-bold text-success fs-5" data-field="PrecioUnitario" data-tooltip="Precio de venta al público por unidad del producto">
+                                                            <i class="fas fa-dollar-sign me-1"></i>$0.00
+                                                        </span>
                                                     </dd>
 
                                                     <dt class="col-sm-5">Precio de Costo:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalPrecioCosto" class="info-tooltip-producto" data-field="PrecioCosto" data-tooltip="Costo de adquisición del producto para la empresa">$0.00</span>
+                                                        <span id="modalPrecioCosto" class="info-tooltip-producto text-muted" data-field="PrecioCosto" data-tooltip="Costo de adquisición del producto para la empresa">
+                                                            <i class="fas fa-coins me-1"></i>$0.00
+                                                        </span>
                                                     </dd>
 
                                                     <dt class="col-sm-5">Margen de Ganancia:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalMargenGanancia" class="info-tooltip-producto" data-field="MargenGanancia" data-tooltip="Diferencia entre precio de venta y costo (Precio Unitario - Precio de Costo)">$0.00</span>
+                                                        <span id="modalMargenGanancia" class="info-tooltip-producto fw-bold text-primary" data-field="MargenGanancia" data-tooltip="Diferencia entre precio de venta y costo (Precio Unitario - Precio de Costo)">
+                                                            <i class="fas fa-chart-line me-1"></i>$0.00
+                                                        </span>
+                                                        <div id="chartMargenGanancia" style="height: 60px; margin-top: 5px;"></div>
                                                     </dd>
 
                                                     <dt class="col-sm-5">Cantidad en Stock:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalCantidadStock" class="info-tooltip-producto" data-field="CantidadStock" data-tooltip="Cantidad disponible en inventario. Stock bajo: menos de 20 unidades, Stock medio: 20-50 unidades, Stock alto: más de 50 unidades">0</span>
+                                                        <div class="d-flex align-items-center">
+                                                            <span id="modalCantidadStock" class="info-tooltip-producto fw-bold me-2" data-field="CantidadStock" data-tooltip="Cantidad disponible en inventario. Stock bajo: menos de 20 unidades, Stock medio: 20-50 unidades, Stock alto: más de 50 unidades">
+                                                                <i class="fas fa-boxes me-1"></i>0
+                                                            </span>
+                                                            <div id="progressStock" style="flex: 1; max-width: 150px;">
+                                                                <ejs-progressbar id="progressBarStock" type="Linear" height="20" value="0" maximum="100" 
+                                                                                progressColor="#28a745" trackColor="#e9ecef" showProgressValue="false">
+                                                                </ejs-progressbar>
+                                                            </div>
+                                                        </div>
                                                     </dd>
                                                 </dl>
                                             </div>
@@ -98,7 +115,17 @@
                                     </div>
                                 </div>
                                 <div class="row mt-3">
-                                    <div class="col-12">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">Análisis de Precios</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="chartPrecios" style="height: 200px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
                                         <div class="card">
                                             <div class="card-header">
                                                 <h5 class="card-title mb-0">Descripción</h5>

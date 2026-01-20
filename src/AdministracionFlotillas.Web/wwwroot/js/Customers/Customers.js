@@ -389,8 +389,8 @@ var modalClienteModo = 'ver';
             setText('modalClienteTitulo', cliente.IdCliente);
             setText('modalIdCliente', cliente.IdCliente);
             setText('modalNombreCliente', cliente.NombreCliente || '-');
-            setText('modalEmailCliente', cliente.Email || '-');
-            setText('modalTelefonoCliente', cliente.Telefono || '-');
+            setHtml('modalEmailCliente', '<i class="fas fa-envelope me-1"></i>' + (cliente.Email || '-'));
+            setHtml('modalTelefonoCliente', '<i class="fas fa-phone me-1"></i>' + (cliente.Telefono || '-'));
             
             // Estado con badge y tooltip
             var estadoHtml = '';
@@ -408,16 +408,86 @@ var modalClienteModo = 'ver';
             setText('modalCodigoPostalCliente', cliente.CodigoPostal || '-');
             setText('modalPaisCliente', cliente.Pais || '-');
             
-            // Información comercial
-            setText('modalLimiteCredito', '$' + (cliente.LimiteCredito || 0).toFixed(2));
-            setText('modalTotalOrdenes', cliente.TotalOrdenes || 0);
-            setText('modalTotalCompras', '$' + (cliente.TotalCompras || 0).toFixed(2));
+            // Información comercial con iconos mejorados
+            var limiteCredito = cliente.LimiteCredito || 0;
+            var totalCompras = cliente.TotalCompras || 0;
+            var totalOrdenes = cliente.TotalOrdenes || 0;
+            
+            setHtml('modalLimiteCredito', '<i class="fas fa-credit-card me-1"></i>$' + limiteCredito.toFixed(2));
+            setHtml('modalTotalOrdenes', '<i class="fas fa-shopping-cart me-1"></i>' + totalOrdenes);
+            setHtml('modalTotalCompras', '<i class="fas fa-dollar-sign me-1"></i>$' + totalCompras.toFixed(2));
+            
+            // Actualizar ProgressBar de límite de crédito (usando totalCompras como porcentaje)
+            var progressBarLimite = document.getElementById('progressBarLimiteCredito');
+            if (progressBarLimite && progressBarLimite.ej2_instances && progressBarLimite.ej2_instances[0]) {
+                var porcentajeUso = limiteCredito > 0 ? Math.min((totalCompras / limiteCredito) * 100, 100) : 0;
+                var progressColor = porcentajeUso > 80 ? '#dc3545' : (porcentajeUso > 50 ? '#ffc107' : '#0d6efd');
+                progressBarLimite.ej2_instances[0].value = porcentajeUso;
+                progressBarLimite.ej2_instances[0].progressColor = progressColor;
+                progressBarLimite.ej2_instances[0].dataBind();
+            }
             
             if (cliente.FechaRegistro) {
-                setText('modalFechaRegistro', new Date(cliente.FechaRegistro).toLocaleDateString('es-MX'));
+                setHtml('modalFechaRegistro', '<i class="fas fa-calendar-alt me-1"></i>' + new Date(cliente.FechaRegistro).toLocaleDateString('es-MX'));
             } else {
                 setText('modalFechaRegistro', '-');
             }
+            
+            // Actualizar gráfica de actividad
+            setTimeout(function() {
+                window.Customers.Modal.ActualizarGraficaActividad(cliente);
+            }, 300);
+        },
+        
+        ActualizarGraficaActividad: function(cliente) {
+            var chartContainer = document.getElementById('chartActividadCliente');
+            if (!chartContainer) return;
+            
+            var totalOrdenes = cliente.TotalOrdenes || 0;
+            var totalCompras = cliente.TotalCompras || 0;
+            var limiteCredito = cliente.LimiteCredito || 0;
+            
+            // Destruir gráfica anterior si existe
+            if (chartContainer.ej2_instances && chartContainer.ej2_instances[0]) {
+                chartContainer.ej2_instances[0].destroy();
+            }
+            
+            // Crear gráfica de barras para actividad comercial
+            var chart = new ej.charts.Chart({
+                primaryXAxis: {
+                    valueType: 'Category'
+                },
+                primaryYAxis: {
+                    title: 'Valor'
+                },
+                series: [{
+                    type: 'Column',
+                    dataSource: [
+                        { concepto: 'Órdenes', valor: totalOrdenes },
+                        { concepto: 'Compras ($)', valor: totalCompras / 1000 }, // Dividir por 1000 para mejor visualización
+                        { concepto: 'Límite ($)', valor: limiteCredito / 1000 }
+                    ],
+                    xName: 'concepto',
+                    yName: 'valor',
+                    name: 'Actividad',
+                    marker: {
+                        dataLabel: {
+                            visible: true,
+                            position: 'Top'
+                        }
+                    }
+                }],
+                tooltip: {
+                    enable: true
+                },
+                legendSettings: {
+                    visible: false
+                },
+                height: '200px',
+                width: '100%'
+            });
+            
+            chart.appendTo('#chartActividadCliente');
         },
         
         AbrirDialog: function() {

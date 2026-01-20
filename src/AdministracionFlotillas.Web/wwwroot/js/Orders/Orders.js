@@ -973,11 +973,74 @@ var modalOrdenModo = 'ver';
             setText('modalIdTienda', orden.IdTienda || '-');
             setText('modalNombreTienda', orden.NombreTienda || '-');
             
-            // Totales
-            setText('modalSubtotal', '$' + (orden.Subtotal || 0).toFixed(2));
-            setText('modalDescuentos', '-$' + (orden.Descuentos || 0).toFixed(2));
-            setText('modalImpuestos', '$' + (orden.Impuestos || 0).toFixed(2));
-            setText('modalTotal', '$' + (orden.Total || 0).toFixed(2));
+            // Totales con iconos mejorados
+            var subtotal = orden.Subtotal || 0;
+            var descuentos = orden.Descuentos || 0;
+            var impuestos = orden.Impuestos || 0;
+            var total = orden.Total || 0;
+            
+            setHtml('modalSubtotal', '<i class="fas fa-calculator me-1"></i>$' + subtotal.toFixed(2));
+            setHtml('modalDescuentos', '<i class="fas fa-tag me-1"></i>-$' + descuentos.toFixed(2));
+            setHtml('modalImpuestos', '<i class="fas fa-receipt me-1"></i>$' + impuestos.toFixed(2));
+            setHtml('modalTotal', '<i class="fas fa-dollar-sign me-1"></i>$' + total.toFixed(2));
+            
+            // Actualizar gráfica de totales
+            setTimeout(function() {
+                window.Orders.Modal.ActualizarGraficaTotales(orden);
+            }, 300);
+        },
+        
+        ActualizarGraficaTotales: function(orden) {
+            var chartContainer = document.getElementById('chartTotalesOrden');
+            if (!chartContainer) return;
+            
+            var subtotal = orden.Subtotal || 0;
+            var descuentos = orden.Descuentos || 0;
+            var impuestos = orden.Impuestos || 0;
+            var total = orden.Total || 0;
+            
+            // Destruir gráfica anterior si existe
+            if (chartContainer.ej2_instances && chartContainer.ej2_instances[0]) {
+                chartContainer.ej2_instances[0].destroy();
+            }
+            
+            // Crear gráfica de pie para desglose de totales
+            var chart = new ej.charts.Chart({
+                series: [{
+                    type: 'Pie',
+                    dataSource: [
+                        { concepto: 'Subtotal', valor: subtotal },
+                        { concepto: 'Impuestos', valor: impuestos },
+                        { concepto: 'Descuentos', valor: descuentos }
+                    ],
+                    xName: 'concepto',
+                    yName: 'valor',
+                    radius: '70%',
+                    dataLabel: {
+                        visible: true,
+                        position: 'Outside',
+                        name: 'concepto',
+                        font: {
+                            fontWeight: '600'
+                        },
+                        connectorStyle: {
+                            length: '20px'
+                        }
+                    },
+                    tooltip: {
+                        enable: true,
+                        format: '${point.x}: $${point.y}'
+                    }
+                }],
+                legendSettings: {
+                    visible: true,
+                    position: 'Bottom'
+                },
+                height: '180px',
+                width: '100%'
+            });
+            
+            chart.appendTo('#chartTotalesOrden');
         },
         
         CargarItemsFactura: function(idOrden) {

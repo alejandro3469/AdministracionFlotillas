@@ -40,39 +40,39 @@
                                             </div>
                                             <div class="card-body">
                                                 <dl class="row">
-                                                    <dt class="col-sm-5">ID de Orden:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-hashtag me-1"></i>ID de Orden:</dt>
                                                     <dd class="col-sm-7">
-                                                        <strong id="modalIdOrden" class="info-tooltip-orden" data-field="IdOrden" data-tooltip="Identificador único de la orden en el sistema">-</strong>
+                                                        <strong id="modalIdOrden" class="info-tooltip-orden fs-5" data-field="IdOrden" data-tooltip="Identificador único de la orden en el sistema">-</strong>
                                                     </dd>
 
-                                                    <dt class="col-sm-5">Fecha de Orden:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-calendar-alt me-1"></i>Fecha de Orden:</dt>
                                                     <dd class="col-sm-7">
                                                         <span id="modalFechaOrden" class="info-tooltip-orden" data-field="FechaOrden" data-tooltip="Fecha y hora en que se registró la orden">-</span>
                                                     </dd>
 
-                                                    <dt class="col-sm-5">Estado:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-info-circle me-1"></i>Estado:</dt>
                                                     <dd class="col-sm-7" id="modalEstadoOrden">
                                                         <span class="info-tooltip-orden" data-field="EstadoOrden" data-tooltip="Estado actual de la orden: COMPLETE (completada), CANCELLED (cancelada), REFUNDED (reembolsada), PENDING (pendiente)">-</span>
                                                     </dd>
 
-                                                    <dt class="col-sm-5">ID Cliente:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-user me-1"></i>ID Cliente:</dt>
                                                     <dd class="col-sm-7">
                                                         <span id="modalIdCliente" class="info-tooltip-orden" data-field="IdCliente" data-tooltip="Identificador del cliente que realizó la orden">-</span>
                                                     </dd>
 
-                                                    <dt class="col-sm-5">Nombre Cliente:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-user-tag me-1"></i>Nombre Cliente:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalNombreCliente" class="info-tooltip-orden" data-field="NombreCliente" data-tooltip="Nombre completo del cliente">-</span>
+                                                        <span id="modalNombreCliente" class="info-tooltip-orden fw-bold" data-field="NombreCliente" data-tooltip="Nombre completo del cliente">-</span>
                                                     </dd>
 
-                                                    <dt class="col-sm-5">ID Tienda:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-store me-1"></i>ID Tienda:</dt>
                                                     <dd class="col-sm-7">
                                                         <span id="modalIdTienda" class="info-tooltip-orden" data-field="IdTienda" data-tooltip="Identificador de la tienda donde se procesó la orden">-</span>
                                                     </dd>
 
-                                                    <dt class="col-sm-5">Nombre Tienda:</dt>
+                                                    <dt class="col-sm-5"><i class="fas fa-store-alt me-1"></i>Nombre Tienda:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalNombreTienda" class="info-tooltip-orden" data-field="NombreTienda" data-tooltip="Nombre de la tienda">-</span>
+                                                        <span id="modalNombreTienda" class="info-tooltip-orden fw-bold" data-field="NombreTienda" data-tooltip="Nombre de la tienda">-</span>
                                                     </dd>
                                                 </dl>
                                             </div>
@@ -87,25 +87,25 @@
                                                 <table class="table table-borderless">
                                                     <tbody>
                                                         <tr>
-                                                            <td class="text-end"><strong>Subtotal:</strong></td>
+                                                            <td class="text-end"><strong><i class="fas fa-calculator me-1"></i>Subtotal:</strong></td>
                                                             <td class="text-end">
-                                                                <span id="modalSubtotal" class="info-tooltip-orden" data-field="Subtotal" data-tooltip="Suma de todos los items antes de descuentos e impuestos">$0.00</span>
+                                                                <span id="modalSubtotal" class="info-tooltip-orden fw-bold" data-field="Subtotal" data-tooltip="Suma de todos los items antes de descuentos e impuestos">$0.00</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="text-end"><strong>Descuentos:</strong></td>
+                                                            <td class="text-end"><strong><i class="fas fa-tag me-1 text-danger"></i>Descuentos:</strong></td>
                                                             <td class="text-end text-danger">
-                                                                <span id="modalDescuentos" class="info-tooltip-orden" data-field="Descuentos" data-tooltip="Total de descuentos aplicados a la orden">-$0.00</span>
+                                                                <span id="modalDescuentos" class="info-tooltip-orden fw-bold" data-field="Descuentos" data-tooltip="Total de descuentos aplicados a la orden">-$0.00</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="text-end"><strong>Impuestos:</strong></td>
+                                                            <td class="text-end"><strong><i class="fas fa-receipt me-1"></i>Impuestos:</strong></td>
                                                             <td class="text-end">
-                                                                <span id="modalImpuestos" class="info-tooltip-orden" data-field="Impuestos" data-tooltip="Total de impuestos calculados sobre el subtotal">$0.00</span>
+                                                                <span id="modalImpuestos" class="info-tooltip-orden fw-bold" data-field="Impuestos" data-tooltip="Total de impuestos calculados sobre el subtotal">$0.00</span>
                                                             </td>
                                                         </tr>
                                                         <tr class="border-top">
-                                                            <td class="text-end"><h4>Total:</h4></td>
+                                                            <td class="text-end"><h4><i class="fas fa-dollar-sign me-2"></i>Total:</h4></td>
                                                             <td class="text-end">
                                                                 <h4 class="text-primary">
                                                                     <span id="modalTotal" class="info-tooltip-orden" data-field="Total" data-tooltip="Monto total de la orden (Subtotal - Descuentos + Impuestos)">$0.00</span>
@@ -114,6 +114,9 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                <div class="mt-3">
+                                                    <div id="chartTotalesOrden" style="height: 180px;"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
