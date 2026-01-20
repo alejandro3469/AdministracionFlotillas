@@ -94,17 +94,18 @@ window.customersGridToolbarClick = function(args) {
 };
 
 // Funciones de eventos para filtros
-window.filtroNombreChange = function(args) {
+// Funciones de eventos para filtros con debouncing (300ms) para mejorar rendimiento
+window.filtroNombreChange = window.debounce(function(args) {
     if (window.Customers && window.Customers.Filtros) {
         window.Customers.Filtros.Aplicar();
     }
-};
+}, 300);
 
-window.filtroEstadoChange = function(args) {
+window.filtroEstadoChange = window.debounce(function(args) {
     if (window.Customers && window.Customers.Filtros) {
         window.Customers.Filtros.Aplicar();
     }
-};
+}, 300);
 
 // Namespace principal
 window.Customers = window.Customers || {};

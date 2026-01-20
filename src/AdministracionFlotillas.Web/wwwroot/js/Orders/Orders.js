@@ -306,28 +306,29 @@ window.ordersGridToolbarClick = function(args) {
 };
 
 // Funciones de eventos para filtros (scope global ANTES del IIFE)
-window.filtroClienteIdChange = function(args) {
+// Funciones de eventos para filtros con debouncing (300ms) para mejorar rendimiento
+window.filtroClienteIdChange = window.debounce(function(args) {
     console.log('Filtro Cliente ID cambió');
     if (window.Orders && window.Orders.Filtros) {
         window.Orders.Filtros.Aplicar();
     } else {
         console.warn('Orders.Filtros no está disponible');
     }
-};
+}, 300);
 
-window.filtroTiendaIdChange = function(args) {
+window.filtroTiendaIdChange = window.debounce(function(args) {
     console.log('Filtro Tienda ID cambió');
     if (window.Orders && window.Orders.Filtros) {
         window.Orders.Filtros.Aplicar();
     } else {
         console.warn('Orders.Filtros no está disponible');
     }
-};
+}, 300);
 
-window.filtroEstadoChange = function(args) {
+window.filtroEstadoChange = window.debounce(function(args) {
     console.log('Filtro Estado cambió:', args ? args.value : 'null');
     if (window.Orders && window.Orders.Filtros) {
-        // Actualizar estado visual de los botones
+        // Actualizar estado visual de los botones (sin debounce, debe ser inmediato)
         var estado = args ? (args.value || null) : null;
         window.Orders.Filtros.ActualizarEstadoBotones(estado);
         // Aplicar el filtro
@@ -335,25 +336,25 @@ window.filtroEstadoChange = function(args) {
     } else {
         console.warn('Orders.Filtros no está disponible');
     }
-};
+}, 300);
 
-window.filtroFechaInicioChange = function(args) {
+window.filtroFechaInicioChange = window.debounce(function(args) {
     console.log('Filtro Fecha Inicio cambió');
     if (window.Orders && window.Orders.Filtros) {
         window.Orders.Filtros.Aplicar();
     } else {
         console.warn('Orders.Filtros no está disponible');
     }
-};
+}, 300);
 
-window.filtroFechaFinChange = function(args) {
+window.filtroFechaFinChange = window.debounce(function(args) {
     console.log('Filtro Fecha Fin cambió');
     if (window.Orders && window.Orders.Filtros) {
         window.Orders.Filtros.Aplicar();
     } else {
         console.warn('Orders.Filtros no está disponible');
     }
-};
+}, 300);
 
 // Namespace principal
 window.Orders = window.Orders || {};

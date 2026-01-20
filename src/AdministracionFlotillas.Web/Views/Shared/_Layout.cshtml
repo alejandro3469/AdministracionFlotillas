@@ -7,10 +7,12 @@
     <script type="importmap"></script>
     
     <!-- Preload de recursos críticos para mejorar rendimiento -->
+    <!-- Solo preloadamos recursos que se usan inmediatamente en el render inicial -->
     <link rel="preload" href="~/lib/bootstrap/dist/css/bootstrap.min.css" as="style" />
     <link rel="preload" href="https://cdn.syncfusion.com/ej2/32.1.23/fluent.css" as="style" />
-    <link rel="preload" href="~/css/site.css" as="style" />
-    <link rel="preload" href="~/css/navigation.css" as="style" />
+    <!-- site.css y navigation.css se cargan después, usar prefetch en lugar de preload -->
+    <link rel="prefetch" href="~/css/site.css" as="style" />
+    <link rel="prefetch" href="~/css/navigation.css" as="style" />
     
     <!-- DNS Prefetch para CDNs externos -->
     <link rel="dns-prefetch" href="https://cdn.syncfusion.com" />
@@ -169,43 +171,44 @@
     <!-- 1. jQuery (debe cargarse primero según documentación oficial) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     
-    <!-- 2. Bootstrap JS (depende de jQuery) -->
+    <!-- 2. Bootstrap JS (depende de jQuery - sin defer para mantener orden de ejecución) -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- 3. jQuery UI (debe cargarse después de jQuery según documentación oficial) -->
+    <!-- 3. jQuery UI (debe cargarse después de jQuery según documentación oficial - sin defer) -->
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     
-    <!-- 4. jsZip (requerido por DataTables Buttons para Excel) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- 4. jsZip (requerido por DataTables Buttons para Excel - puede usar defer) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
     
-    <!-- 5. pdfmake (requerido por DataTables Buttons para PDF) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <!-- 5. pdfmake (requerido por DataTables Buttons para PDF - puede usar defer) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js" defer></script>
     
-    <!-- 6. DataTables Core (debe cargarse después de jQuery según documentación oficial) -->
+    <!-- 6. DataTables Core (depende de jQuery - sin defer para mantener orden de ejecución) -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     
-    <!-- 7. DataTables Extensions (deben cargarse después de DataTables Core) -->
+    <!-- 7. DataTables Extensions (dependen de DataTables Core - sin defer) -->
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     
-    <!-- 8. Inputmask (depende de jQuery) -->
+    <!-- 8. Inputmask (depende de jQuery - sin defer) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
     
     <!-- 9. SweetAlert2 (no depende de jQuery, pero se carga después para evitar conflictos) -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     
     <!-- 10. Utilidades compartidas (antes de módulos específicos) -->
+    <script src="~/js/utils/debounce.js" asp-append-version="true"></script>
     <script src="~/js/utils/modal-buttons.js" asp-append-version="true"></script>
     
     <!-- 11. Syncfusion ASP.NET Core controls scripts -->
-    <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js"></script>
+    <script src="https://cdn.syncfusion.com/ej2/32.1.23/dist/ej2.min.js" defer></script>
     
     <!-- 12. Custom scripts (antes de Script Manager para que funciones de eventos estén disponibles) -->
-    <script src="~/js/navigation.js" asp-append-version="true"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/navigation.js" asp-append-version="true" defer></script>
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
     
     <!-- 13. Page-specific scripts (se renderizan aquí ANTES de Script Manager) -->
     @await RenderSectionAsync("Scripts", required: false)

@@ -93,30 +93,31 @@ window.productsGridToolbarClick = function(args) {
     }
 };
 
-// Funciones de eventos para filtros
-window.filtroCategoriaChange = function(args) {
+// Funciones de eventos para filtros con debouncing (300ms) para mejorar rendimiento
+// El debouncing evita múltiples peticiones HTTP mientras el usuario está escribiendo
+window.filtroCategoriaChange = window.debounce(function(args) {
     if (window.Products && window.Products.Filtros) {
         window.Products.Filtros.Aplicar();
     }
-};
+}, 300);
 
-window.filtroEstadoChange = function(args) {
+window.filtroEstadoChange = window.debounce(function(args) {
     if (window.Products && window.Products.Filtros) {
         window.Products.Filtros.Aplicar();
     }
-};
+}, 300);
 
-window.filtroPrecioMinChange = function(args) {
+window.filtroPrecioMinChange = window.debounce(function(args) {
     if (window.Products && window.Products.Filtros) {
         window.Products.Filtros.Aplicar();
     }
-};
+}, 300);
 
-window.filtroPrecioMaxChange = function(args) {
+window.filtroPrecioMaxChange = window.debounce(function(args) {
     if (window.Products && window.Products.Filtros) {
         window.Products.Filtros.Aplicar();
     }
-};
+}, 300);
 
 // Namespace principal
 window.Products = window.Products || {};

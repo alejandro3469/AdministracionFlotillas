@@ -192,25 +192,26 @@ window.Dashboard = window.Dashboard || {};
     };
     
     // Eventos globales para filtros
-    window.filtroClienteIdChange = function(args) {
+    // Funciones de eventos para filtros con debouncing (300ms) para mejorar rendimiento
+    window.filtroClienteIdChange = window.debounce(function(args) {
         window.Dashboard.Filtros.Aplicar();
-    };
+    }, 300);
     
-    window.filtroTiendaIdChange = function(args) {
+    window.filtroTiendaIdChange = window.debounce(function(args) {
         window.Dashboard.Filtros.Aplicar();
-    };
+    }, 300);
     
-    window.filtroEstadoChange = function(args) {
+    window.filtroEstadoChange = window.debounce(function(args) {
         window.Dashboard.Filtros.Aplicar();
-    };
+    }, 300);
     
-    window.filtroFechaInicioChange = function(args) {
+    window.filtroFechaInicioChange = window.debounce(function(args) {
         window.Dashboard.Filtros.Aplicar();
-    };
+    }, 300);
     
-    window.filtroFechaFinChange = function(args) {
+    window.filtroFechaFinChange = window.debounce(function(args) {
         window.Dashboard.Filtros.Aplicar();
-    };
+    }, 300);
     
     // Eventos del grid
     window.dashboardOrdersGridCreated = function(args) {
