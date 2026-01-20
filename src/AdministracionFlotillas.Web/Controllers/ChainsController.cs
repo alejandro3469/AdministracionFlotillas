@@ -112,6 +112,57 @@ public class ChainsController : Controller
             return Json(new { exito = false, mensaje = excepcion.Message });
         }
     }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> ActualizarChain([FromBody] SolicitudActualizarChain solicitud)
+    {
+        try
+        {
+            if (solicitud == null || solicitud.IdCadena <= 0)
+            {
+                return Json(new { exito = false, mensaje = "Datos de actualización inválidos" });
+            }
+            
+            // Validaciones de negocio
+            if (solicitud.LimiteCredito.HasValue && solicitud.LimiteCredito.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "El límite de crédito no puede ser negativo" });
+            }
+            
+            if (solicitud.DiasCredito.HasValue && solicitud.DiasCredito.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "Los días de crédito no pueden ser negativos" });
+            }
+            
+            if (solicitud.NumeroSucursales.HasValue && solicitud.NumeroSucursales.Value < 0)
+            {
+                return Json(new { exito = false, mensaje = "El número de sucursales no puede ser negativo" });
+            }
+            
+            if (!string.IsNullOrEmpty(solicitud.Estado) && 
+                solicitud.Estado != "ACTIVE" && solicitud.Estado != "INACTIVE" && solicitud.Estado != "SUSPENDED")
+            {
+                return Json(new { exito = false, mensaje = "Estado inválido. Debe ser ACTIVE, INACTIVE o SUSPENDED" });
+            }
+            
+            // Validar formato de email si se proporciona
+            if (!string.IsNullOrEmpty(solicitud.ContactEmail) && !solicitud.ContactEmail.Contains("@"))
+            {
+                return Json(new { exito = false, mensaje = "El formato de email no es válido" });
+            }
+            
+            // TODO: Implementar actualización real en servicio
+            // var chainActualizada = await _servicio.ActualizarChainAsync(solicitud);
+            
+            // Por ahora retornamos éxito (mock)
+            return Json(new { exito = true, mensaje = "Cadena actualizada correctamente" });
+        }
+        catch (Exception excepcion)
+        {
+            return Json(new { exito = false, mensaje = excepcion.Message });
+        }
+    }
 }
 
 // Clase auxiliar para solicitudes
@@ -119,4 +170,23 @@ public class SolicitudBuscarChains
 {
     public string? Nombre { get; set; }
     public string? Estado { get; set; }
+}
+
+public class SolicitudActualizarChain
+{
+    public int IdCadena { get; set; }
+    public string? NombreCadena { get; set; }
+    public string? RazonSocial { get; set; }
+    public string? RFC { get; set; }
+    public int? NumeroSucursales { get; set; }
+    public decimal? LimiteCredito { get; set; }
+    public int? DiasCredito { get; set; }
+    public string? Estado { get; set; }
+    public string? ContactEmail { get; set; }
+    public string? ContactPhone { get; set; }
+    public string? Direccion { get; set; }
+    public string? Ciudad { get; set; }
+    public string? EstadoDireccion { get; set; }
+    public string? CodigoPostal { get; set; }
+    public string? Pais { get; set; }
 }

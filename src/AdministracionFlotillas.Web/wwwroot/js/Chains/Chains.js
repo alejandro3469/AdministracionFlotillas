@@ -19,31 +19,37 @@ window.Chains = window.Chains || {};
     // Utilidades
     window.Chains.Utilidades = {
         MostrarError: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo || 'Error',
-                    text: mensaje || 'Ha ocurrido un error.',
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: titulo || 'Error',
+                        text: mensaje || 'Ha ocurrido un error.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         },
         
         MostrarExito: function(titulo, mensaje) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: titulo || 'Éxito',
-                    text: mensaje || 'Operación completada.',
-                    confirmButtonText: 'Aceptar',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                alert(titulo + ': ' + mensaje);
-            }
+            return new Promise((resolve) => {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: titulo || 'Éxito',
+                        text: mensaje || 'Operación completada.',
+                        confirmButtonText: 'Aceptar',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => resolve());
+                } else {
+                    alert(titulo + ': ' + mensaje);
+                    resolve();
+                }
+            });
         }
     };
     
@@ -428,7 +434,410 @@ window.Chains = window.Chains || {};
         },
         
         CambiarAModoEdicion: function(idCadena) {
-            window.Chains.Utilidades.MostrarExito('Modo Edición', 'El modo edición se implementará próximamente.');
+            if (!idCadena || idCadena <= 0) {
+                window.Chains.Utilidades.MostrarError('Error', 'ID de cadena no válido.');
+                return;
+            }
+            
+            modalCadenaId = idCadena;
+            modalCadenaModo = 'editar';
+            
+            // Cambiar modo del modal
+            this.ActivarModoEdicion();
+        },
+        
+        ActivarModoEdicion: function() {
+            // Cambiar campos de solo lectura a editables
+            this.ConvertirCamposAEditables();
+            
+            // Cambiar botones del modal
+            this.ActualizarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalCadenaTitulo');
+            if (titulo) {
+                titulo.textContent = modalCadenaId + ' (Editando)';
+            }
+        },
+        
+        DesactivarModoEdicion: function() {
+            // Restaurar campos a solo lectura
+            this.ConvertirCamposASoloLectura();
+            
+            // Restaurar botones del modal
+            this.RestaurarBotonesModal();
+            
+            // Actualizar header del modal
+            var titulo = document.getElementById('modalCadenaTitulo');
+            if (titulo) {
+                titulo.textContent = modalCadenaId;
+            }
+            
+            modalCadenaModo = 'ver';
+        },
+        
+        ConvertirCamposAEditables: function() {
+            // Estado - convertir a dropdown
+            var estadoContainer = document.getElementById('modalEstadoCadena');
+            if (estadoContainer) {
+                var estadoActual = estadoContainer.textContent.trim();
+                estadoContainer.innerHTML = '<select id="editEstadoCadena" class="form-select form-select-sm">' +
+                    '<option value="ACTIVE"' + (estadoActual === 'ACTIVE' ? ' selected' : '') + '>ACTIVE</option>' +
+                    '<option value="INACTIVE"' + (estadoActual === 'INACTIVE' ? ' selected' : '') + '>INACTIVE</option>' +
+                    '<option value="SUSPENDED"' + (estadoActual === 'SUSPENDED' ? ' selected' : '') + '>SUSPENDED</option>' +
+                    '</select>';
+            }
+            
+            // Nombre - convertir a input
+            var nombreContainer = document.getElementById('modalNombreCadena');
+            if (nombreContainer) {
+                var nombreActual = nombreContainer.textContent.trim();
+                nombreContainer.innerHTML = '<input type="text" id="editNombreCadena" class="form-control form-control-sm" value="' + nombreActual + '">';
+            }
+            
+            // Razón Social - convertir a input
+            var razonContainer = document.getElementById('modalRazonSocial');
+            if (razonContainer) {
+                var razonActual = razonContainer.textContent.trim();
+                razonContainer.innerHTML = '<input type="text" id="editRazonSocial" class="form-control form-control-sm" value="' + razonActual + '">';
+            }
+            
+            // RFC - convertir a input
+            var rfcContainer = document.getElementById('modalRFC');
+            if (rfcContainer) {
+                var rfcActual = rfcContainer.textContent.trim();
+                rfcContainer.innerHTML = '<input type="text" id="editRFC" class="form-control form-control-sm" value="' + rfcActual + '">';
+            }
+            
+            // Número de Sucursales - convertir a input numérico
+            var sucursalesContainer = document.getElementById('modalNumeroSucursales');
+            if (sucursalesContainer) {
+                var sucursalesActual = sucursalesContainer.textContent.trim();
+                sucursalesContainer.innerHTML = '<input type="number" id="editNumeroSucursales" class="form-control form-control-sm" min="0" value="' + sucursalesActual + '">';
+            }
+            
+            // Límite de Crédito - convertir a input numérico
+            var limiteContainer = document.getElementById('modalLimiteCredito');
+            if (limiteContainer) {
+                var limiteActual = limiteContainer.textContent.replace('$', '').replace(',', '').trim();
+                limiteContainer.innerHTML = '<input type="number" id="editLimiteCredito" class="form-control form-control-sm" step="0.01" min="0" value="' + limiteActual + '">';
+            }
+            
+            // Días de Crédito - convertir a input numérico
+            var diasContainer = document.getElementById('modalDiasCredito');
+            if (diasContainer) {
+                var diasActual = diasContainer.textContent.trim();
+                diasContainer.innerHTML = '<input type="number" id="editDiasCredito" class="form-control form-control-sm" min="0" value="' + diasActual + '">';
+            }
+            
+            // Email - convertir a input
+            var emailContainer = document.getElementById('modalContactEmail');
+            if (emailContainer) {
+                var emailActual = emailContainer.textContent.trim();
+                emailContainer.innerHTML = '<input type="email" id="editContactEmail" class="form-control form-control-sm" value="' + emailActual + '">';
+            }
+            
+            // Teléfono - convertir a input
+            var telefonoContainer = document.getElementById('modalContactPhone');
+            if (telefonoContainer) {
+                var telefonoActual = telefonoContainer.textContent.trim();
+                telefonoContainer.innerHTML = '<input type="tel" id="editContactPhone" class="form-control form-control-sm" value="' + telefonoActual + '">';
+            }
+            
+            // Dirección - convertir a input
+            var direccionContainer = document.getElementById('modalDireccion');
+            if (direccionContainer) {
+                var direccionActual = direccionContainer.textContent.trim();
+                direccionContainer.innerHTML = '<input type="text" id="editDireccion" class="form-control form-control-sm" value="' + direccionActual + '">';
+            }
+            
+            // Ciudad - convertir a input
+            var ciudadContainer = document.getElementById('modalCiudad');
+            if (ciudadContainer) {
+                var ciudadActual = ciudadContainer.textContent.trim();
+                ciudadContainer.innerHTML = '<input type="text" id="editCiudad" class="form-control form-control-sm" value="' + ciudadActual + '">';
+            }
+            
+            // Estado (dirección) - convertir a input
+            var estadoDirContainer = document.getElementById('modalEstadoDireccion');
+            if (estadoDirContainer) {
+                var estadoDirActual = estadoDirContainer.textContent.trim();
+                estadoDirContainer.innerHTML = '<input type="text" id="editEstadoDireccion" class="form-control form-control-sm" value="' + estadoDirActual + '">';
+            }
+            
+            // Código Postal - convertir a input
+            var codigoPostalContainer = document.getElementById('modalCodigoPostal');
+            if (codigoPostalContainer) {
+                var codigoPostalActual = codigoPostalContainer.textContent.trim();
+                codigoPostalContainer.innerHTML = '<input type="text" id="editCodigoPostal" class="form-control form-control-sm" value="' + codigoPostalActual + '">';
+            }
+            
+            // País - convertir a input
+            var paisContainer = document.getElementById('modalPais');
+            if (paisContainer) {
+                var paisActual = paisContainer.textContent.trim();
+                paisContainer.innerHTML = '<input type="text" id="editPais" class="form-control form-control-sm" value="' + paisActual + '">';
+            }
+        },
+        
+        ConvertirCamposASoloLectura: function() {
+            // Estado - restaurar badge
+            var estadoContainer = document.getElementById('modalEstadoCadena');
+            if (estadoContainer) {
+                var selectEstado = document.getElementById('editEstadoCadena');
+                if (selectEstado) {
+                    var estadoSeleccionado = selectEstado.value;
+                    var estadoHtml = '';
+                    if (estadoSeleccionado === 'ACTIVE') {
+                        estadoHtml = '<span class="badge bg-success info-tooltip-cadena" data-field="Estado" data-tooltip="Cadena activa y operativa">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'INACTIVE') {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-cadena" data-field="Estado" data-tooltip="Cadena inactiva">' + estadoSeleccionado + '</span>';
+                    } else if (estadoSeleccionado === 'SUSPENDED') {
+                        estadoHtml = '<span class="badge bg-warning text-dark info-tooltip-cadena" data-field="Estado" data-tooltip="Cadena suspendida temporalmente">' + estadoSeleccionado + '</span>';
+                    } else {
+                        estadoHtml = '<span class="badge bg-secondary info-tooltip-cadena" data-field="Estado" data-tooltip="Estado desconocido">' + estadoSeleccionado + '</span>';
+                    }
+                    estadoContainer.innerHTML = estadoHtml;
+                }
+            }
+            
+            // Restaurar todos los demás campos
+            var campos = [
+                { id: 'modalNombreCadena', inputId: 'editNombreCadena' },
+                { id: 'modalRazonSocial', inputId: 'editRazonSocial' },
+                { id: 'modalRFC', inputId: 'editRFC' },
+                { id: 'modalContactEmail', inputId: 'editContactEmail' },
+                { id: 'modalContactPhone', inputId: 'editContactPhone' },
+                { id: 'modalDireccion', inputId: 'editDireccion' },
+                { id: 'modalCiudad', inputId: 'editCiudad' },
+                { id: 'modalEstadoDireccion', inputId: 'editEstadoDireccion' },
+                { id: 'modalCodigoPostal', inputId: 'editCodigoPostal' },
+                { id: 'modalPais', inputId: 'editPais' }
+            ];
+            
+            campos.forEach(function(campo) {
+                var container = document.getElementById(campo.id);
+                if (container) {
+                    var input = document.getElementById(campo.inputId);
+                    if (input) {
+                        container.textContent = input.value || '-';
+                    }
+                }
+            });
+            
+            // Número de Sucursales
+            var sucursalesContainer = document.getElementById('modalNumeroSucursales');
+            if (sucursalesContainer) {
+                var inputSucursales = document.getElementById('editNumeroSucursales');
+                if (inputSucursales) {
+                    sucursalesContainer.textContent = inputSucursales.value || 0;
+                }
+            }
+            
+            // Límite de Crédito
+            var limiteContainer = document.getElementById('modalLimiteCredito');
+            if (limiteContainer) {
+                var inputLimite = document.getElementById('editLimiteCredito');
+                if (inputLimite) {
+                    var limiteValue = parseFloat(inputLimite.value) || 0;
+                    limiteContainer.textContent = '$' + limiteValue.toFixed(2);
+                }
+            }
+            
+            // Días de Crédito
+            var diasContainer = document.getElementById('modalDiasCredito');
+            if (diasContainer) {
+                var inputDias = document.getElementById('editDiasCredito');
+                if (inputDias) {
+                    diasContainer.textContent = inputDias.value || 0;
+                }
+            }
+        },
+        
+        ActualizarBotonesModal: function() {
+            // Ocultar botones de modo ver
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.add('d-none');
+            if (btnCerrar) btnCerrar.classList.add('d-none');
+            
+            // Mostrar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.remove('d-none');
+            if (btnCancelar) btnCancelar.classList.remove('d-none');
+        },
+        
+        RestaurarBotonesModal: function() {
+            // Ocultar botones de modo edición
+            var btnGuardar = document.getElementById('btnModalGuardar');
+            var btnCancelar = document.getElementById('btnModalCancelar');
+            
+            if (btnGuardar) btnGuardar.classList.add('d-none');
+            if (btnCancelar) btnCancelar.classList.add('d-none');
+            
+            // Mostrar botones de modo ver
+            var btnEditar = document.getElementById('btnModalEditar');
+            var btnCerrar = document.getElementById('btnModalCerrar');
+            
+            if (btnEditar) btnEditar.classList.remove('d-none');
+            if (btnCerrar) btnCerrar.classList.remove('d-none');
+        },
+        
+        GuardarCambios: function() {
+            if (!modalCadenaId || modalCadenaId <= 0) {
+                window.Chains.Utilidades.MostrarError('Error', 'No hay cadena seleccionada para guardar.');
+                return;
+            }
+            
+            // Obtener valores editados
+            var selectEstado = document.getElementById('editEstadoCadena');
+            var inputNombre = document.getElementById('editNombreCadena');
+            var inputRazon = document.getElementById('editRazonSocial');
+            var inputRFC = document.getElementById('editRFC');
+            var inputSucursales = document.getElementById('editNumeroSucursales');
+            var inputLimite = document.getElementById('editLimiteCredito');
+            var inputDias = document.getElementById('editDiasCredito');
+            var inputEmail = document.getElementById('editContactEmail');
+            var inputTelefono = document.getElementById('editContactPhone');
+            var inputDireccion = document.getElementById('editDireccion');
+            var inputCiudad = document.getElementById('editCiudad');
+            var inputEstadoDir = document.getElementById('editEstadoDireccion');
+            var inputCodigoPostal = document.getElementById('editCodigoPostal');
+            var inputPais = document.getElementById('editPais');
+            
+            var nuevoEstado = selectEstado ? selectEstado.value : null;
+            var nuevoNombre = inputNombre ? inputNombre.value.trim() : null;
+            var nuevaRazon = inputRazon ? inputRazon.value.trim() : null;
+            var nuevoRFC = inputRFC ? inputRFC.value.trim() : null;
+            var nuevoSucursales = inputSucursales ? parseInt(inputSucursales.value) : null;
+            var nuevoLimite = inputLimite ? parseFloat(inputLimite.value) : null;
+            var nuevoDias = inputDias ? parseInt(inputDias.value) : null;
+            var nuevoEmail = inputEmail ? inputEmail.value.trim() : null;
+            var nuevoTelefono = inputTelefono ? inputTelefono.value.trim() : null;
+            var nuevaDireccion = inputDireccion ? inputDireccion.value.trim() : null;
+            var nuevaCiudad = inputCiudad ? inputCiudad.value.trim() : null;
+            var nuevoEstadoDir = inputEstadoDir ? inputEstadoDir.value.trim() : null;
+            var nuevoCodigoPostal = inputCodigoPostal ? inputCodigoPostal.value.trim() : null;
+            var nuevoPais = inputPais ? inputPais.value.trim() : null;
+            
+            // Validaciones
+            if (nuevoEmail && !nuevoEmail.includes('@')) {
+                window.Chains.Utilidades.MostrarError('Error', 'El formato de email no es válido.');
+                return;
+            }
+            
+            if (nuevoLimite !== null && nuevoLimite < 0) {
+                window.Chains.Utilidades.MostrarError('Error', 'El límite de crédito no puede ser negativo.');
+                return;
+            }
+            
+            if (nuevoDias !== null && nuevoDias < 0) {
+                window.Chains.Utilidades.MostrarError('Error', 'Los días de crédito no pueden ser negativos.');
+                return;
+            }
+            
+            if (nuevoSucursales !== null && nuevoSucursales < 0) {
+                window.Chains.Utilidades.MostrarError('Error', 'El número de sucursales no puede ser negativo.');
+                return;
+            }
+            
+            // Deshabilitar botones antes de enviar
+            window.ModalButtons.Deshabilitar('modalCadena', '#chainsGrid .e-gridcontent .e-rowcell .btn');
+            
+            // Preparar datos para enviar
+            var datosActualizacion = {
+                IdCadena: modalCadenaId,
+                Estado: nuevoEstado,
+                NombreCadena: nuevoNombre,
+                RazonSocial: nuevaRazon,
+                RFC: nuevoRFC,
+                NumeroSucursales: nuevoSucursales,
+                LimiteCredito: nuevoLimite,
+                DiasCredito: nuevoDias,
+                ContactEmail: nuevoEmail,
+                ContactPhone: nuevoTelefono,
+                Direccion: nuevaDireccion,
+                Ciudad: nuevaCiudad,
+                EstadoDireccion: nuevoEstadoDir,
+                CodigoPostal: nuevoCodigoPostal,
+                Pais: nuevoPais
+            };
+            
+            // Enviar al servidor
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Chains/ActualizarChain', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var respuesta = JSON.parse(xhr.responseText);
+                            if (respuesta.exito) {
+                                // Mostrar mensaje de éxito y esperar confirmación
+                                window.Chains.Utilidades.MostrarExito(
+                                    'Cadena actualizada',
+                                    'Los cambios se guardaron correctamente.'
+                                ).then(function() {
+                                    // Desactivar modo edición
+                                    if (window.Chains && window.Chains.Modal) {
+                                        window.Chains.Modal.DesactivarModoEdicion();
+                                        
+                                        // Recargar datos de la cadena
+                                        window.Chains.Modal.CargarDatosCadena(modalCadenaId);
+                                        
+                                        // Recargar grid
+                                        if (window.Chains && window.Chains.Grid) {
+                                            window.Chains.Grid.Recargar();
+                                        }
+                                    }
+                                    
+                                    // Re-habilitar botones después de confirmar éxito
+                                    window.ModalButtons.Habilitar('modalCadena', '#chainsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            } else {
+                                window.Chains.Utilidades.MostrarError(
+                                    'Error al guardar',
+                                    respuesta.mensaje || 'No se pudieron guardar los cambios.'
+                                ).then(function() {
+                                    window.ModalButtons.Habilitar('modalCadena', '#chainsGrid .e-gridcontent .e-rowcell .btn');
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error al parsear respuesta:', e);
+                            window.Chains.Utilidades.MostrarError('Error', 'Error al procesar la respuesta del servidor.').then(function() {
+                                window.ModalButtons.Habilitar('modalCadena', '#chainsGrid .e-gridcontent .e-rowcell .btn');
+                            });
+                        }
+                    } else {
+                        var mensajeError = 'Error HTTP: ' + xhr.status + ' - ' + xhr.statusText;
+                        window.Chains.Utilidades.MostrarError('Error de Conexión', mensajeError).then(function() {
+                            window.ModalButtons.Habilitar('modalCadena', '#chainsGrid .e-gridcontent .e-rowcell .btn');
+                        });
+                        console.error('Error al guardar cadena:', mensajeError);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                window.Chains.Utilidades.MostrarError('Error de Conexión', 'No se pudo conectar con el servidor.').then(function() {
+                    window.ModalButtons.Habilitar('modalCadena', '#chainsGrid .e-gridcontent .e-rowcell .btn');
+                });
+            };
+            
+            xhr.send(JSON.stringify(datosActualizacion));
+        },
+        
+        CancelarEdicion: function() {
+            // Recargar datos originales
+            if (modalCadenaId) {
+                this.CargarDatosCadena(modalCadenaId);
+            }
+            
+            // Desactivar modo edición
+            this.DesactivarModoEdicion();
         }
     };
     
