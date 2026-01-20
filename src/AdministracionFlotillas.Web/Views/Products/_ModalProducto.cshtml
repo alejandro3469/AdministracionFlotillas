@@ -50,7 +50,12 @@
 
                                                     <dt class="col-sm-5">Categoría:</dt>
                                                     <dd class="col-sm-7">
-                                                        <span id="modalCategoria" class="info-tooltip-producto" data-field="Categoria" data-tooltip="Categoría a la que pertenece el producto">-</span>
+                                                        <ejs-chiplist id="chipCategoria" selection="Single" cssClass="e-outline"></ejs-chiplist>
+                                                    </dd>
+                                                    
+                                                    <dt class="col-sm-5">Calidad del Producto:</dt>
+                                                    <dd class="col-sm-7">
+                                                        <ejs-rating id="ratingCalidad" value="0" precision="Half" showLabel="true" labelTemplate="<span>Calidad: ${value}/5</span>"></ejs-rating>
                                                     </dd>
 
                                                     <dt class="col-sm-5">Estado:</dt>
@@ -93,20 +98,16 @@
                                                         <span id="modalMargenGanancia" class="info-tooltip-producto fw-bold text-primary" data-field="MargenGanancia" data-tooltip="Diferencia entre precio de venta y costo (Precio Unitario - Precio de Costo)">
                                                             <i class="fas fa-chart-line me-1"></i>$0.00
                                                         </span>
-                                                        <div id="chartMargenGanancia" style="height: 60px; margin-top: 5px;"></div>
+                                                        <div id="sparklineMargen" style="height: 60px; margin-top: 5px;"></div>
                                                     </dd>
 
                                                     <dt class="col-sm-5">Cantidad en Stock:</dt>
                                                     <dd class="col-sm-7">
-                                                        <div class="d-flex align-items-center">
-                                                            <span id="modalCantidadStock" class="info-tooltip-producto fw-bold me-2" data-field="CantidadStock" data-tooltip="Cantidad disponible en inventario. Stock bajo: menos de 20 unidades, Stock medio: 20-50 unidades, Stock alto: más de 50 unidades">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span id="modalCantidadStock" class="info-tooltip-producto fw-bold" data-field="CantidadStock" data-tooltip="Cantidad disponible en inventario. Stock bajo: menos de 20 unidades, Stock medio: 20-50 unidades, Stock alto: más de 50 unidades">
                                                                 <i class="fas fa-boxes me-1"></i>0
                                                             </span>
-                                                            <div id="progressStock" style="flex: 1; max-width: 150px;">
-                                                                <ejs-progressbar id="progressBarStock" type="Linear" height="20" value="0" maximum="100" 
-                                                                                progressColor="#28a745" trackColor="#e9ecef" showProgressValue="false">
-                                                                </ejs-progressbar>
-                                                            </div>
+                                                            <div id="gaugeStock" style="flex: 1; max-width: 200px; height: 60px;"></div>
                                                         </div>
                                                     </dd>
                                                 </dl>

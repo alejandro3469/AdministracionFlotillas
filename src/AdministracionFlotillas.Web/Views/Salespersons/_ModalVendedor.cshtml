@@ -125,8 +125,10 @@
         </div>
     </e-content-template>
     <e-dialog-buttons>
-        <e-dialog-dialogbutton content="Editar" isPrimary="false" cssClass="e-flat" click="modalVendedorEditar"></e-dialog-dialogbutton>
-        <e-dialog-dialogbutton content="Cerrar" isPrimary="true" click="modalVendedorCerrar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalEditar" content="Editar" isPrimary="false" cssClass="e-flat" click="modalVendedorEditar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalGuardar" content="Guardar" isPrimary="true" cssClass="e-flat d-none" click="modalVendedorGuardar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCancelar" content="Cancelar" isPrimary="false" cssClass="e-flat d-none" click="modalVendedorCancelar"></e-dialog-dialogbutton>
+        <e-dialog-dialogbutton id="btnModalCerrar" content="Cerrar" isPrimary="true" click="modalVendedorCerrar"></e-dialog-dialogbutton>
     </e-dialog-buttons>
 </ejs-dialog>
 
@@ -350,7 +352,25 @@
         }
     };
 
+    window.modalVendedorGuardar = function() {
+        if (window.Salespersons && window.Salespersons.Modal) {
+            window.Salespersons.Modal.GuardarCambios();
+        }
+    };
+
+    window.modalVendedorCancelar = function() {
+        if (window.Salespersons && window.Salespersons.Modal) {
+            window.Salespersons.Modal.CancelarEdicion();
+        }
+    };
+
     window.modalVendedorCerrar = function() {
+        if (modalVendedorModo === 'editar') {
+            if (window.Salespersons && window.Salespersons.Modal) {
+                window.Salespersons.Modal.CancelarEdicion();
+            }
+        }
+        
         if (typeof window.ocultarModalVendedor === 'function') {
             window.ocultarModalVendedor();
         } else {
