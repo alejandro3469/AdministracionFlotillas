@@ -37,7 +37,7 @@ public class EmployeesController : Controller
         try
         {
             var empleados = await _servicio.ObtenerEmployeesAsync();
-            var modelosVista = EmployeeParseador.ConvertirListaAVista(empleados);
+            var modelosVista = EmployeeParseador.ConvertirListaAVista(empleados, _servicio);
             
             return CrearRespuestaExito(modelosVista);
         }
@@ -64,7 +64,7 @@ public class EmployeesController : Controller
                 return CrearRespuestaError("Empleado no encontrado");
             }
             
-            var modeloVista = EmployeeParseador.ConvertirAVista(empleado);
+            var modeloVista = EmployeeParseador.ConvertirAVista(empleado, _servicio);
             return CrearRespuestaExito(modeloVista);
         }
         catch (Exception excepcion)
@@ -88,5 +88,15 @@ public class EmployeesController : Controller
     {
         return Json(new { exito = false, mensaje = mensaje });
     }
+
+    public async Task<IActionResult> Resumen()
+    {
+        var resumenNegocio = await _servicio.ObtenerResumenAsync();
+
+        var resumenVista = EmployeeResumenParseador.ConvertirAVista(resumenNegocio);
+
+        return View(resumenVista);
+    }
+
 }
 

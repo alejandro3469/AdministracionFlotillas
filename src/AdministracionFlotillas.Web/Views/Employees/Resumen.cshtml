@@ -1,0 +1,72 @@
+﻿@model AdministracionFlotillas.Web.ViewModels.EmployeeResumenViewModel
+
+@{
+    ViewBag.Title = "Resumen de Empleados";
+}
+
+<h2 class="mb-4">Resumen de Empleados</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Total Empleados</h5>
+                <h3>@Model.TotalEmpleados</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Promedio Salario</h5>
+                <h3>@Model.PromedioSalario</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Mayor salario</h5>
+                <h4>@Model.EmpleadoMayorSalario</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Mayor antigüedad</h5>
+                <h3>@Model.AntiguedadMayor</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<h4>Empleados por Departamento</h4>
+
+<table class="table table-bordered mt-3">
+    <thead class="table-light">
+        <tr>
+            <th>Departamento</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.EmpleadosPorDepartamento)
+        {
+            <tr>
+                <td>
+                    @(item.IdDepartamento.HasValue
+                        ? $"Departamento {item.IdDepartamento}"
+                        : "Sin departamento")
+                </td>
+                <td>@item.Total</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

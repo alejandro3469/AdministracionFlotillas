@@ -13,6 +13,8 @@
                 <input type="text" class="form-control" id="filtroFechaFin" placeholder="Hasta" readonly>
             </div>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <label class="form-label">Rango de Salario</label>
             <div class="input-group">
@@ -20,6 +22,15 @@
                 <input type="text" class="form-control" id="filtroSalarioMin" placeholder="Mínimo" style="text-align: right;">
                 <span class="input-group-text">-</span>
                 <input type="text" class="form-control" id="filtroSalarioMax" placeholder="Máximo" style="text-align: right;">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Rango de Salario Anual</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="text" class="form-control" id="filtroSalarioAnualMin" placeholder="Mínimo" style="text-align: right;">
+                <span class="input-group-text">-</span>
+                <input type="text" class="form-control" id="filtroSalarioAnualMax" placeholder="Máximo" style="text-align: right;">
             </div>
         </div>
     </div>
@@ -31,6 +42,10 @@
         <div class="col-md-4">
             <label for="filtroEmail" class="form-label">Email</label>
             <input type="text" class="form-control" id="filtroEmail" placeholder="Buscar por email...">
+        </div>
+        <div class="col-md-4">
+            <label for="filtroEmailPersonal" class="form-label">Email Personal</label>
+            <input type="text" class="form-control" id="filtroEmailPersonal" placeholder="Buscar por email personal...">
         </div>
         <div class="col-md-4">
             <label for="filtroTelefono" class="form-label">Teléfono</label>
@@ -47,9 +62,11 @@
                 <th></th>
                 <th>Nombre Completo</th>
                 <th>Email</th>
+                <th>Email Personal</th>
                 <th>Teléfono</th>
                 <th>Fecha Contratación</th>
                 <th>Salario</th>
+                <th>Salario Anual</th>
                 <th>Departamento</th>
                 <th>Acciones</th>
             </tr>
